@@ -1,0 +1,1555 @@
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found
+playMusic @ enhanced-audio.js:429
+updateMusicState @ enhanced-audio.js:511
+updateDynamicMusic @ game-integration.js:260
+updateGameState @ game-integration.js:220
+update @ game-integration.js:182
+update @ game-integration.js:161
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162
+requestAnimationFrame
+update @ game-integration.js:162Understand this warning
+mapRenderer.js:106 🗺️ Rendering map: mas Ground tiles: 3 Buildings: 26
+mapRenderer.js:179 🎨 Rendering 3 custom ground tiles
+mapRenderer.js:217 🏗️ Rendering 26 buildings/objects
+enhanced-audio.js:429 Music track 'combat_high' not found

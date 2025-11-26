@@ -1,0 +1,24 @@
+{
+  "name": "thefortz-game",
+  "version": "3.0.0",
+  "description": "Tank Battle Arena - Multiplayer Game",
+  "main": "src/server/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server/server.js",
+    "dev": "node src/server/server.js"
+  },
+  "keywords": [
+    "game",
+    "multiplayer",
+    "tank",
+    "websocket"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "ws": "^8.18.3"
+  }
+}

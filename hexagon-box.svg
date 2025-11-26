@@ -1,0 +1,58 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Glow filter for the octagon -->
+    <filter id="octagonGlow">
+      <feGaussianBlur stdDeviation="3" result="blur1"/>
+      <feGaussianBlur stdDeviation="6" result="blur2"/>
+      <feGaussianBlur stdDeviation="10" result="blur3"/>
+      <feMerge>
+        <feMergeNode in="blur3"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Gradient for the octagon edge -->
+    <linearGradient id="octagonEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(0,247,255,0.9);stop-opacity:1" />
+      <stop offset="50%" style="stop-color:rgba(0,247,255,1);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgba(0,220,255,0.9);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Single Regular Octagon - More circular with wider proportions -->
+  <!-- Calculated to appear more circular by making width equal to height -->
+  <polygon 
+    points="300,80 437.28,137.28 494.56,274.56 494.56,325.44 437.28,462.72 300,520 162.72,462.72 105.44,325.44 105.44,274.56 162.72,137.28" 
+    fill="none" 
+    stroke="url(#octagonEdge)" 
+    stroke-width="5"
+    stroke-linejoin="miter"
+    stroke-miterlimit="2"
+    filter="url(#octagonGlow)"
+  />
+
+  <!-- Inner accent stroke for depth -->
+  <polygon 
+    points="300,100 427.28,152.28 479.56,279.56 479.56,320.44 427.28,447.72 300,500 172.72,447.72 120.44,320.44 120.44,279.56 172.72,152.28" 
+    fill="none" 
+    stroke="rgba(255,255,255,0.6)" 
+    stroke-width="2"
+    stroke-linejoin="miter"
+    stroke-miterlimit="2"
+    filter="url(#octagonGlow)"
+  />
+
+  <!-- Corner highlights at each vertex -->
+  <circle cx="300" cy="80" r="5" fill="rgba(255,255,255,0.9)" filter="url(#octagonGlow)"/>
+  <circle cx="437.28" cy="137.28" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+  <circle cx="494.56" cy="274.56" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+  <circle cx="494.56" cy="325.44" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+  <circle cx="437.28" cy="462.72" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+  <circle cx="300" cy="520" r="5" fill="rgba(255,255,255,0.9)" filter="url(#octagonGlow)"/>
+  <circle cx="162.72" cy="462.72" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+  <circle cx="105.44" cy="325.44" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+  <circle cx="105.44" cy="274.56" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+  <circle cx="162.72" cy="137.28" r="4" fill="rgba(255,255,255,0.85)" filter="url(#octagonGlow)"/>
+</svg>
