@@ -1,0 +1,35 @@
+{
+  "name": "js-html-audit-tool",
+  "version": "1.0.0",
+  "description": "Static analysis tool for auditing JavaScript-HTML connections",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "audit-js-html": "./src/index.js"
+  },
+  "scripts": {
+    "audit": "node src/index.js",
+    "audit:fix": "node src/index.js --fix",
+    "test": "vitest --run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "audit",
+    "static-analysis",
+    "javascript",
+    "html",
+    "dom"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/generator": "^7.28.5",
+    "@babel/parser": "^7.28.5",
+    "cheerio": "^1.1.2",
+    "fs-extra": "^11.3.2",
+    "glob": "^13.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.15"
+  }
+}

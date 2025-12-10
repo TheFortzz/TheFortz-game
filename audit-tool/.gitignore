@@ -1,0 +1,20 @@
+# Output files
+output/
+dist/
+
+# Backups
+backups/
+
+# Node modules (if installed locally)
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

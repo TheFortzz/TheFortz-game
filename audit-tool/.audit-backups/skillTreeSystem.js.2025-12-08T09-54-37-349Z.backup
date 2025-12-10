@@ -1,0 +1,441 @@
+/**
+ * Skill Tree System for TheFortz
+ * RPG-style skill progression with multiple branches
+ */
+
+const SkillTreeSystem = {
+    // Skill tree branches
+    branches: {
+        OFFENSE: {
+            name: 'Offense',
+            icon: '⚔️',
+            color: '#FF4444',
+            skills: {
+                DAMAGE_1: {
+                    id: 'damage_1',
+                    name: 'Increased Damage I',
+                    description: '+5% weapon damage',
+                    maxLevel: 5,
+                    cost: [1, 2, 3, 4, 5],
+                    effect: { damageBonus: 0.05 },
+                    requires: null
+                },
+                DAMAGE_2: {
+                    id: 'damage_2',
+                    name: 'Increased Damage II',
+                    description: '+10% weapon damage',
+                    maxLevel: 5,
+                    cost: [2, 3, 4, 5, 6],
+                    effect: { damageBonus: 0.10 },
+                    requires: 'damage_1'
+                },
+                CRIT_CHANCE: {
+                    id: 'crit_chance',
+                    name: 'Critical Strike',
+                    description: '+5% critical hit chance',
+                    maxLevel: 3,
+                    cost: [3, 5, 7],
+                    effect: { critChance: 0.05 },
+                    requires: 'damage_1'
+                },
+                CRIT_DAMAGE: {
+                    id: 'crit_damage',
+                    name: 'Critical Power',
+                    description: '+25% critical damage',
+                    maxLevel: 3,
+                    cost: [4, 6, 8],
+                    effect: { critDamage: 0.25 },
+                    requires: 'crit_chance'
+                },
+                FIRE_RATE: {
+                    id: 'fire_rate',
+                    name: 'Rapid Fire',
+                    description: '+10% fire rate',
+                    maxLevel: 5,
+                    cost: [2, 3, 4, 5, 6],
+                    effect: { fireRateBonus: 0.10 },
+                    requires: 'damage_1'
+                },
+                PENETRATION: {
+                    id: 'penetration',
+                    name: 'Armor Penetration',
+                    description: 'Bullets ignore 10% armor',
+                    maxLevel: 3,
+                    cost: [5, 7, 9],
+                    effect: { armorPen: 0.10 },
+                    requires: 'damage_2'
+                }
+            }
+        },
+
+        DEFENSE: {
+            name: 'Defense',
+            icon: '🛡️',
+            color: '#4444FF',
+            skills: {
+                HEALTH_1: {
+                    id: 'health_1',
+                    name: 'Increased Health I',
+                    description: '+10 max health',
+                    maxLevel: 5,
+                    cost: [1, 2, 3, 4, 5],
+                    effect: { healthBonus: 10 },
+                    requires: null
+                },
+                HEALTH_2: {
+                    id: 'health_2',
+                    name: 'Increased Health II',
+                    description: '+20 max health',
+                    maxLevel: 5,
+                    cost: [2, 3, 4, 5, 6],
+                    effect: { healthBonus: 20 },
+                    requires: 'health_1'
+                },
+                ARMOR: {
+                    id: 'armor',
+                    name: 'Armor Plating',
+                    description: '+5% damage reduction',
+                    maxLevel: 5,
+                    cost: [2, 3, 4, 5, 6],
+                    effect: { damageReduction: 0.05 },
+                    requires: 'health_1'
+                },
+                SHIELD_REGEN: {
+                    id: 'shield_regen',
+                    name: 'Shield Regeneration',
+                    description: '+1 shield/sec',
+                    maxLevel: 3,
+                    cost: [3, 5, 7],
+                    effect: { shieldRegen: 1 },
+                    requires: 'armor'
+                },
+                HEALTH_REGEN: {
+                    id: 'health_regen',
+                    name: 'Health Regeneration',
+                    description: '+0.5 health/sec',
+                    maxLevel: 3,
+                    cost: [4, 6, 8],
+                    effect: { healthRegen: 0.5 },
+                    requires: 'health_2'
+                },
+                FORTIFY: {
+                    id: 'fortify',
+                    name: 'Fortify',
+                    description: '10% chance to block damage',
+                    maxLevel: 3,
+                    cost: [5, 7, 9],
+                    effect: { blockChance: 0.10 },
+                    requires: 'armor'
+                }
+            }
+        },
+
+        MOBILITY: {
+            name: 'Mobility',
+            icon: '⚡',
+            color: '#FFFF44',
+            skills: {
+                SPEED_1: {
+                    id: 'speed_1',
+                    name: 'Increased Speed I',
+                    description: '+5% movement speed',
+                    maxLevel: 5,
+                    cost: [1, 2, 3, 4, 5],
+                    effect: { speedBonus: 0.05 },
+                    requires: null
+                },
+                SPEED_2: {
+                    id: 'speed_2',
+                    name: 'Increased Speed II',
+                    description: '+10% movement speed',
+                    maxLevel: 5,
+                    cost: [2, 3, 4, 5, 6],
+                    effect: { speedBonus: 0.10 },
+                    requires: 'speed_1'
+                },
+                DASH_COOLDOWN: {
+                    id: 'dash_cooldown',
+                    name: 'Quick Dash',
+                    description: '-20% dash cooldown',
+                    maxLevel: 3,
+                    cost: [3, 5, 7],
+                    effect: { dashCooldown: -0.20 },
+                    requires: 'speed_1'
+                },
+                EVASION: {
+                    id: 'evasion',
+                    name: 'Evasion',
+                    description: '+5% dodge chance',
+                    maxLevel: 3,
+                    cost: [4, 6, 8],
+                    effect: { dodgeChance: 0.05 },
+                    requires: 'speed_2'
+                },
+                ACCELERATION: {
+                    id: 'acceleration',
+                    name: 'Acceleration',
+                    description: '+20% acceleration',
+                    maxLevel: 3,
+                    cost: [3, 5, 7],
+                    effect: { accelerationBonus: 0.20 },
+                    requires: 'speed_1'
+                }
+            }
+        },
+
+        UTILITY: {
+            name: 'Utility',
+            icon: '🔧',
+            color: '#44FF44',
+            skills: {
+                XP_BOOST: {
+                    id: 'xp_boost',
+                    name: 'Experience Boost',
+                    description: '+10% XP gain',
+                    maxLevel: 5,
+                    cost: [1, 2, 3, 4, 5],
+                    effect: { xpBonus: 0.10 },
+                    requires: null
+                },
+                FORTZ_BOOST: {
+                    id: 'fortz_boost',
+                    name: 'Wealth',
+                    description: '+10% Fortz gain',
+                    maxLevel: 5,
+                    cost: [2, 3, 4, 5, 6],
+                    effect: { fortzBonus: 0.10 },
+                    requires: null
+                },
+                POWERUP_DURATION: {
+                    id: 'powerup_duration',
+                    name: 'Extended Power',
+                    description: '+20% power-up duration',
+                    maxLevel: 3,
+                    cost: [3, 5, 7],
+                    effect: { powerupDuration: 0.20 },
+                    requires: 'xp_boost'
+                },
+                RADAR_RANGE: {
+                    id: 'radar_range',
+                    name: 'Enhanced Radar',
+                    description: '+25% radar range',
+                    maxLevel: 3,
+                    cost: [3, 5, 7],
+                    effect: { radarRange: 0.25 },
+                    requires: null
+                },
+                SCAVENGER: {
+                    id: 'scavenger',
+                    name: 'Scavenger',
+                    description: '+20% power-up spawn rate',
+                    maxLevel: 3,
+                    cost: [4, 6, 8],
+                    effect: { powerupSpawn: 0.20 },
+                    requires: 'powerup_duration'
+                }
+            }
+        }
+    },
+
+    // Player skill trees
+    playerSkills: {},
+
+    // Initialize player
+    initPlayer(playerId) {
+        if (!this.playerSkills[playerId]) {
+            this.playerSkills[playerId] = {
+                skillPoints: 0,
+                skills: {},
+                activeEffects: {}
+            };
+        }
+    },
+
+    // Add skill points
+    addSkillPoints(playerId, points) {
+        this.initPlayer(playerId);
+        this.playerSkills[playerId].skillPoints += points;
+    },
+
+    // Unlock/upgrade skill
+    upgradeSkill(playerId, branch, skillId) {
+        this.initPlayer(playerId);
+        const player = this.playerSkills[playerId];
+        const skill = this.branches[branch].skills[skillId.toUpperCase()];
+
+        if (!skill) {
+            return { success: false, error: 'Skill not found' };
+        }
+
+        // Get current level
+        const currentLevel = player.skills[skill.id] || 0;
+
+        // Check max level
+        if (currentLevel >= skill.maxLevel) {
+            return { success: false, error: 'Max level reached' };
+        }
+
+        // Check requirements
+        if (skill.requires) {
+            const reqLevel = player.skills[skill.requires] || 0;
+            if (reqLevel === 0) {
+                return { success: false, error: 'Requires ' + skill.requires };
+            }
+        }
+
+        // Check skill points
+        const cost = skill.cost[currentLevel];
+        if (player.skillPoints < cost) {
+            return { success: false, error: 'Not enough skill points' };
+        }
+
+        // Upgrade skill
+        player.skillPoints -= cost;
+        player.skills[skill.id] = currentLevel + 1;
+
+        // Recalculate effects
+        this.recalculateEffects(playerId);
+
+        return {
+            success: true,
+            newLevel: currentLevel + 1,
+            cost: cost
+        };
+    },
+
+    // Recalculate all active effects
+    recalculateEffects(playerId) {
+        const player = this.playerSkills[playerId];
+        const effects = {
+            damageBonus: 0,
+            critChance: 0,
+            critDamage: 0,
+            fireRateBonus: 0,
+            armorPen: 0,
+            healthBonus: 0,
+            damageReduction: 0,
+            shieldRegen: 0,
+            healthRegen: 0,
+            blockChance: 0,
+            speedBonus: 0,
+            dashCooldown: 0,
+            dodgeChance: 0,
+            accelerationBonus: 0,
+            xpBonus: 0,
+            fortzBonus: 0,
+            powerupDuration: 0,
+            radarRange: 0,
+            powerupSpawn: 0
+        };
+
+        // Sum up all skill effects
+        Object.values(this.branches).forEach(branch => {
+            Object.values(branch.skills).forEach(skill => {
+                const level = player.skills[skill.id] || 0;
+                if (level > 0) {
+                    Object.entries(skill.effect).forEach(([key, value]) => {
+                        effects[key] += value * level;
+                    });
+                }
+            });
+        });
+
+        player.activeEffects = effects;
+    },
+
+    // Get player effects
+    getEffects(playerId) {
+        this.initPlayer(playerId);
+        return this.playerSkills[playerId].activeEffects;
+    },
+
+    // Get skill tree state
+    getSkillTree(playerId) {
+        this.initPlayer(playerId);
+        const player = this.playerSkills[playerId];
+
+        const tree = {};
+        Object.entries(this.branches).forEach(([branchKey, branch]) => {
+            tree[branchKey] = {
+                name: branch.name,
+                icon: branch.icon,
+                color: branch.color,
+                skills: {}
+            };
+
+            Object.entries(branch.skills).forEach(([skillKey, skill]) => {
+                const currentLevel = player.skills[skill.id] || 0;
+                tree[branchKey].skills[skillKey] = {
+                    ...skill,
+                    currentLevel: currentLevel,
+                    canUpgrade: this.canUpgradeSkill(playerId, branchKey, skill.id),
+                    nextCost: currentLevel < skill.maxLevel ? skill.cost[currentLevel] : null
+                };
+            });
+        });
+
+        return {
+            tree: tree,
+            skillPoints: player.skillPoints,
+            activeEffects: player.activeEffects
+        };
+    },
+
+    // Check if skill can be upgraded
+    canUpgradeSkill(playerId, branch, skillId) {
+        const player = this.playerSkills[playerId];
+        const skill = this.branches[branch].skills[skillId.toUpperCase()];
+
+        if (!skill) return false;
+
+        const currentLevel = player.skills[skill.id] || 0;
+
+        // Check max level
+        if (currentLevel >= skill.maxLevel) return false;
+
+        // Check requirements
+        if (skill.requires) {
+            const reqLevel = player.skills[skill.requires] || 0;
+            if (reqLevel === 0) return false;
+        }
+
+        // Check skill points
+        const cost = skill.cost[currentLevel];
+        if (player.skillPoints < cost) return false;
+
+        return true;
+    },
+
+    // Reset skills (costs Fortz)
+    resetSkills(playerId, fortzCost = 1000) {
+        this.initPlayer(playerId);
+        const player = this.playerSkills[playerId];
+
+        // Refund all skill points
+        let totalPoints = 0;
+        Object.values(this.branches).forEach(branch => {
+            Object.values(branch.skills).forEach(skill => {
+                const level = player.skills[skill.id] || 0;
+                for (let i = 0; i < level; i++) {
+                    totalPoints += skill.cost[i];
+                }
+            });
+        });
+
+        // Reset
+        player.skills = {};
+        player.skillPoints = totalPoints;
+        player.activeEffects = {};
+
+        return {
+            success: true,
+            refundedPoints: totalPoints,
+            cost: fortzCost
+        };
+    }
+};
+
+// Export
+if (typeof window !== 'undefined') {
+    window.SkillTreeSystem = SkillTreeSystem;
+}

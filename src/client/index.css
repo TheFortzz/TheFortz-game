@@ -1682,7 +1682,9 @@ body {
   pointer-events: none;
 }
 
-#lobbyBackground {
+#tankLobbyBackground,
+#jetLobbyBackground,
+#raceLobbyBackground {
   position: absolute;
   top: 0;
   left: 0;
@@ -3674,16 +3676,16 @@ Loading Animation */
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.4) !important;
 }
 
-/* Race Button (Right) */
+/* Race Button (Right) - Green Theme */
 #lobbyScreen .vehicle-type-buttons .vehicle-btn-right {
-  background: linear-gradient(45deg, #8b4500 0%, #cc7a00 25%, #FFA500 60%, #FF6B35 100%) !important;
+  background: linear-gradient(45deg, #1a5c2e 0%, #27ae60 25%, #2ecc71 60%, #58d68d 100%) !important;
   color: white !important;
-  border-color: rgba(255, 165, 0, 0.5) !important;
+  border-color: rgba(46, 204, 113, 0.5) !important;
 }
 
 #lobbyScreen .vehicle-type-buttons .vehicle-btn-right:hover {
-  border-color: rgba(255, 165, 0, 0.8) !important;
-  box-shadow: 0 0 20px rgba(255, 165, 0, 0.4) !important;
+  border-color: rgba(46, 204, 113, 0.8) !important;
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.4) !important;
 }
 
 /* Active states */
@@ -3700,8 +3702,8 @@ Loading Animation */
 }
 
 #lobbyScreen .vehicle-type-buttons .vehicle-btn.active.vehicle-btn-right {
-  border-color: rgba(255, 165, 0, 1) !important;
-  box-shadow: 0 0 25px rgba(255, 165, 0, 0.8) !important;
+  border-color: rgba(46, 204, 113, 1) !important;
+  box-shadow: 0 0 25px rgba(46, 204, 113, 0.8) !important;
   transform: scale(1.1) !important;
 }
 
@@ -3721,4 +3723,596 @@ Loading Animation */
   font-size: inherit !important;
   font-weight: inherit !important;
   color: inherit !important;
+}
+/* ===== MODERN SHOP SYSTEM ===== */
+
+/* Shop Screen - Clean Modern Design */
+.figma-shop-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.figma-shop-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.95);
+}
+
+/* Shop Container - Modern Card Design */
+.figma-shop-container {
+  width: 90%;
+  max-width: 1200px;
+  height: 85%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Close Button - Minimalist */
+.figma-shop-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10001;
+}
+
+.figma-shop-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ff4757;
+  transform: scale(1.1);
+}
+
+/* Header - Clean Navigation */
+.figma-shop-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Category Buttons - Modern Pills */
+.figma-category-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.figma-category-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.figma-category-btn:hover::before {
+  left: 100%;
+}
+
+.figma-category-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.figma-category-btn.active {
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  border-color: #00d4ff;
+  color: white;
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+}
+
+/* Category-specific active colors */
+.tanks-btn.active {
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+}
+
+.jets-btn.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.cars-btn.active {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
+}
+
+.music-btn.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+}
+
+/* Main Content Area */
+.figma-shop-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  position: relative;
+}
+
+/* Shop Title - Clean Typography */
+.figma-shop-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin: 0 0 30px 0;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* Items Container - Modern Layout */
+.figma-items-container {
+  flex: 1;
+  position: relative;
+  margin: 0 60px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 350px;
+}
+
+.figma-items-scroll {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  height: 100%;
+  align-items: flex-start;
+}
+
+.figma-items-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll Buttons - Minimal Design */
+.figma-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.figma-scroll-left {
+  left: 10px;
+}
+
+.figma-scroll-right {
+  right: 10px;
+}
+
+.figma-scroll-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.figma-scroll-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Shop Items - Modern Cards */
+.figma-shop-item {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+  min-width: 260px;
+  max-width: 280px;
+  width: 260px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+}
+
+.figma-shop-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.figma-shop-item:hover::before {
+  opacity: 1;
+}
+
+.figma-shop-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Item Image Container */
+.figma-shop-item-image {
+  position: relative;
+  height: 180px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Item Info */
+.figma-shop-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.figma-shop-item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.figma-shop-item-price {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Price States - Clean Colors */
+.figma-shop-item-price.owned {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.figma-shop-item-price.free {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.figma-shop-item-price.paid {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+/* Category-specific item accents */
+.figma-shop-item[data-category="tanks"] {
+  border-left: 3px solid #00d4ff;
+}
+
+.figma-shop-item[data-category="jets"] {
+  border-left: 3px solid #8b5cf6;
+}
+
+.figma-shop-item[data-category="cars"] {
+  border-left: 3px solid #ec4899;
+}
+
+.figma-shop-item[data-category="music"] {
+  border-left: 3px solid #f59e0b;
+}
+
+/* Hover effects by category */
+.figma-shop-item[data-category="tanks"]:hover {
+  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+}
+
+.figma-shop-item[data-category="jets"]:hover {
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+}
+
+.figma-shop-item[data-category="cars"]:hover {
+  box-shadow: 0 20px 40px rgba(236, 72, 153, 0.2);
+}
+
+.figma-shop-item[data-category="music"]:hover {
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .figma-shop-container {
+    width: 95%;
+    height: 90%;
+  }
+  
+  .figma-shop-header {
+    padding: 20px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  
+  .figma-category-btn {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+  
+  .figma-shop-title {
+    font-size: 24px;
+  }
+  
+  .figma-items-container {
+    margin: 0 50px;
+  }
+  
+  .figma-shop-item {
+    min-width: 220px;
+    max-width: 240px;
+    padding: 16px;
+  }
+  
+  .figma-shop-item-image {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .figma-shop-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+  
+  .figma-shop-header {
+    padding: 16px;
+  }
+  
+  .figma-category-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+  
+  .figma-items-container {
+    margin: 0 40px;
+  }
+  
+  .figma-shop-item {
+    min-width: 200px;
+    max-width: 220px;
+  }
+}
+
+/* ===== END MODERN SHOP SYSTEM ===== */
+
+/* Modern Vehicle and Music Previews */
+.vehicle-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.vehicle-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.vehicle-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  text-align: center;
+}
+
+.vehicle-color {
+  font-size: 14px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.vehicle-type {
+  font-size: 12px;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Music preview - Clean design */
+.music-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.music-preview .music-icon-container {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  transition: all 0.3s ease;
+}
+
+.music-preview .music-icon {
+  font-size: 36px;
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+.music-preview .music-theme {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Hover effects */
+.figma-shop-item:hover .vehicle-preview {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.figma-shop-item:hover .music-icon-container {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Notification animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Notification styles */
+.notification {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-left: 4px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.notification-success {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%) !important;
+  border-left-color: #66bb6a;
+}
+
+.notification-error {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%) !important;
+  border-left-color: #ef5350;
+}
+
+.notification-info {
+  background: linear-gradient(135deg, #2196F3 0%, #1976d2 100%) !important;
+  border-left-color: #42a5f5;
+}
+/* U
+tility Classes */
+.hidden {
+  display: none !important;
+}
+
+.feature-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.95);
+}
+
+.feature-screen.hidden {
+  display: none !important;
 }

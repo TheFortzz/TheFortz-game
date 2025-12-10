@@ -1,0 +1,118 @@
+/**
+ * Example of how to use the new modular game architecture
+ * This demonstrates the integration of all core modules
+ */
+
+import moduleManager from '../core/ModuleManager.js';
+import { TANK_CONFIG, PHYSICS_CONFIG } from '../core/Config.js';
+import Player from '../entities/Player.js';
+
+/**
+ * Initialize and start the modular game
+ */
+async function initializeModularGame() {
+    try {
+        // Get canvas element
+        const canvas = document.getElementById('gameCanvas') || createCanvas();
+        
+        // Initialize all modules
+        await moduleManager.initialize(canvas);
+        
+        // Get systems
+        const gameStateManager = moduleManager.getGameStateManager();
+        const inputSystem = moduleManager.getSystem('input');
+        const networkSystem = moduleManager.getSystem('network');
+        
+        // Create a test player
+        const player = new Player('player1', {
+            x: 400,
+            y: 300,
+            selectedTank: {
+                color: TANK_CONFIG.colors[0],
+                body: TANK_CONFIG.bodies[0],
+                weapon: TANK_CONFIG.weapons[0]
+            }
+        });
+        
+        // Add player to game state
+        gameStateManager.initializePlayer('player1', player.serialize());
+        
+        // Set up game state
+        gameStateManager.updateGameState({
+            isInLobby: false,
+            playerId: 'player1',
+            gameWidth: canvas.width,
+            gameHeight: canvas.height
+        });
+        
+        // Connect to server (optional)
+        try {
+            await networkSystem.connectToServer();
+            console.log('✅ Connected to server');
+        } catch (error) {
+            console.warn('⚠️ Could not connect to server, running in offline mode');
+        }
+        
+        // Start the game loop
+        moduleManager.start();
+        
+        console.log('🎮 Modular game initialized and started!');
+        console.log('📊 Game State:', gameStateManager.getGameState());
+        console.log('🎯 Available tank colors:', TANK_CONFIG.colors);
+        console.log('⚙️ Physics config:', PHYSICS_CONFIG);
+        
+        return {
+            moduleManager,
+            gameStateManager,
+            player
+        };
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize modular game:', error);
+        throw error;
+    }
+}
+
+/**
+ * Create a canvas element if one doesn't exist
+ */
+function createCanvas() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'gameCanvas';
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.style.border = '1px solid #ccc';
+    document.body.appendChild(canvas);
+    return canvas;
+}
+
+/**
+ * Cleanup and stop the game
+ */
+function stopModularGame() {
+    moduleManager.cleanup();
+    console.log('🛑 Modular game stopped and cleaned up');
+}
+
+// Export functions for use
+export {
+    initializeModularGame,
+    stopModularGame
+};
+
+// Auto-initialize if running in browser
+if (typeof window !== 'undefined') {
+    window.initializeModularGame = initializeModularGame;
+    window.stopModularGame = stopModularGame;
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM ready, modular game example available');
+            console.log('💡 Call initializeModularGame() to start the game');
+        });
+    } else {
+        console.log('🚀 Modular game example loaded');
+        console.log('💡 Call initializeModularGame() to start the game');
+    }
+}

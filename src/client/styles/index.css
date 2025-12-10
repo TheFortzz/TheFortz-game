@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
 
 :root {
   --background: hsl(220, 15%, 8%);
@@ -1336,6 +1337,14 @@ body {
   background-color: #AD1457;
 }
 
+.button-3d-blue .button-3d-top::after {
+  background-image: radial-gradient(#4a9eff, #2563eb);
+}
+
+.button-3d-blue .button-3d-bottom {
+  background-color: #1d4ed8;
+}
+
 .button-3d-red .button-3d-top::after {
   background-image: radial-gradient(#cd3f64, #9d3656);
 }
@@ -1996,49 +2005,7 @@ body {
 }
 
 
-#levelProgressContainer {
-  margin-top: 8px;
-}
 
-#levelProgressBar {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-#levelProgress {
-  height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);
-  border-radius: 3px;
-  width: 0%;
-  transition: width 0.5s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-#levelProgress::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: progressShine 2s infinite;
-}
-
-@keyframes progressShine {
-  0% {
-    left: -100%;
-  }
-
-  100% {
-    left: 100%;
-  }
-}
 
 
 
@@ -2074,12 +2041,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background:
-    linear-gradient(-45deg, hsl(204, 66.7%, 13.3%), hsl(207, 29.4%, 25.9%), hsl(201, 33.3%, 32.9%)),
-    radial-gradient(circle at 20% 80%, hsla(186, 100%, 50%, 0.1), transparent 50%),
-    radial-gradient(circle at 80% 20%, hsla(213, 72%, 52%, 0.1), transparent 50%);
-  background-size: 400% 400%, 100% 100%, 100% 100%;
-  animation: backgroundMove 15s ease infinite, backgroundShimmer 20s ease infinite;
+  /* Background removed - using canvas background instead */
   z-index: 40;
   overflow: hidden;
 }
@@ -2105,7 +2067,7 @@ body {
   width: 100%;
   height: 100%;
   z-index: 1;
-  display: none; /* Hidden - using DOM map instead */
+  display: block; /* Show canvas for background switching */
 }
 
 #lobbyMapContainer {
@@ -2114,7 +2076,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: 2;
   overflow: hidden;
   pointer-events: none;
 }
@@ -2269,36 +2231,190 @@ body {
 
 .bottom-right-container {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 15px;
+  justify-content: flex-end;
+  gap: 0;
   z-index: 45;
-  animation: slideInRight 0.8s ease-out;
+  pointer-events: none;
 }
 
+.bottom-right-container > div {
+  display: flex;
+  gap: 0;
+  pointer-events: auto;
+}
 
+.play-buttons-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+
+.solo-button {
+  width: 186px;
+  height: 43px;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a855f7 50%, #7c3aed 100%);
+  color: #ffffff;
+  border: 3px solid rgba(168, 85, 247, 0.8);
+  border-right: none;
+  border-bottom: none;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: normal;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2px;
+  transform: none !important;
+}
+
+.solo-button:hover {
+  background: linear-gradient(135deg, #7c6cf7 0%, #b865f7 50%, #8c4afd 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
+}
+
+.team-mode-dropdown {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  right: 0;
+  width: 186px;
+  background: linear-gradient(180deg, rgba(40, 25, 70, 0.98) 0%, rgba(25, 15, 45, 0.98) 100%);
+  border: 2px solid rgba(168, 85, 247, 0.7);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 
+    0 -8px 30px rgba(168, 85, 247, 0.3),
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform-origin: bottom center;
+  animation: dropdownSlideIn 0.25s ease-out;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.team-mode-dropdown.hidden {
+  display: none;
+}
+
+.team-mode-option {
+  padding: 14px 20px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.team-mode-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.2), transparent);
+  transition: left 0.4s ease;
+}
+
+.team-mode-option:last-child {
+  border-bottom: none;
+}
+
+.team-mode-option:hover {
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.3), rgba(138, 43, 226, 0.4));
+  color: #fff;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+  transform: scale(1.02);
+}
+
+.team-mode-option:hover::before {
+  left: 100%;
+}
+
+.team-mode-option.selected {
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.5), rgba(138, 43, 226, 0.6));
+  color: #fff;
+  text-shadow: 0 0 15px rgba(168, 85, 247, 1);
+  border-left: 3px solid #a855f7;
+}
+
+.team-mode-option:active {
+  transform: scale(0.98);
+}
 
 .play-button,
+.play-button,
 .map-button {
-  width: 180px;
-  height: 60px;
+  width: 259px;
+  height: 82px;
   border: none;
-  border-radius: 12px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   overflow: hidden;
-  font-size: 1.4rem;
+  font-size: 2rem;
   font-weight: 900;
+  font-style: normal;
   text-transform: uppercase;
   letter-spacing: 2px;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  border-radius: 0;
+  font-family: inherit;
+}
+
+.map-button {
+  background: gold !important;
+  color: #000000 !important;
+  text-shadow: none;
+  border: 2px solid #FFD700;
+  border-bottom: none;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 60px 40px -7px;
+  background-image: none !important;
+  width: auto;
+  min-width: 168px;
+  height: 78px;
+  padding: 0 30px 0 50px;
+  transform: skewX(-15deg) skewY(0deg) translateX(-18px) !important;
+  margin-bottom: 0;
+  align-self: flex-end;
+}
+
+.map-button > *,
+.map-button span {
+  transform: skewX(15deg) !important;
+  display: inline-block;
 }
 
 .play-button {
@@ -2306,21 +2422,18 @@ body {
   color: #ffffff;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   border: 3px solid rgba(0, 212, 255, 0.8);
+  border-right: none;
+  border-bottom: none;
+  transform: none !important;
+  margin-left: -20px;
+  clip-path: polygon(25px 0, 100% 0, 100% 100%, 0 100%);
+  padding-left: 30px;
 }
 
-.map-button {
-  background: rgba(255, 215, 0, 0.2);
-  color: #000000;
-  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.5);
-  border: 3px solid rgba(255, 215, 0, 0.9);
-  margin-right: 15px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 60px 40px -7px;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  width: auto;
-  min-width: 115px;
-  padding: 0;
+.play-button > *,
+.play-button div,
+.play-button span {
+  transform: none !important;
 }
 
 /* Premium glow effect */
@@ -2375,7 +2488,7 @@ body {
 }
 
 .map-button:hover {
-  transform: translateY(-4px) scale(1.05);
+  transform: skewX(-15deg) translateY(-4px) scale(1.05);
   box-shadow:
     0 12px 35px rgba(255, 215, 0, 0.6),
     0 0 40px rgba(255, 215, 0, 0.4),
@@ -2402,7 +2515,7 @@ body {
 }
 
 .map-button:active {
-  transform: translateY(-2px) scale(1.02);
+  transform: skewX(-15deg) translateY(-2px) scale(1.02);
   box-shadow:
     0 6px 20px rgba(255, 215, 0, 0.5),
     0 0 25px rgba(255, 215, 0, 0.3);
@@ -2671,6 +2784,45 @@ body {
   bottom: -55px;
 }
 
+/* Blue line on bottom edge of hexagon */
+.hex-edge-line {
+  position: absolute;
+  height: 4px;
+  background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(0, 247, 255, 0.6) 15%, 
+      rgba(0, 247, 255, 1) 50%, 
+      rgba(0, 247, 255, 0.6) 85%, 
+      transparent 100%);
+  box-shadow: 0 0 10px rgba(0, 247, 255, 0.6), 0 0 20px rgba(0, 247, 255, 0.4);
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Hide diagonal lines */
+.hex-edge-left,
+.hex-edge-right {
+  display: none;
+}
+
+/* Bottom horizontal edge _ */
+.hex-edge-bottom {
+  width: 50%;
+  bottom: 0%;
+  left: 25%;
+  transform: none;
+}
+
+.lobby-box:hover .hex-edge-line {
+  box-shadow: 0 0 15px rgba(0, 247, 255, 0.8), 0 0 30px rgba(0, 247, 255, 0.6);
+  background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(0, 247, 255, 0.7) 15%, 
+      rgba(0, 247, 255, 1) 50%, 
+      rgba(0, 247, 255, 0.7) 85%, 
+      transparent 100%);
+}
+
 .lobby-box-back-left {
   width: 480px;
   height: 480px;
@@ -2690,9 +2842,9 @@ body {
 }
 
 .lobby-box-front-center {
-  width: 624px;
-  height: 624px;
-  bottom: 4%;
+  width: 550px;
+  height: 550px;
+  bottom: 8%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
@@ -2890,20 +3042,20 @@ body {
   }
 
   .bottom-right-container {
-    bottom: 20px;
-    right: 20px;
+    bottom: 0;
+    right: 0;
   }
 
-
-
   .play-button {
-    padding: 12px 30px;
-    font-size: 1.2rem;
+    width: 216px;
+    height: 72px;
+    font-size: 1.5rem;
   }
 
   .map-button {
-    padding: 12px 20px;
-    margin-right: 5px;
+    min-width: 132px;
+    height: 72px;
+    font-size: 1.5rem;
   }
 
   #instructions {
@@ -3276,91 +3428,52 @@ body {
 .user-info-container {
   cursor: pointer;
   position: absolute;
-  left: 30px;
-  top: 25%;
-  transform: translateY(-50%);
-  padding: 2px;
-  border-radius: 6px;
-  border: 0;
-  text-shadow: 1px 1px #000a;
-  background: linear-gradient(#006caa, #00c3ff);
-  box-shadow: 0px 4px 6px 0px #0008;
-  transition: 0.3s all;
+  left: -20px;
+  top: 80px;
   z-index: 10;
 }
 
-.user-info-container:hover {
-  transform: translateY(-50%) scale(1.05);
-}
-
-.user-info-container:hover {
-  box-shadow: 0px 6px 12px 0px #0009;
-}
-
-.user-info-container:active {
-  box-shadow: 0px 0px 0px 0px #0000;
-}
-
-.user-info-container .inner {
+.level-progress-container {
   position: relative;
-  inset: 0px;
-  padding: 1em;
-  border-radius: 4px;
-  background: radial-gradient(circle at 50% 100%, #30f8f8 10%, #30f8f800 55%),
-    linear-gradient(#00526a, #009dcd);
-  overflow: hidden;
-  transition: inherit;
+  width: 370px;
+  height: 106px;
+}
+
+.level-progress-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.vehicle-hexagon {
+  position: absolute;
+  left: 66px;
+  top: 20px;
+  width: 60px;
+  height: 60px;
+  background: transparent;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  overflow: visible;
 }
 
-.user-info-container .inner::before {
-  content: "";
+.vehicle-hexagon canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.level-username {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(-65deg, #0000 40%, #fff7 50%, #0000 70%);
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  animation: profileShine 3s ease infinite;
-}
-
-@keyframes profileShine {
-  0% {
-    background-position: 130%;
-    opacity: 1;
-  }
-
-  to {
-    background-position: -166%;
-    opacity: 0;
-  }
-}
-
-.user-info-container .top-white {
-  position: absolute;
-  border-radius: inherit;
-  inset: 0 -8em;
-  background: radial-gradient(circle at 50% -270%,
-      #fff 45%,
-      #fff6 60%,
-      #fff0 60%);
-  transition: inherit;
-}
-
-.user-info-container .inner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  transition: inherit;
-  box-shadow: inset 0px 2px 8px -2px #0000;
-}
-
-.user-info-container:active .inner::after {
-  box-shadow: inset 0px 2px 8px -2px #000a;
+  left: 145px;
+  top: 12px;
+  width: 120px;
+  height: 20px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
+  text-transform: uppercase;
 }
 
 .user-avatar {
@@ -4106,6 +4219,43 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
+/* Locker screen fullscreen */
+#lockerScreen.feature-screen {
+  padding: 0;
+  overflow: hidden;
+}
+
+#lockerScreen .feature-header {
+  display: none;
+}
+
+.new-locker-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  padding-top: 50px;
+}
+
+.locker-title {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.locker-title::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #00f7ff, transparent);
+  border-radius: 2px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -4723,13 +4873,13 @@ body {
 
 /* Blank Map Creator */
 .blank-creator {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background: #0a0a15;
-  z-index: 101;
+  z-index: 9999;
 }
 
 .blank-creator.hidden {
@@ -4853,6 +5003,54 @@ body {
     0 0 0 1px rgba(60, 255, 220, 0.2) inset;
 }
 
+/* Test Map Button */
+.test-map-btn {
+  position: fixed;
+  right: 0;
+  top: calc(50% + 80px);
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: right center;
+  width: 120px;
+  height: 60px;
+  background: linear-gradient(180deg, rgba(255, 180, 40, 0.9), rgba(200, 120, 20, 0.9));
+  border: 2px solid rgba(200, 120, 20, 0.8);
+  border-right: none;
+  border-radius: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-bottom: 25px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 6px 15px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  z-index: 102;
+  backdrop-filter: blur(10px);
+  letter-spacing: 1px;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+}
+
+.test-map-btn:hover {
+  background: linear-gradient(180deg, rgba(255, 220, 60, 0.9), rgba(255, 180, 30, 0.9));
+  border-color: #ffdc3c;
+  color: #ffdc3c;
+  box-shadow:
+    0 8px 25px rgba(255, 220, 60, 0.6),
+    0 0 0 1px rgba(255, 220, 60, 0.2) inset;
+  transform: translateY(-50%) rotate(-90deg) scale(1.05);
+}
+
+.test-map-btn:active {
+  transform: translateY(-50%) rotate(-90deg) scale(0.95);
+  box-shadow:
+    0 4px 15px rgba(255, 220, 60, 0.4),
+    0 0 0 1px rgba(255, 220, 60, 0.2) inset;
+}
 
 /* Map Creator Canvas */
 .map-creator-canvas {
@@ -4862,7 +5060,721 @@ body {
   width: 100%;
   height: 100%;
   cursor: grab;
-  /* Remove background - let JavaScript handle all rendering */
+}
+
+/* Players Panel */
+.players-panel {
+  padding: 5px 0;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  animation: panelFadeIn 0.3s ease-out;
+}
+
+@keyframes panelFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sectionPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(0, 247, 255, 0); }
+  50% { box-shadow: 0 0 20px rgba(0, 247, 255, 0.15); }
+}
+
+@keyframes botItemSlide {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes buttonPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.players-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.players-panel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.players-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0, 247, 255, 0.5), rgba(0, 150, 200, 0.5));
+  border-radius: 5px;
+}
+
+.players-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0, 247, 255, 0.7), rgba(0, 150, 200, 0.7));
+}
+
+.players-section {
+  background: linear-gradient(135deg, rgba(15, 25, 45, 0.95), rgba(8, 12, 25, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  padding: 14px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.players-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 247, 255, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.players-section:hover::before {
+  opacity: 1;
+}
+
+.players-section:hover {
+  border-color: rgba(0, 247, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(0, 247, 255, 0.08);
+}
+
+.players-section.ai-section {
+  border-color: rgba(255, 80, 80, 0.2);
+}
+
+.players-section.ai-section::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 80, 80, 0.5), transparent);
+}
+
+.players-section.ai-section:hover {
+  border-color: rgba(255, 80, 80, 0.4);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 80, 80, 0.1);
+}
+
+.players-section.auto-fill-section {
+  border-color: rgba(255, 180, 40, 0.2);
+  background: linear-gradient(135deg, rgba(35, 28, 15, 0.95), rgba(18, 14, 8, 0.98));
+}
+
+.players-section.auto-fill-section::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 180, 40, 0.5), transparent);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.section-title h4 {
+  margin: 0;
+  flex: 1;
+  font-size: 13px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.section-icon {
+  font-size: 18px;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+.section-desc {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  margin: -5px 0 12px 0;
+  letter-spacing: 0.3px;
+}
+
+.players-setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  transition: background 0.2s;
+  border-radius: 6px;
+  margin: 0 -6px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.players-setting-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.players-setting-row label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.setting-icon {
+  font-style: normal;
+  font-size: 12px;
+}
+
+.players-input {
+  width: 58px;
+  padding: 7px 10px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid rgba(0, 247, 255, 0.2);
+  border-radius: 8px;
+  color: #00f7ff;
+  font-size: 12px;
+  text-align: center;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.players-input:hover {
+  border-color: rgba(0, 247, 255, 0.4);
+}
+
+.players-input:focus {
+  outline: none;
+  border-color: rgba(0, 247, 255, 0.6);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(0, 247, 255, 0.25);
+  transform: scale(1.02);
+}
+
+.players-select {
+  padding: 7px 12px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.players-select:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(180deg, rgba(20, 20, 30, 0.8), rgba(10, 10, 20, 0.6));
+}
+
+.players-select:focus {
+  outline: none;
+  border-color: rgba(0, 247, 255, 0.5);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch.small {
+  width: 36px;
+  height: 20px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(80, 80, 80, 0.6);
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: linear-gradient(180deg, #fff, #ddd);
+  border-radius: 50%;
+  transition: 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch.small .toggle-slider:before {
+  height: 14px;
+  width: 14px;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: linear-gradient(180deg, rgba(0, 247, 255, 0.7), rgba(0, 180, 200, 0.7));
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.toggle-switch.small input:checked + .toggle-slider:before {
+  transform: translateX(16px);
+}
+
+.add-spawn-btn,
+.add-ai-btn {
+  padding: 4px 10px;
+  background: linear-gradient(180deg, rgba(0, 247, 255, 0.25), rgba(0, 150, 200, 0.25));
+  border: 1px solid rgba(0, 247, 255, 0.5);
+  border-radius: 15px;
+  color: #00f7ff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.add-spawn-btn:hover,
+.add-ai-btn:hover {
+  background: rgba(0, 247, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.ai-section .add-ai-btn {
+  background: linear-gradient(180deg, rgba(255, 100, 100, 0.25), rgba(200, 50, 50, 0.25));
+  border-color: rgba(255, 100, 100, 0.5);
+  color: #ff6464;
+}
+
+.ai-section .add-ai-btn:hover {
+  background: rgba(255, 100, 100, 0.4);
+}
+
+.spawn-points-list,
+.ai-bots-list {
+  max-height: 120px;
+  overflow-y: auto;
+  margin: 8px 0;
+}
+
+.empty-list-msg {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  text-align: center;
+  padding: 15px 10px;
+  font-style: italic;
+}
+
+.ai-bot-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  margin: 5px 0;
+  background: linear-gradient(135deg, rgba(255, 80, 80, 0.12), rgba(200, 40, 40, 0.08));
+  border: 1px solid rgba(255, 80, 80, 0.2);
+  border-left: 3px solid rgba(255, 80, 80, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: botItemSlide 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-bot-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.ai-bot-item:hover::before {
+  left: 100%;
+}
+
+.ai-bot-item:hover {
+  background: linear-gradient(135deg, rgba(255, 80, 80, 0.2), rgba(200, 40, 40, 0.12));
+  border-color: rgba(255, 80, 80, 0.4);
+  border-left-color: rgba(255, 80, 80, 0.8);
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(255, 80, 80, 0.15);
+}
+
+.ai-bot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ai-bot-name {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.ai-bot-difficulty {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.ai-bot-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ai-bot-team {
+  font-size: 8px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-presets {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ai-presets label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preset-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-btn {
+  flex: 1;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, rgba(255, 80, 80, 0.15), rgba(200, 40, 40, 0.1));
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.preset-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.preset-btn:hover::after {
+  width: 150%;
+  height: 150%;
+}
+
+.preset-btn:hover {
+  background: linear-gradient(180deg, rgba(255, 80, 80, 0.3), rgba(200, 40, 40, 0.2));
+  border-color: rgba(255, 80, 80, 0.5);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 80, 80, 0.2);
+}
+
+.preset-btn:active {
+  transform: translateY(0);
+  animation: buttonPop 0.2s ease;
+}
+
+.powerup-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.powerup-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.powerup-checkbox input {
+  width: 14px;
+  height: 14px;
+  accent-color: #00f7ff;
+}
+
+.teams-options {
+  padding-top: 8px;
+}
+
+.ai-bot-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  margin: 5px 0;
+  background: rgba(255, 100, 100, 0.15);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-bot-item:hover {
+  background: rgba(255, 100, 100, 0.25);
+  border-color: rgba(255, 100, 100, 0.5);
+}
+
+.ai-bot-name {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ai-bot-team {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.auto-fill-ai-section {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 180, 40, 0.1);
+  border: 1px solid rgba(255, 180, 40, 0.3);
+  border-radius: 8px;
+}
+
+.auto-fill-ai-section h4 {
+  color: #ffb428;
+  margin: 0 0 5px 0;
+  font-size: 13px;
+}
+
+.auto-fill-desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  margin: 0 0 10px 0;
+}
+
+/* AI Config Modal */
+.ai-config-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.ai-config-modal.hidden {
+  display: none;
+}
+
+.ai-config-content {
+  width: 400px;
+  max-height: 80vh;
+  background: linear-gradient(180deg, rgba(30, 30, 50, 0.98), rgba(20, 20, 35, 0.98));
+  border: 2px solid rgba(255, 100, 100, 0.5);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ai-config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(255, 100, 100, 0.2);
+  border-bottom: 1px solid rgba(255, 100, 100, 0.3);
+}
+
+.ai-config-header h3 {
+  color: #ff6464;
+  margin: 0;
+  font-size: 16px;
+}
+
+.ai-config-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ai-config-close:hover {
+  opacity: 1;
+}
+
+.ai-config-body {
+  padding: 20px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.ai-config-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ai-config-row label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+}
+
+.ai-config-input,
+.ai-config-select {
+  width: 150px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.ai-config-select {
+  cursor: pointer;
+}
+
+.ai-stats-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-stats-section h4 {
+  color: #00f7ff;
+  margin: 0 0 10px 0;
+  font-size: 14px;
+}
+
+.ai-stat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.ai-stat-row label {
+  width: 80px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.ai-stat-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.ai-stat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #00f7ff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.ai-stat-row span {
+  width: 45px;
+  text-align: right;
+  color: #00f7ff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.ai-config-footer {
+  display: flex;
+  gap: 10px;
+  padding: 15px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-config-save-btn {
+  flex: 1;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(0, 247, 255, 0.3), rgba(0, 150, 200, 0.3));
+  border: 2px solid rgba(0, 247, 255, 0.6);
+  border-radius: 6px;
+  color: #00f7ff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.ai-config-save-btn:hover {
+  background: rgba(0, 247, 255, 0.5);
+}
+
+.ai-config-delete-btn {
+  padding: 10px 20px;
+  background: rgba(255, 50, 50, 0.3);
+  border: 2px solid rgba(255, 50, 50, 0.6);
+  border-radius: 6px;
+  color: #ff5050;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.ai-config-delete-btn:hover {
+  background: rgba(255, 50, 50, 0.5);
 }
 
 /* Assets Panel */
@@ -6407,17 +7319,26 @@ body {
   box-shadow: 0 8px 25px rgba(255, 20, 147, 0.2);
 }
 
-.friend-avatar {
+.friend-avatar-container {
+  position: relative;
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, rgba(255, 20, 147, 0.3), rgba(138, 43, 226, 0.3));
-  border: 2px solid rgba(255, 20, 147, 0.5);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
   flex-shrink: 0;
+}
+
+.friend-profile-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.friend-vehicle-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
 }
 
 .friend-info {
@@ -6608,3 +7529,2656 @@ body {
 .game-mode-item.selected .game-mode-info {
     color: #00f7ff !important;
 }
+
+/* ============================================
+   NEW SHOP GRID LAYOUT - Blue/Red/Yellow Theme
+   ============================================ */
+
+/* Override shop grid to use vertical layout - FULL SCREEN with overflow-auto */
+#tanksItemsGrid.shop-items-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 25px !important;
+  height: calc(100vh - 200px) !important;
+  max-height: none !important;
+  overflow: auto !important;
+  padding: 30px !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+  background: linear-gradient(180deg, rgba(15, 25, 50, 0.95), rgba(10, 15, 35, 0.98));
+  scroll-behavior: smooth;
+}
+
+#tanksItemsGrid.shop-items-grid::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+#tanksItemsGrid.shop-items-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+}
+
+#tanksItemsGrid.shop-items-grid::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3498db, #f1c40f, #e74c3c);
+  border-radius: 6px;
+}
+
+#tanksItemsGrid.shop-items-grid::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #5dade2, #f4d03f, #ec7063);
+}
+
+/* Color row container - overflow-x-auto */
+.shop-color-row {
+  display: flex;
+  align-items: stretch;
+  gap: 25px;
+  padding: 20px 25px;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.12), rgba(231, 76, 60, 0.12));
+  border-radius: 16px;
+  border: 2px solid rgba(241, 196, 15, 0.3);
+  transition: all 0.3s ease;
+  min-height: 350px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.shop-color-row:hover {
+  border-color: rgba(241, 196, 15, 0.6);
+  box-shadow: 0 8px 30px rgba(241, 196, 15, 0.15);
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.18), rgba(231, 76, 60, 0.18));
+}
+
+/* Row label (color name) */
+.shop-row-label {
+  width: 80px;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 0 15px currentColor;
+  flex-shrink: 0;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tank boxes container - overflow-x-auto */
+.shop-boxes-container {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  justify-content: flex-start;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 5px;
+  scroll-behavior: smooth;
+  min-width: 0;
+}
+
+.shop-boxes-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.shop-boxes-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.shop-boxes-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #3498db, #e74c3c);
+  border-radius: 4px;
+}
+
+/* Individual tank box */
+.shop-tank-box {
+  width: 200px;
+  min-width: 200px;
+  height: 300px;
+  min-height: 300px;
+  background: linear-gradient(145deg, rgba(25, 35, 55, 0.95), rgba(15, 25, 45, 0.98));
+  border: 2px solid rgba(231, 76, 60, 0.4);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 20px 15px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.shop-tank-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3498db, #f1c40f, #e74c3c);
+  border-radius: 10px 10px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.shop-tank-box:hover::before {
+  opacity: 1;
+}
+
+.shop-tank-box:hover {
+  transform: translateY(-5px);
+  border-color: #f1c40f;
+  box-shadow: 0 8px 25px rgba(241, 196, 15, 0.4);
+}
+
+.shop-tank-box.owned {
+  border-color: rgba(52, 152, 219, 0.8);
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(10, 20, 40, 0.95));
+}
+
+.shop-tank-box.equipped {
+  border-color: #f1c40f !important;
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+  background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(20, 30, 50, 0.95));
+}
+
+.shop-tank-box.equipped::after {
+  content: '★';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #f1c40f;
+  font-size: 14px;
+  text-shadow: 0 0 5px #f1c40f;
+}
+
+.shop-tank-box canvas {
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.shop-weapon-label {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ecf0f1;
+  margin-top: 20px;
+  text-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
+}
+
+.shop-price-label {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Shop screen - FULL SCREEN layout */
+#shopScreen {
+  padding: 20px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+#shopScreen .feature-header {
+  padding: 10px 0 15px 0;
+  margin-bottom: 10px;
+}
+
+#shopScreen .feature-header h1 {
+  background: linear-gradient(135deg, #3498db, #f1c40f, #e74c3c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  font-size: 36px;
+  margin: 0;
+}
+
+#shopScreen .feature-header p {
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+#shopScreen .shop-category-tabs {
+  margin-bottom: 15px;
+}
+
+#shopScreen .shop-tab-content {
+  flex: 1;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Category tabs with new colors */
+#shopScreen .shop-category-tab {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(231, 76, 60, 0.1));
+  border: 2px solid rgba(241, 196, 15, 0.3);
+}
+
+#shopScreen .shop-category-tab:hover {
+  border-color: rgba(241, 196, 15, 0.6);
+  box-shadow: 0 5px 15px rgba(241, 196, 15, 0.2);
+}
+
+#shopScreen .shop-category-tab.active {
+  background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(231, 76, 60, 0.15));
+  border-color: #f1c40f;
+  color: #f1c40f;
+}
+
+/* Scrollbar styling */
+#tanksItemsGrid::-webkit-scrollbar {
+  width: 8px;
+}
+
+#tanksItemsGrid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+#tanksItemsGrid::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3498db, #e74c3c);
+  border-radius: 4px;
+}
+
+#tanksItemsGrid::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #f1c40f, #e74c3c);
+}
+
+
+/* ============================================
+   NEW FIGMA-STYLE SHOP LAYOUT
+   ============================================ */
+
+.new-shop-wrapper {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 250px);
+  padding: 0 80px;
+}
+
+.new-scroll-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  font-size: 36px;
+  color: white;
+  font-weight: bold;
+}
+
+.new-scroll-button:hover {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 15px 35px rgba(124, 58, 237, 0.4);
+}
+
+.new-scroll-button-left {
+  left: 10px;
+}
+
+.new-scroll-button-right {
+  right: 10px;
+}
+
+.new-shop-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #7c3aed #1e293b;
+}
+
+.new-shop-scroll-container::-webkit-scrollbar {
+  height: 10px;
+}
+
+.new-shop-scroll-container::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 5px;
+}
+
+.new-shop-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #7c3aed, #ec4899);
+  border-radius: 5px;
+}
+
+.new-shop-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #8b5cf6, #f472b6);
+}
+
+.new-shop-grid {
+  display: flex;
+  gap: 30px;
+  padding: 30px 20px;
+  height: calc(100% - 20px);
+}
+
+.new-shop-item {
+  min-width: 320px;
+  max-width: 320px;
+  height: 100%;
+  background: #1e293b;
+  border-radius: 20px;
+  border: 3px solid;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.new-shop-item:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+}
+
+/* Rarity colors */
+.new-shop-item.rarity-common {
+  border-color: #6b7280;
+}
+
+.new-shop-item.rarity-rare {
+  border-color: #3b82f6;
+}
+
+.new-shop-item.rarity-epic {
+  border-color: #a855f7;
+}
+
+.new-shop-item.rarity-legendary {
+  border-color: #eab308;
+}
+
+.new-shop-item.equipped {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+}
+
+.new-shop-item.owned:not(.equipped) {
+  border-color: #06b6d4;
+}
+
+/* Rarity badge */
+.new-rarity-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  font-size: 18px;
+  color: white;
+}
+
+.rarity-common .new-rarity-badge {
+  background: linear-gradient(135deg, #4b5563, #374151);
+}
+
+.rarity-rare .new-rarity-badge {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.rarity-epic .new-rarity-badge {
+  background: linear-gradient(135deg, #9333ea, #7e22ce);
+}
+
+.rarity-legendary .new-rarity-badge {
+  background: linear-gradient(135deg, #eab308, #ea580c);
+}
+
+/* Item image area */
+.new-item-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 250px;
+}
+
+.rarity-common .new-item-image {
+  background: linear-gradient(135deg, #4b5563, #374151);
+}
+
+.rarity-rare .new-item-image {
+  background: linear-gradient(135deg, #1e40af, #1e3a8a);
+}
+
+.rarity-epic .new-item-image {
+  background: linear-gradient(135deg, #7e22ce, #581c87);
+}
+
+.rarity-legendary .new-item-image {
+  background: linear-gradient(135deg, #b45309, #92400e);
+}
+
+.new-item-image canvas,
+.new-item-image img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 0;
+  background: transparent;
+  object-fit: contain;
+}
+
+/* Item info */
+.new-item-info {
+  padding: 20px;
+  background: #1e293b;
+}
+
+.new-item-name {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0 0 15px 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.new-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.new-item-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.new-item-price .coin-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.new-item-price .price-text {
+  color: #fbbf24;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.new-item-price .equipped-text {
+  color: #10b981;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.new-item-price .owned-text {
+  color: #06b6d4;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.new-item-price .free-text {
+  color: #22c55e;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.new-buy-button {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 24px;
+}
+
+.new-buy-button:hover {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  transform: scale(1.15);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.5);
+}
+
+.new-buy-button:active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  transform: scale(1.2);
+}
+
+.new-shop-item.equipped .new-buy-button {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.new-shop-item.owned:not(.equipped) .new-buy-button {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+}
+
+/* ============================================
+   VEHICLE STAT ICONS - Damage, Health, Fire Rate
+   ============================================ */
+
+.vehicle-stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 8px 0;
+  justify-content: center;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.stat-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.stat-value {
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Vertical stats - positioned left of vehicle image */
+.vehicle-stats-vertical {
+  position: absolute;
+  left: 12px;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.stat-item-vertical {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  padding: 0;
+}
+
+.stat-icon-vertical {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.stat-value-vertical {
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Locker stats styling */
+.locker-vehicle-stats {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  padding: 10px 15px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.locker-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.locker-stat-item > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.locker-stat-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.locker-stat-value {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.locker-stat-label {
+  color: #aaa;
+  font-size: 9px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Hide old shop elements when new shop is active */
+#tanksTab .scroll-btn {
+  display: none !important;
+}
+
+
+/* ============================================
+   ENHANCED SHOP STYLES - Polished Version
+   ============================================ */
+
+.new-shop-item.purchased {
+  opacity: 0.7;
+  filter: grayscale(0.5);
+}
+
+.new-shop-item.purchased:hover {
+  transform: translateY(-5px) scale(1);
+}
+
+.new-rarity-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  font-size: 18px;
+  color: white;
+}
+
+.rarity-common .new-rarity-badge {
+  background: linear-gradient(135deg, rgba(75, 85, 99, 0.95), rgba(55, 65, 81, 0.95));
+}
+
+.rarity-rare .new-rarity-badge {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
+}
+
+.rarity-epic .new-rarity-badge {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.95), rgba(126, 34, 206, 0.95));
+}
+
+.rarity-legendary .new-rarity-badge {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.95), rgba(234, 88, 12, 0.95));
+  animation: legendaryPulse 2s ease-in-out infinite;
+}
+
+@keyframes legendaryPulse {
+  0%, 100% { box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4); }
+  50% { box-shadow: 0 4px 25px rgba(234, 179, 8, 0.8); }
+}
+
+.new-item-level {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  letter-spacing: 1px;
+}
+
+.new-item-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+}
+
+.new-purchased-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.new-purchased-badge {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+}
+
+.new-item-info {
+  padding: 25px;
+  position: relative;
+  z-index: 2;
+  background: #1e293b;
+}
+
+.new-item-name {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0 0 15px 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.new-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.new-item-price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+.new-item-price .coin-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.8));
+}
+
+.new-item-price .price-text {
+  color: #fbbf24;
+  font-size: 26px;
+  font-weight: 900;
+  text-shadow: 0 2px 10px rgba(251, 191, 36, 0.5);
+}
+
+.new-item-price .equipped-text {
+  color: #10b981;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.new-item-price .owned-text {
+  color: #06b6d4;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.new-item-price .free-text {
+  color: #22c55e;
+  font-size: 22px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.new-buy-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.5), 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  font-size: 24px;
+}
+
+.new-buy-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.new-buy-button:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.new-buy-button:hover {
+  background: linear-gradient(135deg, #6d28d9, #9333ea);
+  transform: scale(1.2) rotate(10deg);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.8), 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.new-buy-button:active {
+  transform: scale(1.1) rotate(0deg);
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.8), 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.new-shop-item.equipped .new-buy-button {
+  background: linear-gradient(135deg, #10b981, #059669);
+  cursor: default;
+}
+
+.new-shop-item.equipped .new-buy-button:hover {
+  transform: scale(1);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.new-shop-item.owned:not(.equipped) .new-buy-button {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+}
+
+/* Sparkle effects for legendary items */
+.new-shop-item.rarity-legendary::after {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 30px;
+  opacity: 0;
+  pointer-events: none;
+  animation: sparkleFloat 3s ease-in-out infinite;
+}
+
+@keyframes sparkleFloat {
+  0%, 100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% { 
+    opacity: 1; 
+    transform: translate(-50%, -80%) scale(1);
+  }
+}
+
+/* Enhanced hover glow for different rarities */
+.new-shop-item.rarity-common:hover {
+  box-shadow: 0 25px 50px rgba(107, 114, 128, 0.4);
+}
+
+.new-shop-item.rarity-rare:hover {
+  box-shadow: 0 25px 50px rgba(59, 130, 246, 0.4);
+}
+
+.new-shop-item.rarity-epic:hover {
+  box-shadow: 0 25px 50px rgba(168, 85, 247, 0.4);
+}
+
+.new-shop-item.rarity-legendary:hover {
+  box-shadow: 0 25px 50px rgba(234, 179, 8, 0.5);
+}
+
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS FOR SHOP
+   ============================================ */
+
+/* Use GPU acceleration for smooth scrolling */
+.new-shop-scroll-container {
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+}
+
+.new-shop-grid {
+  will-change: transform;
+}
+
+.new-shop-item {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reduce animation complexity during scroll */
+.new-shop-scroll-container:active .new-shop-item,
+.new-shop-scroll-container:focus .new-shop-item {
+  transition: none !important;
+}
+
+/* Optimize canvas rendering */
+.new-item-image canvas {
+  image-rendering: optimizeSpeed;
+  will-change: contents;
+}
+
+/* Disable heavy effects on lower-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .new-shop-item,
+  .new-buy-button,
+  .new-rarity-badge {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .new-shop-item:hover {
+    transform: none !important;
+  }
+}
+
+/* Simplify hover effects for better performance */
+.new-shop-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.new-buy-button {
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* Remove backdrop-filter on scroll for performance */
+.new-shop-scroll-container.scrolling .new-rarity-badge {
+  backdrop-filter: none;
+}
+
+.new-shop-scroll-container.scrolling .new-item-image canvas {
+  filter: none;
+}
+
+/* ============================================
+   VEHICLE TYPE SELECTION BUTTONS
+   ============================================ */
+
+.vehicle-type-buttons {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0;
+  z-index: 100;
+  align-items: flex-end;
+}
+
+.vehicle-btn {
+  padding: 18px 40px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+  border: 2px solid rgba(52, 152, 219, 0.5);
+  border-bottom: none;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  overflow: visible;
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.5);
+}
+
+.vehicle-btn:hover {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.3), rgba(30, 41, 59, 0.95));
+  border-color: rgba(52, 152, 219, 0.8);
+  color: #ffffff;
+  box-shadow: 0 -4px 30px rgba(52, 152, 219, 0.4);
+}
+
+.vehicle-btn.active {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  border-color: #3498db;
+  color: #ffffff;
+  box-shadow: 0 0 30px rgba(52, 152, 219, 0.6);
+}
+
+.vehicle-btn.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #f1c40f, #e74c3c, #f1c40f);
+  animation: activeGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes activeGlow {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* JET button - Left side skewed, right side straight */
+.vehicle-btn-left {
+  clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+  border-radius: 0;
+  padding-left: 50px;
+}
+
+.vehicle-btn-left:hover {
+  transform: translateY(-5px);
+}
+
+/* TANK button - Center rectangle, no radius */
+.vehicle-btn-middle {
+  border-radius: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.vehicle-btn-middle:hover {
+  transform: translateY(-5px);
+}
+
+/* RACE button - Right side skewed, left side straight */
+.vehicle-btn-right {
+  clip-path: polygon(0% 0%, 80% 0%, 100% 100%, 0% 100%);
+  border-radius: 0;
+  padding-right: 50px;
+}
+
+.vehicle-btn-right:hover {
+  transform: translateY(-5px);
+}
+
+.vehicle-btn-text {
+  position: relative;
+  z-index: 2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .vehicle-btn {
+    padding: 14px 25px;
+    font-size: 12px;
+  }
+}
+
+/* ============================================
+   CUSTOM GAME FONT STYLE - FIGMA DESIGN
+   ============================================ */
+
+.game-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 8rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 
+    -3px -3px 0px #000,
+    3px -3px 0px #000,
+    -3px 3px 0px #000,
+    3px 3px 0px #000,
+    5px 5px 0px #FF6B00,
+    7px 7px 0px #0055AA,
+    9px 9px 0px #CC0000,
+    10px 10px 0px #000;
+  letter-spacing: 0.05em;
+  transform: skewY(-2deg);
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
+  margin: 0;
+  line-height: 1;
+}
+
+/* Smaller version for medium titles */
+.game-title-medium {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 4rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 
+    -2px -2px 0px #000,
+    2px -2px 0px #000,
+    -2px 2px 0px #000,
+    2px 2px 0px #000,
+    3px 3px 0px #FF6B00,
+    4px 4px 0px #0055AA,
+    5px 5px 0px #CC0000,
+    6px 6px 0px #000;
+  letter-spacing: 0.05em;
+  transform: skewY(-2deg);
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
+  margin: 0;
+  line-height: 1;
+}
+
+/* Small version for UI elements */
+.game-title-small {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 2rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000,
+    2px 2px 0px #FF6B00,
+    3px 3px 0px #0055AA,
+    4px 4px 0px #CC0000;
+  letter-spacing: 0.05em;
+  transform: skewY(-2deg);
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.6));
+  margin: 0;
+  line-height: 1;
+}
+
+/* Apply to main game title */
+.game-logo,
+.game-title-main {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 4rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 
+    -3px -3px 0px #000,
+    3px -3px 0px #000,
+    -3px 3px 0px #000,
+    3px 3px 0px #000,
+    5px 5px 0px #FF6B00,
+    7px 7px 0px #0055AA,
+    9px 9px 0px #CC0000,
+    10px 10px 0px #000;
+  letter-spacing: 0.05em;
+  transform: skewY(-2deg);
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+  margin: 0;
+  line-height: 1;
+}
+
+/* Apply to existing game elements */
+#shopScreen .feature-header h1,
+#lockerScreen .feature-header h1,
+#settingsScreen .feature-header h1,
+#passScreen .feature-header h1,
+#friendsScreen .feature-header h1,
+#createMapScreen .feature-header h1 {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 3rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 
+    -2px -2px 0px #000,
+    2px -2px 0px #000,
+    -2px 2px 0px #000,
+    2px 2px 0px #000,
+    3px 3px 0px #FF6B00,
+    4px 4px 0px #0055AA,
+    5px 5px 0px #CC0000,
+    6px 6px 0px #000;
+  letter-spacing: 0.05em;
+  transform: skewY(-2deg);
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  background-clip: unset !important;
+  margin: 0;
+  line-height: 1;
+}
+
+/* Apply to lobby buttons */
+.lobby-btn,
+.btn,
+button {
+  font-family: 'Luckiest Guy', cursive;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transform: skewY(-1deg);
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000;
+}
+
+/* Main game title in top left */
+h1, .main-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 3rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 
+    -2px -2px 0px #000,
+    2px -2px 0px #000,
+    -2px 2px 0px #000,
+    2px 2px 0px #000,
+    3px 3px 0px #FF6B00,
+    4px 4px 0px #0055AA,
+    5px 5px 0px #CC0000,
+    6px 6px 0px #000;
+  letter-spacing: 0.05em;
+  transform: skewY(-2deg);
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
+  margin: 0;
+  line-height: 1;
+}
+
+/* Apply to vehicle buttons */
+.vehicle-btn-text {
+  font-family: 'Luckiest Guy', cursive;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000;
+}
+
+/* Apply to shop category tabs */
+.shop-category-tab {
+  font-family: 'Luckiest Guy', cursive;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000;
+}
+
+/* Apply to top navigation buttons */
+.top-nav button,
+.nav-btn,
+.feature-btn {
+  font-family: 'Luckiest Guy', cursive;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000;
+}
+
+/* Apply to main play button */
+.play-btn,
+#playButton,
+.join-game-btn {
+  font-family: 'Luckiest Guy', cursive;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000;
+}
+
+/* Apply to login/signup buttons */
+.login-btn,
+.signup-btn,
+#loginBtn,
+#signupBtn {
+  font-family: 'Luckiest Guy', cursive;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000;
+}
+
+/* Apply to all buttons globally (with higher specificity) */
+button:not(.no-game-font),
+.btn:not(.no-game-font),
+input[type="button"]:not(.no-game-font),
+input[type="submit"]:not(.no-game-font) {
+  font-family: 'Luckiest Guy', cursive !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Apply to feature buttons specifically */
+.feature-btn,
+.create-new-map-btn,
+.feature-tab,
+.party-invite-btn,
+.kick-party-btn,
+.leave-party-btn {
+  font-family: 'Luckiest Guy', cursive !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  text-shadow: 
+    -1px -1px 0px #000,
+    1px -1px 0px #000,
+    -1px 1px 0px #000,
+    1px 1px 0px #000 !important;
+}
+
+/* Apply to any text that might be rendered on canvas or dynamically */
+.game-text,
+.lobby-text,
+.ui-text {
+  font-family: 'Luckiest Guy', cursive !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  text-shadow: 
+    -2px -2px 0px #000,
+    2px -2px 0px #000,
+    -2px 2px 0px #000,
+    2px 2px 0px #000,
+    3px 3px 0px #FF6B00,
+    4px 4px 0px #0055AA,
+    5px 5px 0px #CC0000,
+    6px 6px 0px #000 !important;
+  transform: skewY(-2deg) !important;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .game-title {
+    font-size: 4rem;
+  }
+  
+  .game-title-medium {
+    font-size: 2.5rem;
+  }
+  
+  .game-title-small {
+    font-size: 1.5rem;
+  }
+  
+  #shopScreen .feature-header h1,
+  #lockerScreen .feature-header h1,
+  #settingsScreen .feature-header h1,
+  #passScreen .feature-header h1,
+  #friendsScreen .feature-header h1,
+  #createMapScreen .feature-header h1 {
+    font-size: 2rem;
+  }
+}/* =======
+=====================================
+   NEW LOCKER DESIGN - FIGMA STYLE
+   ============================================ */
+
+.new-locker-container {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  box-sizing: border-box;
+}
+
+/* Top Vehicle Selection Buttons */
+.locker-vehicle-selection {
+  position: relative;
+  height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 60px;
+  margin-bottom: 3rem;
+}
+
+.locker-vehicle-btn {
+  position: absolute;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+/* Dynamic positioning based on data-position attribute */
+.locker-vehicle-btn[data-position="center"] {
+  left: 50%;
+  transform: translateX(-50%) scale(1.1);
+  z-index: 20;
+  opacity: 1;
+}
+
+.locker-vehicle-btn[data-position="left"] {
+  left: 15%;
+  transform: scale(0.75);
+  opacity: 0.6;
+  z-index: 10;
+}
+
+.locker-vehicle-btn[data-position="right"] {
+  left: 70%;
+  transform: scale(0.75);
+  opacity: 0.6;
+  z-index: 10;
+}
+
+.locker-vehicle-text {
+  font-size: 4rem !important;
+  transition: opacity 0.3s ease;
+}
+
+.locker-vehicle-btn:not(.active) .locker-vehicle-text {
+  opacity: 0.7;
+}
+
+/* Main Content Layout */
+.locker-main-content {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+}
+
+/* Main Preview Box */
+.locker-preview-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.locker-scroll-btn {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #1e293b 0%, #374151 100%);
+  border: 3px solid #a855f7;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.locker-scroll-btn:hover {
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
+}
+
+.locker-preview-box {
+  background: linear-gradient(135deg, #1e293b 0%, #374151 100%);
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 4px solid #a855f7;
+  box-shadow: 0 25px 50px rgba(168, 85, 247, 0.5);
+  height: 28rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.locker-item-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.locker-item-status.selected {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: 2px solid #10b981;
+}
+
+.locker-item-status.owned {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  border: 2px solid #3b82f6;
+}
+
+.locker-item-status.locked {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: #fff;
+  border: 2px solid #6b7280;
+}
+
+#lockerVehiclePreview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.locker-preview-label {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.locker-preview-label .fortnite-text {
+  font-size: 3rem !important;
+}
+
+/* Right Sidebar */
+.locker-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 16rem;
+}
+
+/* Customization Options */
+.locker-customization-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.locker-option-btn {
+  background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
+  border: 2px solid #a855f7;
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.5);
+}
+
+.locker-option-btn:hover {
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.7);
+}
+
+.locker-option-btn.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.7);
+}
+
+.locker-option-text {
+  font-size: 1.5rem !important;
+}
+
+/* Select Button */
+.locker-select-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 3px solid #10b981;
+  border-radius: 0.5rem;
+  padding: 1.2rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
+  margin-top: auto;
+}
+
+.locker-select-btn:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.7);
+}
+
+.locker-select-btn .fortnite-text {
+  font-size: 1.8rem !important;
+}
+
+.locker-select-btn.selected {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  border-color: #6b7280;
+  cursor: default;
+}
+
+.locker-select-btn.selected:hover {
+  transform: none;
+}
+
+/* Upgrade System */
+.locker-upgrade-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.locker-upgrade-btn {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  border: 2px solid #10b981;
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
+}
+
+.locker-upgrade-btn:hover {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.7);
+}
+
+.locker-upgrade-text {
+  font-size: 1.5rem !important;
+}
+
+/* Upgrade Bars */
+.locker-upgrade-bars {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.locker-upgrade-bar {
+  flex: 1;
+  height: 2rem;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.locker-upgrade-bar.filled {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5);
+}
+
+.locker-upgrade-bar.empty {
+  background: #374151;
+  border: 2px solid #4b5563;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .new-locker-container {
+    padding: 1rem;
+    gap: 1.5rem;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .locker-main-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .locker-sidebar {
+    width: 100%;
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .locker-customization-options,
+  .locker-upgrade-section {
+    flex: 1;
+  }
+  
+  .locker-vehicle-text {
+    font-size: 2.5rem !important;
+  }
+  
+  .locker-preview-label .fortnite-text {
+    font-size: 2rem !important;
+  }
+  
+  .locker-preview-box {
+    height: 20rem;
+  }
+  
+  .locker-vehicle-selection {
+    height: 6rem;
+    margin-bottom: 1rem;
+  }
+}/* Vehicle
+ Selection Buttons in Lobby */
+/* Vehicle buttons edge positioning - see main definition above */
+.vehicle-btn-text {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ============================================
+   FRIENDS SCREEN STYLES - DARK BLUE THEME
+   ============================================ */
+
+#friendsScreen {
+  background: linear-gradient(135deg, #0a1628 0%, #1a2744 50%, #0d1f3c 100%);
+}
+
+/* Search Box */
+.friends-search-box {
+  max-width: 400px;
+  margin: 0 auto 25px;
+}
+
+.friends-search-input {
+  width: 100%;
+  padding: 12px 20px;
+  background: rgba(10, 30, 60, 0.8);
+  border: 2px solid rgba(74, 158, 255, 0.3);
+  border-radius: 25px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.friends-search-input:focus {
+  border-color: #4a9eff;
+  box-shadow: 0 0 20px rgba(74, 158, 255, 0.3);
+}
+
+.friends-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Navigation Tabs */
+.friends-nav-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.friends-tab {
+  padding: 12px 30px;
+  background: rgba(10, 30, 60, 0.6);
+  border: 2px solid rgba(74, 158, 255, 0.3);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.friends-tab:hover {
+  background: rgba(74, 158, 255, 0.2);
+  border-color: rgba(74, 158, 255, 0.6);
+  color: #fff;
+}
+
+.friends-tab.active {
+  background: linear-gradient(135deg, #4a9eff, #2563eb);
+  border-color: #4a9eff;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(74, 158, 255, 0.4);
+}
+
+/* Friends Content */
+.friends-content {
+  max-width: 700px;
+  margin: 0 auto;
+  max-height: 450px;
+  overflow-y: auto;
+  padding: 0 20px;
+}
+
+.friends-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.friends-content::-webkit-scrollbar-track {
+  background: rgba(10, 30, 60, 0.5);
+  border-radius: 3px;
+}
+
+.friends-content::-webkit-scrollbar-thumb {
+  background: rgba(74, 158, 255, 0.5);
+  border-radius: 3px;
+}
+
+.friends-tab-content {
+  animation: fadeIn 0.3s ease;
+}
+
+.friends-tab-content.hidden {
+  display: none;
+}
+
+/* Friends List */
+.friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Friend Card */
+.friend-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 20px;
+  background: rgba(15, 35, 70, 0.8);
+  border: 1px solid rgba(74, 158, 255, 0.2);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.friend-card:hover {
+  background: rgba(74, 158, 255, 0.15);
+  border-color: rgba(74, 158, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.friend-card.request {
+  border-color: rgba(255, 193, 7, 0.4);
+}
+
+/* Avatar */
+.friend-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #4a9eff, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Friend Info */
+.friend-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.friend-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.friend-status {
+  font-size: 12px;
+  color: #6b7c93;
+}
+
+.friend-status.online {
+  color: #22c55e;
+}
+
+.friend-status.in-game {
+  color: #f59e0b;
+}
+
+.friend-status.offline {
+  color: #6b7c93;
+}
+
+/* Friend Actions */
+.friend-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.friend-action-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.friend-action-btn.invite {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+}
+
+.friend-action-btn.invite:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+}
+
+.friend-action-btn.message {
+  background: rgba(74, 158, 255, 0.2);
+  border: 1px solid rgba(74, 158, 255, 0.5);
+  color: #4a9eff;
+}
+
+.friend-action-btn.message:hover {
+  background: rgba(74, 158, 255, 0.35);
+  transform: scale(1.05);
+}
+
+.friend-action-btn.spectate {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #f59e0b;
+}
+
+.friend-action-btn.spectate:hover {
+  background: rgba(245, 158, 11, 0.35);
+  transform: scale(1.05);
+}
+
+.friend-action-btn.accept {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+}
+
+.friend-action-btn.accept:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+}
+
+.friend-action-btn.decline {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+}
+
+.friend-action-btn.decline:hover {
+  background: rgba(239, 68, 68, 0.35);
+  transform: scale(1.05);
+}
+
+/* Empty State */
+.friends-empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #6b7c93;
+}
+
+.friend-action-btn.profile {
+  background: rgba(147, 112, 219, 0.15);
+  border: 1px solid rgba(147, 112, 219, 0.4);
+  color: #9370db;
+}
+
+.friend-action-btn.profile:hover {
+  background: rgba(147, 112, 219, 0.25);
+}
+
+.friend-action-btn.remove {
+  background: rgba(255, 100, 100, 0.15);
+  border: 1px solid rgba(255, 100, 100, 0.4);
+  color: #ff6464;
+}
+
+.friend-action-btn.remove:hover {
+  background: rgba(255, 100, 100, 0.25);
+}
+
+.friend-action-btn.accept {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: #fff;
+}
+
+.friend-action-btn.accept:hover {
+  transform: scale(1.05);
+}
+
+.friend-action-btn.decline {
+  background: rgba(255, 100, 100, 0.15);
+  border: 1px solid rgba(255, 100, 100, 0.4);
+  color: #ff6464;
+}
+
+.friend-action-btn.decline:hover {
+  background: rgba(255, 100, 100, 0.25);
+}
+
+.friend-action-btn.block {
+  background: rgba(100, 100, 100, 0.15);
+  border: 1px solid rgba(100, 100, 100, 0.4);
+  color: #888;
+}
+
+.friend-action-btn.block:hover {
+  background: rgba(100, 100, 100, 0.25);
+}
+
+/* Empty State */
+.friends-empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+/* Add Friend Tab */
+.add-friend-container {
+  text-align: center;
+  padding: 50px 30px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  border: 2px solid rgba(255, 105, 180, 0.15);
+}
+
+.add-friend-container h3 {
+  font-size: 24px;
+  color: #ff69b4;
+  margin-bottom: 10px;
+}
+
+.add-friend-container p {
+  color: #888;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+.add-friend-input-group {
+  display: flex;
+  gap: 12px;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.add-friend-input {
+  flex: 1;
+  padding: 14px 18px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 105, 180, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+}
+
+.add-friend-input:focus {
+  border-color: #ff69b4;
+}
+
+.add-friend-btn {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #ff69b4, #ff1493);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.add-friend-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+}
+
+/* ============================================
+   PASS SCREEN STYLES
+   ============================================ */
+
+#passScreen .feature-header h1 {
+  background: linear-gradient(135deg, #ffa500 0%, #ff6600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pass-coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  padding: 40px;
+}
+
+.coming-soon-icon {
+  font-size: 120px;
+  margin-bottom: 30px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.coming-soon-title {
+  font-size: 72px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffa500 0%, #ff6600 50%, #ffa500 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.coming-soon-text {
+  font-size: 24px;
+  color: #ffa500;
+  margin-bottom: 15px;
+}
+
+.coming-soon-subtext {
+  font-size: 16px;
+  color: #888;
+  max-width: 400px;
+}
+
+/* Notification animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Shop item improvements */
+.shop-item-card {
+    min-width: 200px;
+    margin-right: 20px;
+}
+
+.fortz-icon-small {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+}
+
+/* Ensure shop is visible when opened */
+#shopScreen.feature-screen {
+    display: flex;
+    flex-direction: column;
+}
+
+#shopScreen.feature-screen.hidden {
+    display: none;
+}/* Sh
+op category switching fixes */
+#shopScreen .shop-tab-content {
+    display: none;
+}
+
+#shopScreen .shop-tab-content:not(.hidden) {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Ensure shop tabs are properly positioned */
+#tanksTab, #jetsTab, #raceTab, #musicTab {
+    width: 100%;
+    min-height: 300px;
+}
+
+/* Debug styles for shop tabs */
+.shop-tab-content[style*="display: block"] {
+    display: block !important;
+}
+
+/* Ensure Figma shop items are visible */
+.figma-items-container {
+    min-height: 400px;
+    background: rgba(255, 255, 255, 0.05); /* Slight background to see the area */
+}
+
+.figma-items-scroll {
+    min-height: 350px;
+    padding: 20px 0;
+}
+
+/* Force visibility for shop items */
+.figma-shop-item {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1;
+    transition: all 0.5s ease;
+}
+
+/* Shop item price styling */
+.figma-shop-item-price.owned {
+    color: #22c55e !important;
+    font-weight: bold;
+}
+
+.figma-shop-item-price.free {
+    color: #4ade80 !important;
+    font-weight: bold;
+}
+
+.figma-shop-item-price.paid {
+    color: #fbbf24 !important;
+    font-weight: bold;
+}
+
+/* Fallback item styling */
+.shop-item-fallback {
+    transition: opacity 0.3s ease;
+}
+
+/* Ensure proper spacing between items */
+.figma-shop-item:not(:last-child) {
+    margin-right: 48px;
+}/* I
+mport Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+
+/* Figma Shop Styles */
+.figma-shop-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #581c87 0%, #312e81 50%, #1e3a8a 100%);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 1000;
+    font-family: 'Luckiest Guy', cursive !important;
+    letter-spacing: 2px;
+}
+
+.figma-shop-screen.hidden {
+    display: none;
+}
+
+.figma-shop-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(239, 68, 68, 0.8);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+
+.figma-shop-close:hover {
+    background: rgba(239, 68, 68, 1);
+    transform: scale(1.1);
+}
+
+.figma-shop-container {
+    width: 100%;
+    height: 100%;
+    max-width: 1800px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header with Category Buttons */
+.figma-shop-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 32px;
+}
+
+/* Category Button Base Styles */
+.figma-category-btn {
+    padding: 32px 80px;
+    font-size: 48px;
+    font-family: 'Luckiest Guy', cursive !important;
+    letter-spacing: 2px;
+    border: 10px solid;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    color: white;
+    text-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.figma-category-btn:hover {
+    transform: scale(1.25);
+}
+
+/* Music Button - Skewed */
+.music-wrapper {
+    position: relative;
+    border: 10px solid #facc15;
+    clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
+    box-shadow: 0 0 50px rgba(251, 146, 60, 0.8);
+    transition: all 0.5s ease;
+}
+
+.music-wrapper:hover {
+    transform: scale(1.25) rotate(-2deg);
+}
+
+.music-wrapper.active {
+    border-color: #84cc16;
+    box-shadow: 0 0 50px rgba(132, 204, 22, 0.8);
+    animation: glow 2s infinite;
+}
+
+.music-btn {
+    background: linear-gradient(135deg, #facc15 0%, #f97316 50%, #ea580c 100%);
+    clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+.music-btn.active {
+    background: linear-gradient(135deg, #84cc16 0%, #22c55e 50%, #15803d 100%);
+    animation: pulse 2s infinite;
+}
+
+.figma-category-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 32px;
+}
+
+/* Tanks Button - No Skew */
+.tanks-btn {
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #1d4ed8 100%);
+    border-color: #22d3ee;
+    box-shadow: 0 0 50px rgba(34, 211, 238, 0.8);
+}
+
+.tanks-btn:hover {
+    transform: scale(1.25) rotate(3deg);
+}
+
+.tanks-btn.active {
+    background: linear-gradient(135deg, #84cc16 0%, #22c55e 50%, #15803d 100%);
+    border-color: #84cc16;
+    box-shadow: 0 0 50px rgba(132, 204, 22, 0.8);
+    animation: glow 2s infinite, pulse 2s infinite;
+}
+
+/* Jets Button - No Skew */
+.jets-btn {
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #1d4ed8 100%);
+    border-color: #22d3ee;
+    box-shadow: 0 0 50px rgba(34, 211, 238, 0.8);
+}
+
+.jets-btn:hover {
+    transform: scale(1.25) rotate(3deg);
+}
+
+.jets-btn.active {
+    background: linear-gradient(135deg, #84cc16 0%, #22c55e 50%, #15803d 100%);
+    border-color: #84cc16;
+    box-shadow: 0 0 50px rgba(132, 204, 22, 0.8);
+    animation: glow 2s infinite, pulse 2s infinite;
+}
+
+/* Cars Button - Skewed */
+.cars-wrapper {
+    position: relative;
+    border: 10px solid #22d3ee;
+    clip-path: polygon(0% 0%, 85% 0%, 100% 100%, 0% 100%);
+    box-shadow: 0 0 50px rgba(34, 211, 238, 0.8);
+    transition: all 0.5s ease;
+}
+
+.cars-wrapper:hover {
+    transform: scale(1.25) rotate(2deg);
+}
+
+.cars-wrapper.active {
+    border-color: #84cc16;
+    box-shadow: 0 0 50px rgba(132, 204, 22, 0.8);
+    animation: glow 2s infinite;
+}
+
+.cars-btn {
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #1d4ed8 100%);
+    clip-path: polygon(0% 0%, 85% 0%, 100% 100%, 0% 100%);
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+.cars-btn.active {
+    background: linear-gradient(135deg, #84cc16 0%, #22c55e 50%, #15803d 100%);
+    animation: pulse 2s infinite;
+}
+
+/* Shop Main Container */
+.figma-shop-main {
+    position: relative;
+    background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #312e81 100%);
+    padding: 48px;
+    border: 12px solid #facc15;
+    box-shadow: 0 0 80px rgba(250, 204, 21, 0.6);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.figma-shop-title {
+    font-size: 32px;
+    text-align: center;
+    color: #fde047;
+    margin-bottom: 32px;
+    text-shadow: 0 10px 20px rgba(0, 0, 0, 0.9);
+    animation: float 3s ease-in-out infinite;
+    font-family: 'Luckiest Guy', cursive !important;
+    letter-spacing: 2px;
+}
+
+/* Scroll Buttons */
+.figma-scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: linear-gradient(135deg, #ec4899 0%, #f43f5e 50%, #be185d 100%);
+    padding: 32px;
+    border: 10px solid #f9a8d4;
+    box-shadow: 0 0 50px rgba(244, 114, 182, 0.8);
+    color: white;
+    font-size: 48px;
+    cursor: pointer;
+    transition: all 0.7s ease;
+}
+
+.figma-scroll-left {
+    left: 24px;
+}
+
+.figma-scroll-right {
+    right: 24px;
+}
+
+.figma-scroll-btn:hover {
+    transform: translateY(-50%) scale(1.5) rotate(360deg);
+}
+
+/* Items Container */
+.figma-items-container {
+    overflow: hidden;
+    padding: 0 96px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.figma-items-scroll {
+    display: flex;
+    gap: 48px;
+    transition: transform 0.7s ease-out;
+    transform: translateX(0px);
+}
+
+/* Shop Items */
+.figma-shop-item {
+    background: linear-gradient(135deg, #a855f7 0%, #d946ef 50%, #ec4899 100%);
+    border: 10px solid #c084fc;
+    box-shadow: 0 0 60px rgba(168, 85, 247, 0.8);
+    width: 320px;
+    height: 320px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.figma-shop-item:hover {
+    box-shadow: 0 0 100px rgba(232, 121, 249, 1);
+    transform: scale(1.25) rotate(6deg);
+}
+
+.figma-shop-item-image {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.figma-shop-item-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.figma-shop-item-info {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-family: 'Luckiest Guy', cursive !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.figma-shop-item-name {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.figma-shop-item-price {
+    font-size: 14px;
+    color: #fde047;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px); 
+    }
+    50% { 
+        transform: translateY(-10px); 
+    }
+}
+
+@keyframes glow {
+    0%, 100% { 
+        box-shadow: 0 0 20px currentColor; 
+    }
+    50% { 
+        box-shadow: 0 0 40px currentColor, 0 0 60px currentColor; 
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Float animation for items */
+.figma-shop-item:nth-child(1) { animation: float 3s ease-in-out infinite; }
+.figma-shop-item:nth-child(2) { animation: float 4s ease-in-out infinite 0.2s; }
+.figma-shop-item:nth-child(3) { animation: float 5s ease-in-out infinite 0.4s; }
+.figma-shop-item:nth-child(4) { animation: float 3s ease-in-out infinite 0.6s; }
+.figma-shop-item:nth-child(5) { animation: float 4s ease-in-out infinite 0.8s; }
+.figma-shop-item:nth-child(6) { animation: float 5s ease-in-out infinite 1s; }
+.figma-shop-item:nth-child(7) { animation: float 3s ease-in-out infinite 1.2s; }
+.figma-shop-item:nth-child(8) { animation: float 4s ease-in-out infinite 1.4s; }
+.figma-shop-item:nth-child(9) { animation: float 5s ease-in-out infinite 1.6s; }
+.figma-shop-item:nth-child(10) { animation: float 3s ease-in-out infinite 1.8s; }

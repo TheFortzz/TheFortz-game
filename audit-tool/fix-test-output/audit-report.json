@@ -1,0 +1,4419 @@
+{
+  "metadata": {
+    "generatedAt": "2025-12-08T09:54:36.802Z",
+    "toolVersion": "1.0.0"
+  },
+  "summary": {
+    "totalIssues": 603,
+    "critical": 38,
+    "warning": 154,
+    "info": 411
+  },
+  "issues": {
+    "orphanedFunctions": [
+      {
+        "severity": "warning",
+        "functionName": "initZoomSlider",
+        "filePath": "src/client/js/zoomSlider.js",
+        "lineNumber": 8,
+        "missingElementId": "mapZoomSlider",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "initZoomSlider",
+        "filePath": "src/client/js/zoomSlider.js",
+        "lineNumber": 9,
+        "missingElementId": "mapZoomSliderFill",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "initZoomSlider",
+        "filePath": "src/client/js/zoomSlider.js",
+        "lineNumber": 10,
+        "missingElementId": "mapZoomSliderThumb",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/zoomSlider.js",
+        "lineNumber": 37,
+        "missingElementId": "zoomDisplay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "captureMapThumbnail",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 16,
+        "missingElementId": "mapCreatorMinimapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "stopCreateMapRendering",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 624,
+        "missingElementId": "createNewMapBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createInteractiveElements",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 630,
+        "missingElementId": "createNewMapBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showTankMapNameInput",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 820,
+        "missingElementId": "tankMapNameInput",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showTankMapNameInput",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 823,
+        "missingElementId": "tankCancelBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showTankMapNameInput",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 825,
+        "missingElementId": "tankCreateBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 845,
+        "missingElementId": "tankCreateBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showVehicleTypeSelection",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 989,
+        "missingElementId": "cancelVehicleBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showMapNameInput",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1072,
+        "missingElementId": "mapNameInput",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showMapNameInput",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1076,
+        "missingElementId": "backBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showMapNameInput",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1082,
+        "missingElementId": "createBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1104,
+        "missingElementId": "createBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showMapCreatorLoading",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1111,
+        "missingElementId": "mapCreatorLoadingScreen",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateMapCreatorLoadingProgress",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1197,
+        "missingElementId": "mapLoadProgress",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateMapCreatorLoadingProgress",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1198,
+        "missingElementId": "mapLoadStatus",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "hideMapCreatorLoading",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1205,
+        "missingElementId": "mapCreatorLoadingScreen",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "addVehicleTypeIndicator",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1370,
+        "missingElementId": "vehicleTypeIndicator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showRenameMapDialog",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1500,
+        "missingElementId": "renameMapInput",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showRenameMapDialog",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1514,
+        "missingElementId": "cancelRenameBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showRenameMapDialog",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1519,
+        "missingElementId": "confirmRenameBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "confirmRename",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1532,
+        "missingElementId": "mapNameDisplay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createZoomSlider",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1552,
+        "missingElementId": "mapCreatorZoomSlider",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createZoomSlider",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1653,
+        "missingElementId": "zoomDisplay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createMinimapViewer",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1690,
+        "missingElementId": "mapCreatorMinimap",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createHelpButton",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1746,
+        "missingElementId": "mapCreatorHelpButton",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateMinimapViewer",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 1824,
+        "missingElementId": "mapCreatorMinimapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeBlankMapCreator",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 2003,
+        "missingElementId": "mapCreatorZoomSlider",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeBlankMapCreator",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 2009,
+        "missingElementId": "mapCreatorMinimap",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeBlankMapCreator",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 2015,
+        "missingElementId": "vehicleTypeIndicator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeBlankMapCreator",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 2021,
+        "missingElementId": "mapCreatorHelpButton",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeBlankMapCreator",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 2027,
+        "missingElementId": "mapCreatorHelpTooltip",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "handleCanvasWheel",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 3021,
+        "missingElementId": "zoomDisplay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 3592,
+        "missingElementId": "mapTestOverlay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "stopMapTest",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 3736,
+        "missingElementId": "mapTestCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4291,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4294,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5374,
+        "missingElementId": "zoomDisplay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateZoomSlider",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5388,
+        "missingElementId": "mapZoomSlider",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateZoomSlider",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5389,
+        "missingElementId": "mapZoomSliderFill",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateZoomSlider",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5390,
+        "missingElementId": "mapZoomSliderThumb",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "zoomIn",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5426,
+        "missingElementId": "zoomDisplay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "zoomOut",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5458,
+        "missingElementId": "zoomDisplay",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateSlider",
+        "filePath": "src/client/js/settings.js",
+        "lineNumber": 18,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateSlider",
+        "filePath": "src/client/js/settings.js",
+        "lineNumber": 19,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateVolume",
+        "filePath": "src/client/js/settings.js",
+        "lineNumber": 31,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/settings.js",
+        "lineNumber": 52,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/scrollButtons.js",
+        "lineNumber": 9,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showRaceMapNameInput",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 368,
+        "missingElementId": "raceMapNameInput",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showRaceMapNameInput",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 371,
+        "missingElementId": "raceCancelBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showRaceMapNameInput",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 373,
+        "missingElementId": "raceCreateBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 387,
+        "missingElementId": "raceCreateBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createRaceMapEditorUI",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 408,
+        "missingElementId": "raceMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "initRaceMapCanvas",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 755,
+        "missingElementId": "raceMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "renderRaceMap",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 841,
+        "missingElementId": "raceMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "renderRaceMap",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 955,
+        "missingElementId": "raceObjectCount",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "handleRaceCanvasZoom",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1062,
+        "missingElementId": "raceMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "handleRaceCanvasMouseMove",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1106,
+        "missingElementId": "raceMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "loadRaceAssets",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1161,
+        "missingElementId": "raceAssetGrid",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createRaceMinimap",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1239,
+        "missingElementId": "raceMinimap",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateRaceMinimap",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1281,
+        "missingElementId": "raceMinimapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateRaceMinimap",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1282,
+        "missingElementId": "raceMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeRaceMapCreator",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1426,
+        "missingElementId": "raceMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeRaceMapCreator",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1430,
+        "missingElementId": "raceMinimap",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "toggleRaceAssetsPanel",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1449,
+        "missingElementId": "raceAssetPanel",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "toggleRaceAssetsPanel",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1450,
+        "missingElementId": "raceMinimizeBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "toggleRaceAssetsPanel",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1451,
+        "missingElementId": "raceAssetPanelContent",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "setupRaceEditorDrag",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1494,
+        "missingElementId": "raceAssetPanel",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "setupRaceEditorDrag",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1495,
+        "missingElementId": "raceEditorHeader",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "handleRaceKeyDown",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1531,
+        "missingElementId": "raceMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "panLoop",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1553,
+        "missingElementId": "raceMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showJetMapNameInput",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 164,
+        "missingElementId": "jetMapNameInput",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showJetMapNameInput",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 167,
+        "missingElementId": "jetCancelBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showJetMapNameInput",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 169,
+        "missingElementId": "jetCreateBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 183,
+        "missingElementId": "jetCreateBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createJetMapEditorUI",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 204,
+        "missingElementId": "jetMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "initJetMapCanvas",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 408,
+        "missingElementId": "jetMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "renderJetMap",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 492,
+        "missingElementId": "jetMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "renderJetMap",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 573,
+        "missingElementId": "jetObjectCount",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "handleJetCanvasZoom",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 663,
+        "missingElementId": "jetMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "handleJetCanvasMouseMove",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 702,
+        "missingElementId": "jetMapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "loadJetAssets",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 752,
+        "missingElementId": "jetAssetGrid",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "createJetMinimap",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 818,
+        "missingElementId": "jetMinimap",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateJetMinimap",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 860,
+        "missingElementId": "jetMinimapCanvas",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "updateJetMinimap",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 861,
+        "missingElementId": "jetMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeJetMapCreator",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 999,
+        "missingElementId": "jetMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "closeJetMapCreator",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1003,
+        "missingElementId": "jetMinimap",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "toggleJetAssetsPanel",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1022,
+        "missingElementId": "jetAssetPanel",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "toggleJetAssetsPanel",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1023,
+        "missingElementId": "jetMinimizeBtn",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "toggleJetAssetsPanel",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1024,
+        "missingElementId": "jetAssetPanelContent",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "setupJetEditorDrag",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1067,
+        "missingElementId": "jetAssetPanel",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "setupJetEditorDrag",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1068,
+        "missingElementId": "jetEditorHeader",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "handleJetKeyDown",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1104,
+        "missingElementId": "jetMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "panLoop",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1126,
+        "missingElementId": "jetMapCreator",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showMapLoadingScreen",
+        "filePath": "src/client/js/createdMapsIntegration.js",
+        "lineNumber": 160,
+        "missingElementId": "mapLoadingScreen",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 49,
+        "missingElementId": "colorsItemsGrid",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 58,
+        "missingElementId": "bodiesItemsGrid",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 64,
+        "missingElementId": "weaponsItemsGrid",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 201,
+        "missingElementId": "currentColor",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 205,
+        "missingElementId": "currentBody",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 209,
+        "missingElementId": "currentWeapon",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 298,
+        "missingElementId": "lockerTankPreview",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 317,
+        "missingElementId": "currentColor",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 318,
+        "missingElementId": "currentBody",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/ui/LockerUI.js",
+        "lineNumber": 319,
+        "missingElementId": "currentWeapon",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/ui/LobbyUI.js",
+        "lineNumber": 380,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/ui/LobbyUI.js",
+        "lineNumber": 712,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/ui/LobbyUI.js",
+        "lineNumber": 742,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/ui/LobbyUI.js",
+        "lineNumber": 942,
+        "missingElementId": "gameModesScreen",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "showAuthError",
+        "filePath": "src/client/js/ui/Auth.js",
+        "lineNumber": 6,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "anonymous",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 109,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/game/input.js",
+        "lineNumber": 164,
+        "missingElementId": "cooldownCursor",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/game/input.js",
+        "lineNumber": 172,
+        "missingElementId": "cooldownCursor",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/game/input.js",
+        "lineNumber": 182,
+        "missingElementId": "cooldownCursor",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/game/input.js",
+        "lineNumber": 213,
+        "missingElementId": "cooldownCursor",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/game/input.js",
+        "lineNumber": 215,
+        "missingElementId": "cooldownCursor",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 438,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 490,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      },
+      {
+        "severity": "warning",
+        "functionName": "global",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 524,
+        "missingElementId": "<dynamic>",
+        "queryMethod": "getElementById"
+      }
+    ],
+    "brokenHandlers": [
+      {
+        "severity": "critical",
+        "elementId": "inviteBtn1",
+        "eventType": "onclick",
+        "missingFunction": "showPartyInviteMenu",
+        "htmlLineNumber": 69
+      },
+      {
+        "severity": "critical",
+        "elementId": "inviteBtn2",
+        "eventType": "onclick",
+        "missingFunction": "showPartyInviteMenu",
+        "htmlLineNumber": 86
+      },
+      {
+        "severity": "critical",
+        "elementId": "jetBtn",
+        "eventType": "onclick",
+        "missingFunction": "selectVehicleType",
+        "htmlLineNumber": 115
+      },
+      {
+        "severity": "critical",
+        "elementId": "tankBtn",
+        "eventType": "onclick",
+        "missingFunction": "selectVehicleType",
+        "htmlLineNumber": 118
+      },
+      {
+        "severity": "critical",
+        "elementId": "raceBtn",
+        "eventType": "onclick",
+        "missingFunction": "selectVehicleType",
+        "htmlLineNumber": 121
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchShopCategory",
+        "htmlLineNumber": 496
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchShopCategory",
+        "htmlLineNumber": 500
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchShopCategory",
+        "htmlLineNumber": 503
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchShopCategory",
+        "htmlLineNumber": 506
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "scrollLockerItems",
+        "htmlLineNumber": 592
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "scrollLockerItems",
+        "htmlLineNumber": 624
+      },
+      {
+        "severity": "critical",
+        "elementId": "lockerSelectBtn",
+        "eventType": "onclick",
+        "missingFunction": "selectLockerItem",
+        "htmlLineNumber": 644
+      },
+      {
+        "severity": "critical",
+        "elementId": "tabTopPlayers",
+        "eventType": "onclick",
+        "missingFunction": "switchChampionsTab",
+        "htmlLineNumber": 732
+      },
+      {
+        "severity": "critical",
+        "elementId": "tabTopCreators",
+        "eventType": "onclick",
+        "missingFunction": "switchChampionsTab",
+        "htmlLineNumber": 736
+      },
+      {
+        "severity": "critical",
+        "elementId": "tabChampions",
+        "eventType": "onclick",
+        "missingFunction": "switchChampionsTab",
+        "htmlLineNumber": 740
+      },
+      {
+        "severity": "critical",
+        "elementId": "tabAward",
+        "eventType": "onclick",
+        "missingFunction": "switchChampionsTab",
+        "htmlLineNumber": 744
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchFriendsTab",
+        "htmlLineNumber": 830
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchFriendsTab",
+        "htmlLineNumber": 831
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "inviteFriend",
+        "htmlLineNumber": 849
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "messageFriend",
+        "htmlLineNumber": 850
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "spectateFriend",
+        "htmlLineNumber": 863
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "messageFriend",
+        "htmlLineNumber": 864
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "inviteFriend",
+        "htmlLineNumber": 877
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "messageFriend",
+        "htmlLineNumber": 878
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "declineFriendRequest",
+        "htmlLineNumber": 898
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "declineFriendRequest",
+        "htmlLineNumber": 912
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchFriendsTab",
+        "htmlLineNumber": 1193
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "switchFriendsTab",
+        "htmlLineNumber": 1196
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "closeGameModeModal",
+        "htmlLineNumber": 1228
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "scrollGameModeList",
+        "htmlLineNumber": 1230
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "scrollGameModeList",
+        "htmlLineNumber": 1236
+      },
+      {
+        "severity": "critical",
+        "elementId": "soloBtn",
+        "eventType": "onclick",
+        "missingFunction": "toggleTeamModeDropdown",
+        "htmlLineNumber": 1244
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "selectTeamMode",
+        "htmlLineNumber": 1249
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "selectTeamMode",
+        "htmlLineNumber": 1250
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "selectTeamMode",
+        "htmlLineNumber": 1251
+      },
+      {
+        "severity": "critical",
+        "elementId": null,
+        "eventType": "onclick",
+        "missingFunction": "openBattleRoyal",
+        "htmlLineNumber": 1255
+      },
+      {
+        "severity": "critical",
+        "elementId": "respawnBtn",
+        "eventType": "onclick",
+        "missingFunction": "respawnPlayer",
+        "htmlLineNumber": 1415
+      },
+      {
+        "severity": "critical",
+        "elementId": "friendSearchInput",
+        "eventType": "oninput",
+        "missingFunction": "filterFriends",
+        "htmlLineNumber": 825
+      }
+    ],
+    "unusedFunctions": [
+      {
+        "severity": "info",
+        "functionName": "initPlayerWeapon",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 183,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createBullets",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 210,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "startCharge",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 271,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getChargeProgress",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 283,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "switchWeapon",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 295,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getCurrentWeapon",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 308,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getUnlockedWeapons",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 315,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateBullet",
+        "filePath": "src/client/js/weaponSystem.js",
+        "lineNumber": 322,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handleBulletHit",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 79,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderMuzzleFlashes",
+        "filePath": "src/client/js/visualPolish.js",
+        "lineNumber": 301,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "randomInt",
+        "filePath": "src/client/js/utils.js",
+        "lineNumber": 26,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "registerPlayer",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 366,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "reportMatchResult",
+        "filePath": "src/client/js/tournamentSystem.js",
+        "lineNumber": 212,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getLeaderboard",
+        "filePath": "src/client/js/miniGameSystem.js",
+        "lineNumber": 346,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getActiveTournaments",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 1171,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPlayerTournaments",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 1176,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "constructor",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 12,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "rounds",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 56,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "unregisterPlayer",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 422,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getTournament",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 1163,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAllTournaments",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 1167,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getSeasonData",
+        "filePath": "src/client/js/tournament-system.js",
+        "lineNumber": 1206,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getTerrainEffect",
+        "filePath": "src/client/js/terrainSystem.js",
+        "lineNumber": 344,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "applyTerrainEffects",
+        "filePath": "src/client/js/terrainSystem.js",
+        "lineNumber": 365,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "generateBiomeMap",
+        "filePath": "src/client/js/terrainSystem.js",
+        "lineNumber": 385,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showTankMapNameInput",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 746,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "backToObjects",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 2341,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearAllObjects",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 2437,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "drawIsometricTile",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 3308,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "syncPreviewAITanks",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4158,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "publishMap",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4344,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getMostPlayedMap",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4420,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "incrementMapPlays",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4429,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "drawIsometricGrid",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4446,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderParallelogramTerrain",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 4610,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "drawGroundIsometricTile",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5099,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "drawSubtleIsometricGrid",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5113,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderHexTerrainForEditor",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5160,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "easeOutCubic",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5297,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "zoomIn",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5405,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "zoomOut",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5437,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "editMap",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5565,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "analyzeMap",
+        "filePath": "src/client/js/tankCreatmap.js",
+        "lineNumber": 5654,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "deleteMap",
+        "filePath": "src/client/js/mapGenerator.js",
+        "lineNumber": 344,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "enableSpectatorMode",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 59,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "disableSpectatorMode",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 76,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setCameraMode",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 83,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "nextPlayer",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 104,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "previousPlayer",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 116,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "selectPlayer",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 128,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateAutoDirector",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 138,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getCameraTarget",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 217,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getCameraSettings",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 244,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "toggleOverlay",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 210,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderSpectatorUI",
+        "filePath": "src/client/js/spectatorSystem.js",
+        "lineNumber": 293,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addSkillPoints",
+        "filePath": "src/client/js/skillTreeSystem.js",
+        "lineNumber": 255,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "upgradeSkill",
+        "filePath": "src/client/js/skillTreeSystem.js",
+        "lineNumber": 261,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getEffects",
+        "filePath": "src/client/js/skillTreeSystem.js",
+        "lineNumber": 347,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getSkillTree",
+        "filePath": "src/client/js/skillTreeSystem.js",
+        "lineNumber": 353,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "resetSkills",
+        "filePath": "src/client/js/skillTreeSystem.js",
+        "lineNumber": 410,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "initSettingsUI",
+        "filePath": "src/client/js/settings.js",
+        "lineNumber": 3,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "startEvent",
+        "filePath": "src/client/js/seasonalEventSystem.js",
+        "lineNumber": 97,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "joinEvent",
+        "filePath": "src/client/js/seasonalEventSystem.js",
+        "lineNumber": 121,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getActiveEvents",
+        "filePath": "src/client/js/seasonalEventSystem.js",
+        "lineNumber": 212,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "endEvent",
+        "filePath": "src/client/js/seasonalEventSystem.js",
+        "lineNumber": 254,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getTimeRemaining",
+        "filePath": "src/client/js/seasonalEventSystem.js",
+        "lineNumber": 269,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setVignette",
+        "filePath": "src/client/js/screenEffects.js",
+        "lineNumber": 76,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderPostEffects",
+        "filePath": "src/client/js/screenEffects.js",
+        "lineNumber": 131,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "hit",
+        "filePath": "src/client/js/screenEffects.js",
+        "lineNumber": 234,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "death",
+        "filePath": "src/client/js/screenEffects.js",
+        "lineNumber": 246,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "speedBoost",
+        "filePath": "src/client/js/screenEffects.js",
+        "lineNumber": 259,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "normal",
+        "filePath": "src/client/js/screenEffects.js",
+        "lineNumber": 264,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "startRecording",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 24,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "recordEvent",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 117,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "startPlayback",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 177,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updatePlayback",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 200,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "pausePlayback",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 271,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "resumePlayback",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 279,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "seekTo",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 288,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setSpeed",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 302,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getReplayList",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 316,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "deleteReplay",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 327,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "loadFromStorage",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 345,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "exportReplay",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 360,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "importReplay",
+        "filePath": "src/client/js/replaySystem.js",
+        "lineNumber": 372,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateAfterMatch",
+        "filePath": "src/client/js/rankingSystem.js",
+        "lineNumber": 58,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getRankInfo",
+        "filePath": "src/client/js/rankingSystem.js",
+        "lineNumber": 131,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "resetSeason",
+        "filePath": "src/client/js/rankingSystem.js",
+        "lineNumber": 229,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "quickPlayFFAWithPlayerMap",
+        "filePath": "src/client/js/randomMapLoader.js",
+        "lineNumber": 171,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearRaceMap",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1344,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "saveRaceMap",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1387,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "toggleRaceAssetsPanel",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1448,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "switchRaceAssetCategory",
+        "filePath": "src/client/js/raceCreatmap.js",
+        "lineNumber": 1476,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "claimReward",
+        "filePath": "src/client/js/battlePassSystem.js",
+        "lineNumber": 205,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getActiveQuests",
+        "filePath": "src/client/js/questSystem.js",
+        "lineNumber": 283,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getActivePowerUps",
+        "filePath": "src/client/js/advancedPowerUps.js",
+        "lineNumber": 416,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "forcePowerUpSpawn",
+        "filePath": "src/client/js/power-up-system.js",
+        "lineNumber": 1049,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "removePowerUp",
+        "filePath": "src/client/js/power-up-system.js",
+        "lineNumber": 1053,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setMaxPowerUps",
+        "filePath": "src/client/js/power-up-system.js",
+        "lineNumber": 1063,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setRarePowerUpsEnabled",
+        "filePath": "src/client/js/power-up-system.js",
+        "lineNumber": 1071,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addXP",
+        "filePath": "src/client/js/battlePassSystem.js",
+        "lineNumber": 144,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "prestige",
+        "filePath": "src/client/js/playerProgressionSystem.js",
+        "lineNumber": 128,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "trackWeaponKill",
+        "filePath": "src/client/js/playerProgressionSystem.js",
+        "lineNumber": 164,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPlayerSummary",
+        "filePath": "src/client/js/playerProgressionSystem.js",
+        "lineNumber": 246,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderProgressionUI",
+        "filePath": "src/client/js/playerProgressionSystem.js",
+        "lineNumber": 274,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setEntityCount",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 95,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setParticleCount",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 100,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setDrawCalls",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 105,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setNetworkLatency",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 110,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderOverlay",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 115,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getReport",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 185,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isPerformanceGood",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 195,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPerformanceGrade",
+        "filePath": "src/client/js/performanceMonitor.js",
+        "lineNumber": 200,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "debounce",
+        "filePath": "src/client/js/bug-fixes.js",
+        "lineNumber": 234,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "throttle",
+        "filePath": "src/client/js/bug-fixes.js",
+        "lineNumber": 247,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "requestAnimationFrameThrottled",
+        "filePath": "src/client/js/performance.js",
+        "lineNumber": 33,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "throttledCallback",
+        "filePath": "src/client/js/performance.js",
+        "lineNumber": 37,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "cacheRender",
+        "filePath": "src/client/js/performance.js",
+        "lineNumber": 56,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "batchDOMUpdates",
+        "filePath": "src/client/js/performance.js",
+        "lineNumber": 79,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "lazyLoadImage",
+        "filePath": "src/client/js/performance.js",
+        "lineNumber": 86,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "measurePerformance",
+        "filePath": "src/client/js/performance.js",
+        "lineNumber": 124,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getFPS",
+        "filePath": "src/client/js/performance.js",
+        "lineNumber": 149,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "recordFPS",
+        "filePath": "src/client/js/performance-config.js",
+        "lineNumber": 116,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isEnabled",
+        "filePath": "src/client/js/templates/BaseSystem.js",
+        "lineNumber": 59,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getLimit",
+        "filePath": "src/client/js/performance-config.js",
+        "lineNumber": 155,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "toggleFeature",
+        "filePath": "src/client/js/performance-config.js",
+        "lineNumber": 160,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "spawnExplosion",
+        "filePath": "src/client/js/particles-optimized.js",
+        "lineNumber": 109,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "spawnSmoke",
+        "filePath": "src/client/js/particles-optimized.js",
+        "lineNumber": 135,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getCount",
+        "filePath": "src/client/js/particles-optimized.js",
+        "lineNumber": 263,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "dismiss",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 128,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearAll",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 136,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showAchievement",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 210,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showLevelUp",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 221,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showKill",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 232,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showReward",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 243,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showQuestComplete",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 254,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showError",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 265,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showInfo",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 269,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showWarning",
+        "filePath": "src/client/js/notificationSystem.js",
+        "lineNumber": 273,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "callMissileStrike",
+        "filePath": "src/client/js/newPowerUps.js",
+        "lineNumber": 302,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "startGame",
+        "filePath": "src/client/js/miniGameSystem.js",
+        "lineNumber": 102,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateSession",
+        "filePath": "src/client/js/miniGameSystem.js",
+        "lineNumber": 171,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAllPlayerStats",
+        "filePath": "src/client/js/miniGameSystem.js",
+        "lineNumber": 341,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getDailyChallenge",
+        "filePath": "src/client/js/miniGameSystem.js",
+        "lineNumber": 369,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "joinQueue",
+        "filePath": "src/client/js/matchmakingSystem.js",
+        "lineNumber": 40,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "leaveQueue",
+        "filePath": "src/client/js/matchmakingSystem.js",
+        "lineNumber": 72,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getQueueStatus",
+        "filePath": "src/client/js/matchmakingSystem.js",
+        "lineNumber": 167,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getMatch",
+        "filePath": "src/client/js/matchmakingSystem.js",
+        "lineNumber": 196,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "endMatch",
+        "filePath": "src/client/js/matchmakingSystem.js",
+        "lineNumber": 201,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "_setPlayCounts",
+        "filePath": "src/client/js/mapRenderer.js",
+        "lineNumber": 431,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "drawAnimatedWaterTile",
+        "filePath": "src/client/js/mapRenderer.js",
+        "lineNumber": 451,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "generateMap",
+        "filePath": "src/client/js/mapGenerator.js",
+        "lineNumber": 93,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderDefaultTerrain",
+        "filePath": "src/client/js/map-renderer.js",
+        "lineNumber": 389,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderWaterBackground",
+        "filePath": "src/client/js/map-renderer.js",
+        "lineNumber": 450,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isBuildingVisible",
+        "filePath": "src/client/js/map-renderer.js",
+        "lineNumber": 682,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getMapBounds",
+        "filePath": "src/client/js/map-renderer.js",
+        "lineNumber": 757,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getCurrentMap",
+        "filePath": "src/client/js/map-renderer.js",
+        "lineNumber": 777,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getLoadingProgress",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 409,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setRenderDistance",
+        "filePath": "src/client/js/map-renderer.js",
+        "lineNumber": 790,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setCollisionsEnabled",
+        "filePath": "src/client/js/map-renderer.js",
+        "lineNumber": 794,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "openCrate",
+        "filePath": "src/client/js/lootBoxSystem.js",
+        "lineNumber": 159,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "purchaseCrate",
+        "filePath": "src/client/js/lootBoxSystem.js",
+        "lineNumber": 246,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPlayerCrates",
+        "filePath": "src/client/js/lootBoxSystem.js",
+        "lineNumber": 272,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getOpenHistory",
+        "filePath": "src/client/js/lootBoxSystem.js",
+        "lineNumber": 278,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getCrateInfo",
+        "filePath": "src/client/js/lootBoxSystem.js",
+        "lineNumber": 284,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAllCrateTypes",
+        "filePath": "src/client/js/lootBoxSystem.js",
+        "lineNumber": 289,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearJetMap",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 922,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "saveJetMap",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 961,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "toggleJetAssetsPanel",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1021,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "switchJetAssetCategory",
+        "filePath": "src/client/js/jetCreatmap.js",
+        "lineNumber": 1049,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getLevelBadge",
+        "filePath": "src/client/js/image-fallback.js",
+        "lineNumber": 29,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "hasFailed",
+        "filePath": "src/client/js/image-fallback.js",
+        "lineNumber": 111,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createPlaceholder",
+        "filePath": "src/client/js/image-fallback.js",
+        "lineNumber": 151,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderMinimap",
+        "filePath": "src/client/js/hexTerrainSystem.js",
+        "lineNumber": 347,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addKillFeed",
+        "filePath": "src/client/js/gameplay-enhancements.js",
+        "lineNumber": 121,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addComboKill",
+        "filePath": "src/client/js/gameplay-enhancements.js",
+        "lineNumber": 187,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "applyScreenShakeToContext",
+        "filePath": "src/client/js/gameplay-enhancements.js",
+        "lineNumber": 263,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handleTankDestruction",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 146,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handlePowerUpCollection",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 170,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handleTerrainHit",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 206,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "applyCameraShake",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 305,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getWeatherEffects",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 317,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handlePlayerShoot",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 339,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handlePlayerMovement",
+        "filePath": "src/client/js/gameIntegration.js",
+        "lineNumber": 366,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getStats",
+        "filePath": "src/client/js/entities/Tank.js",
+        "lineNumber": 203,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "displayStats",
+        "filePath": "src/client/js/game-loop-optimized.js",
+        "lineNumber": 130,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getRandomSpawnPoint",
+        "filePath": "src/client/js/game-integration.js",
+        "lineNumber": 637,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAllSystems",
+        "filePath": "src/client/js/game-integration.js",
+        "lineNumber": 858,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setSettings",
+        "filePath": "src/client/js/game-integration.js",
+        "lineNumber": 866,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getSettings",
+        "filePath": "src/client/js/game-integration.js",
+        "lineNumber": 871,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "enableSystem",
+        "filePath": "src/client/js/game-integration.js",
+        "lineNumber": 876,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "unlisten",
+        "filePath": "src/client/js/game-integration.js",
+        "lineNumber": 965,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateDeltaTime",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 29,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "bufferInput",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 40,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "processInputBuffer",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 53,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateSpatialGrid",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 65,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getNearbyEntities",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 82,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "shouldSendNetworkUpdate",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 115,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "interpolate",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 124,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "predictPosition",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 129,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isInViewport",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 137,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "circleCollision",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 159,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "rectCollision",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 165,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "angleBetween",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 175,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "lerpAngle",
+        "filePath": "src/client/js/game-improvements.js",
+        "lineNumber": 187,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "deactivate",
+        "filePath": "src/client/js/entities/Bullet.js",
+        "lineNumber": 157,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setVolume",
+        "filePath": "src/client/js/enhancedSoundSystem.js",
+        "lineNumber": 104,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "playEngineSound",
+        "filePath": "src/client/js/enhancedSoundSystem.js",
+        "lineNumber": 157,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "loadDefaultSounds",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 95,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "generateFallbackSounds",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 182,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "generateFallbackMusic",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 302,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "generateFallbackAmbient",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 340,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "playMusic",
+        "filePath": "src/client/js/advancedSound.js",
+        "lineNumber": 196,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "fadeOutMusic",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 434,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "fadeInMusic",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 448,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateMusicState",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 458,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setSfxVolume",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 500,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setAmbientVolume",
+        "filePath": "src/client/js/enhanced-audio.js",
+        "lineNumber": 505,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "onKill",
+        "filePath": "src/client/js/endlessDirector.js",
+        "lineNumber": 71,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "onDamage",
+        "filePath": "src/client/js/endlessDirector.js",
+        "lineNumber": 91,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getScoreMultiplier",
+        "filePath": "src/client/js/endlessDirector.js",
+        "lineNumber": 98,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setWeatherType",
+        "filePath": "src/client/js/dynamic-weather.js",
+        "lineNumber": 706,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getFrictionModifier",
+        "filePath": "src/client/js/dynamic-weather.js",
+        "lineNumber": 716,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getWindEffect",
+        "filePath": "src/client/js/dynamic-weather.js",
+        "lineNumber": 721,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setParticleQuality",
+        "filePath": "src/client/js/dynamic-weather.js",
+        "lineNumber": 737,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setWeatherChangeInterval",
+        "filePath": "src/client/js/dynamic-weather.js",
+        "lineNumber": 741,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "onWeatherChange",
+        "filePath": "src/client/js/dynamic-weather.js",
+        "lineNumber": 746,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "renderToGame",
+        "filePath": "src/client/js/domMapRenderer.js",
+        "lineNumber": 134,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "startCameraSync",
+        "filePath": "src/client/js/domMapRenderer.js",
+        "lineNumber": 142,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "hide",
+        "filePath": "src/client/js/domMapRenderer.js",
+        "lineNumber": 312,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearMap",
+        "filePath": "src/client/js/domMapRenderer.js",
+        "lineNumber": 341,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearGameMap",
+        "filePath": "src/client/js/domMapRenderer.js",
+        "lineNumber": 359,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getChallengeProgress",
+        "filePath": "src/client/js/dailyChallenges.js",
+        "lineNumber": 175,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getLoadout",
+        "filePath": "src/client/js/customizationSystem.js",
+        "lineNumber": 370,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getItemsByType",
+        "filePath": "src/client/js/customizationSystem.js",
+        "lineNumber": 376,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getItemsByRarity",
+        "filePath": "src/client/js/customizationSystem.js",
+        "lineNumber": 392,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getUnlockedItems",
+        "filePath": "src/client/js/customizationSystem.js",
+        "lineNumber": 404,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "hideMapLoadingScreen",
+        "filePath": "src/client/js/createdMapsIntegration.js",
+        "lineNumber": 219,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setupMapForGameStart",
+        "filePath": "src/client/js/createdMapsIntegration.js",
+        "lineNumber": 242,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "showRewardedAd",
+        "filePath": "src/client/js/crazygames-integration.js",
+        "lineNumber": 140,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "saveToCloud",
+        "filePath": "src/client/js/crazygames-integration.js",
+        "lineNumber": 307,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "loadFromCloud",
+        "filePath": "src/client/js/crazygames-integration.js",
+        "lineNumber": 329,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createClan",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 95,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "invitePlayer",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 150,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "acceptInvite",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 186,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "leaveClan",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 213,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "kickMember",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 235,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "promoteMember",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 269,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addClanXP",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 301,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getClanPerks",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 342,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getClan",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 368,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPlayerClan",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 373,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "searchClans",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 380,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getClanLeaderboard",
+        "filePath": "src/client/js/clanSystem.js",
+        "lineNumber": 388,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setRotation",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 129,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addShake",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 134,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addTrauma",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 159,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "applyTransform",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 193,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "resetTransform",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 211,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "screenToWorld",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 216,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "worldToScreen",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 229,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isInView",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 242,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "panTo",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 254,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "zoomTo",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 279,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "followPlayer",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 303,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "spectator",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 309,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sniper",
+        "filePath": "src/client/js/cameraSystem.js",
+        "lineNumber": 319,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "safeJSONParse",
+        "filePath": "src/client/js/bug-fixes.js",
+        "lineNumber": 191,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "purchasePremium",
+        "filePath": "src/client/js/battlePassSystem.js",
+        "lineNumber": 173,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAllRewards",
+        "filePath": "src/client/js/battlePassSystem.js",
+        "lineNumber": 254,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "newSeason",
+        "filePath": "src/client/js/battlePassSystem.js",
+        "lineNumber": 269,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "generateWalls",
+        "filePath": "src/client/js/backend-server.js",
+        "lineNumber": 653,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createTankBodyAnimation",
+        "filePath": "src/client/js/animation-manager.js",
+        "lineNumber": 13,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateMovementAnimation",
+        "filePath": "src/client/js/animation-manager.js",
+        "lineNumber": 28,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAnimation",
+        "filePath": "src/client/js/animation-manager.js",
+        "lineNumber": 53,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearPlayerAnimations",
+        "filePath": "src/client/js/animation-manager.js",
+        "lineNumber": 66,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "startSession",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 48,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "endSession",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 76,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "trackKill",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 133,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "trackDeath",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 142,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "trackPowerUpCollected",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 150,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "trackWeaponFired",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 158,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "trackAchievement",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 167,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "trackPurchase",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 175,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getSessionStats",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 185,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getEventSummary",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 201,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getHeatmapData",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 215,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAggregateStats",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 251,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearAllData",
+        "filePath": "src/client/js/analyticsSystem.js",
+        "lineNumber": 296,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "removeAITank",
+        "filePath": "src/client/js/ai-opponents.js",
+        "lineNumber": 1042,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getAITank",
+        "filePath": "src/client/js/ai-opponents.js",
+        "lineNumber": 1046,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "damageAITank",
+        "filePath": "src/client/js/ai-opponents.js",
+        "lineNumber": 1064,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "findPath",
+        "filePath": "src/client/js/ai-opponents.js",
+        "lineNumber": 1109,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createNode",
+        "filePath": "src/client/js/ai-opponents.js",
+        "lineNumber": 1122,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "execute",
+        "filePath": "src/client/js/ai-opponents.js",
+        "lineNumber": 1127,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addMotionTrail",
+        "filePath": "src/client/js/advancedVisualEffects.js",
+        "lineNumber": 35,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addLightRay",
+        "filePath": "src/client/js/advancedVisualEffects.js",
+        "lineNumber": 47,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addImpactWave",
+        "filePath": "src/client/js/advancedVisualEffects.js",
+        "lineNumber": 57,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addEnergyField",
+        "filePath": "src/client/js/advancedVisualEffects.js",
+        "lineNumber": 69,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "applyHeatWave",
+        "filePath": "src/client/js/advancedVisualEffects.js",
+        "lineNumber": 273,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateListener",
+        "filePath": "src/client/js/advancedSound.js",
+        "lineNumber": 307,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "preloadAll",
+        "filePath": "src/client/js/advancedSound.js",
+        "lineNumber": 319,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "spawnPowerUp",
+        "filePath": "src/client/js/advancedPowerUps.js",
+        "lineNumber": 318,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "applyPowerUp",
+        "filePath": "src/client/js/advancedPowerUps.js",
+        "lineNumber": 369,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "clearPlayerPowerUps",
+        "filePath": "src/client/js/advancedPowerUps.js",
+        "lineNumber": 421,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPowerUpData",
+        "filePath": "src/client/js/advancedPowerUps.js",
+        "lineNumber": 426,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createImpact",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 238,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createEngineSmoke",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 265,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createPowerUpEffect",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 285,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createHealEffect",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 309,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createShieldEffect",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 332,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createDamageNumber",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 354,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createLevelUpEffect",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 401,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createEmitter",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 425,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getParticleCount",
+        "filePath": "src/client/js/advancedParticles.js",
+        "lineNumber": 467,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addLight",
+        "filePath": "src/client/js/advancedLighting.js",
+        "lineNumber": 37,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "removeLight",
+        "filePath": "src/client/js/advancedLighting.js",
+        "lineNumber": 44,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "muzzleFlash",
+        "filePath": "src/client/js/advancedLighting.js",
+        "lineNumber": 200,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "repairComponent",
+        "filePath": "src/client/js/advancedCombat.js",
+        "lineNumber": 188,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "takeDamage",
+        "filePath": "src/client/js/entities/Player.js",
+        "lineNumber": 127,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "removeBot",
+        "filePath": "src/client/js/advancedAI.js",
+        "lineNumber": 395,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getBot",
+        "filePath": "src/client/js/advancedAI.js",
+        "lineNumber": 417,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addMixedBots",
+        "filePath": "src/client/js/advancedAI.js",
+        "lineNumber": 427,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getBotData",
+        "filePath": "src/client/js/advancedAI.js",
+        "lineNumber": 437,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createTrail",
+        "filePath": "src/client/js/advanced-graphics.js",
+        "lineNumber": 137,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateTrail",
+        "filePath": "src/client/js/advanced-graphics.js",
+        "lineNumber": 152,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateStats",
+        "filePath": "src/client/js/achievementSystem.js",
+        "lineNumber": 222,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPlayerAchievements",
+        "filePath": "src/client/js/achievementSystem.js",
+        "lineNumber": 280,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getByCategory",
+        "filePath": "src/client/js/achievementSystem.js",
+        "lineNumber": 292,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getByRarity",
+        "filePath": "src/client/js/achievementSystem.js",
+        "lineNumber": 297,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "awardAchievement",
+        "filePath": "src/client/js/achievementSystem.js",
+        "lineNumber": 302,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getCompletionPercentage",
+        "filePath": "src/client/js/achievementSystem.js",
+        "lineNumber": 316,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "stopVehicleHexagonRendering",
+        "filePath": "src/client/js/ui/LobbyUI.js",
+        "lineNumber": 494,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "logout",
+        "filePath": "src/client/js/ui/Auth.js",
+        "lineNumber": 108,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "toggleStatsBox",
+        "filePath": "src/client/js/ui/Auth.js",
+        "lineNumber": 244,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isCommonPattern",
+        "filePath": "src/client/js/tests/code-duplication-elimination.test.js",
+        "lineNumber": 311,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "enable",
+        "filePath": "src/client/js/templates/BaseSystem.js",
+        "lineNumber": 44,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "disable",
+        "filePath": "src/client/js/templates/BaseSystem.js",
+        "lineNumber": 51,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isInitialized",
+        "filePath": "src/client/js/templates/BaseSystem.js",
+        "lineNumber": 67,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handleDisconnection",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 132,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "unregisterMessageHandler",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 635,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sendQueuedMessages",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 711,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getConnectionStatus",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 743,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sendPlayerShoot",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 752,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sendCollectPowerUp",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 763,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sendRequestShapeSpawn",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 772,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sendUpdateFortzCurrency",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 780,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sendChangeGameMode",
+        "filePath": "src/client/js/systems/NetworkSystem.js",
+        "lineNumber": 788,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handleTouchStart",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 508,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handleTouchEnd",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 521,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "handleTouchMove",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 530,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isKeyPressed",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 543,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getMouseState",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 551,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getTouchState",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 559,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getInputState",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 567,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isMoving",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 609,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getGameInputFlags",
+        "filePath": "src/client/js/systems/InputSystem.js",
+        "lineNumber": 618,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "scroll",
+        "filePath": "src/client/js/shop/shop-optimized.js",
+        "lineNumber": 267,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "sendMovement",
+        "filePath": "src/client/js/game/network.js",
+        "lineNumber": 70,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addDamage",
+        "filePath": "src/client/js/game/gameManager.js",
+        "lineNumber": 10,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addKill",
+        "filePath": "src/client/js/entities/Player.js",
+        "lineNumber": 169,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "addPowerUp",
+        "filePath": "src/client/js/game/gameManager.js",
+        "lineNumber": 102,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "health",
+        "filePath": "src/client/js/game/gameManager.js",
+        "lineNumber": 124,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "shield",
+        "filePath": "src/client/js/game/gameManager.js",
+        "lineNumber": 125,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "ammo",
+        "filePath": "src/client/js/game/gameManager.js",
+        "lineNumber": 126,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "initializeModularGame",
+        "filePath": "src/client/js/examples/modular-game-example.js",
+        "lineNumber": 13,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "stopModularGame",
+        "filePath": "src/client/js/examples/modular-game-example.js",
+        "lineNumber": 92,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getConfig",
+        "filePath": "src/client/js/entities/Tank.js",
+        "lineNumber": 20,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setConfig",
+        "filePath": "src/client/js/entities/Tank.js",
+        "lineNumber": 32,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getTankAssetKey",
+        "filePath": "src/client/js/entities/Tank.js",
+        "lineNumber": 42,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getWeaponAssetKey",
+        "filePath": "src/client/js/entities/Tank.js",
+        "lineNumber": 50,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "deserialize",
+        "filePath": "src/client/js/entities/Bullet.js",
+        "lineNumber": 218,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isValidConfig",
+        "filePath": "src/client/js/entities/Tank.js",
+        "lineNumber": 239,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getDefaultConfig",
+        "filePath": "src/client/js/entities/Tank.js",
+        "lineNumber": 253,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "heal",
+        "filePath": "src/client/js/entities/Player.js",
+        "lineNumber": 146,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "respawn",
+        "filePath": "src/client/js/entities/Player.js",
+        "lineNumber": 157,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getPosition",
+        "filePath": "src/client/js/entities/Player.js",
+        "lineNumber": 178,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getTankConfig",
+        "filePath": "src/client/js/entities/Player.js",
+        "lineNumber": 196,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "setTankConfig",
+        "filePath": "src/client/js/entities/Player.js",
+        "lineNumber": 204,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getSpeed",
+        "filePath": "src/client/js/entities/Bullet.js",
+        "lineNumber": 165,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getDirection",
+        "filePath": "src/client/js/entities/Bullet.js",
+        "lineNumber": 173,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "isExpired",
+        "filePath": "src/client/js/entities/Bullet.js",
+        "lineNumber": 189,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createFromPlayer",
+        "filePath": "src/client/js/entities/Bullet.js",
+        "lineNumber": 228,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "getGameLoop",
+        "filePath": "src/client/js/core/ModuleManager.js",
+        "lineNumber": 101,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "updateLockerState",
+        "filePath": "src/client/js/core/GameState.js",
+        "lineNumber": 52,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "loadImageWithFallback",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 115,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "loadJetImage",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 306,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "loadRaceImage",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 318,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "loadAsteroidImages",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 330,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createAsteroidPlaceholder",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 340,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "verifyDefaultTank",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 397,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "createFallbackImage",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 557,
+        "callCount": 0
+      },
+      {
+        "severity": "info",
+        "functionName": "batchLoadImages",
+        "filePath": "src/client/js/assets/ImageLoader.js",
+        "lineNumber": 582,
+        "callCount": 0
+      }
+    ],
+    "nonFunctionalElements": [
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 513,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 519,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 526,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 532,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 539,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 545,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 552,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 558,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 1130,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "button",
+        "htmlLineNumber": 1167,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "maxPlayersInput",
+        "tagName": "input",
+        "htmlLineNumber": 247,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "matchTimeInput",
+        "tagName": "input",
+        "htmlLineNumber": 252,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "killLimitInput",
+        "tagName": "input",
+        "htmlLineNumber": 257,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "respawnTimeInput",
+        "tagName": "input",
+        "htmlLineNumber": 262,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "friendlyFireToggle",
+        "tagName": "input",
+        "htmlLineNumber": 289,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "autoBalanceToggle",
+        "tagName": "input",
+        "htmlLineNumber": 296,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "autoFillToggle",
+        "tagName": "input",
+        "htmlLineNumber": 344,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "minPlayersForAI",
+        "tagName": "input",
+        "htmlLineNumber": 351,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "autoFillAICount",
+        "tagName": "input",
+        "htmlLineNumber": 355,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "powerupsToggle",
+        "tagName": "input",
+        "htmlLineNumber": 374,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "input",
+        "htmlLineNumber": 380,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "input",
+        "htmlLineNumber": 381,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "input",
+        "htmlLineNumber": 382,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "input",
+        "htmlLineNumber": 383,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": null,
+        "tagName": "input",
+        "htmlLineNumber": 384,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "powerupSpawnRate",
+        "tagName": "input",
+        "htmlLineNumber": 388,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "numTeamsSelect",
+        "tagName": "select",
+        "htmlLineNumber": 280,
+        "reason": "No event handler or JavaScript reference found"
+      },
+      {
+        "severity": "warning",
+        "elementId": "autoFillDifficulty",
+        "tagName": "select",
+        "htmlLineNumber": 359,
+        "reason": "No event handler or JavaScript reference found"
+      }
+    ],
+    "patternIssues": [
+      {
+        "severity": "warning",
+        "pattern": "modal",
+        "elementId": "aiBotConfigModal",
+        "missingComponents": [
+          "open function",
+          "close function"
+        ]
+      },
+      {
+        "severity": "warning",
+        "pattern": "modal",
+        "elementId": "chatModal",
+        "missingComponents": [
+          "open function",
+          "close function"
+        ]
+      },
+      {
+        "severity": "warning",
+        "pattern": "modal",
+        "elementId": "friendsModal",
+        "missingComponents": [
+          "open function"
+        ]
+      },
+      {
+        "severity": "warning",
+        "pattern": "modal",
+        "elementId": "gameModeModal",
+        "missingComponents": [
+          "open function",
+          "close function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "createdMapTab",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "analyzeTab",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "tanksTab",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "jetsTab",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "raceTab",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "musicTab",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "tabTopPlayers",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "tabTopCreators",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "tabChampions",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "tabAward",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "championsTabTopPlayers",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "championsTabTopCreators",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "championsTabChampions",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "championsTabAward",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "friendsTabOnline",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "friendsTabRequests",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "friendsTabContent",
+        "missingComponents": [
+          "switch function"
+        ]
+      },
+      {
+        "severity": "info",
+        "pattern": "tab",
+        "elementId": "requestsTabContent",
+        "missingComponents": [
+          "switch function"
+        ]
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "title": "Fix broken event handlers",
+      "description": "These prevent user interactions from working. Add missing function definitions or remove unused event handlers."
+    },
+    {
+      "priority": "high",
+      "title": "Fix orphaned functions",
+      "description": "These query non-existent elements. Add missing HTML elements, update JavaScript to use correct IDs, or remove orphaned code."
+    },
+    {
+      "priority": "high",
+      "title": "Add handlers to interactive elements",
+      "description": "These elements appear clickable but do nothing. Add event handlers or remove unnecessary elements."
+    },
+    {
+      "priority": "low",
+      "title": "Remove unused functions",
+      "description": "These increase bundle size unnecessarily. Review and remove dead code to improve maintainability."
+    },
+    {
+      "priority": "low",
+      "title": "Complete UI patterns",
+      "description": "These may indicate incomplete features. Add missing components for modals, tabs, forms, and navigation."
+    }
+  ]
+}

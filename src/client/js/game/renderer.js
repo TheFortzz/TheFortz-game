@@ -20,17 +20,23 @@ const Renderer = {
     },
 
     loadGroundTextures() {
-        const textureCount = 18;
+        const groundFiles = [
+            'BlueGrass.png', 'BrownCobblestone.png', 'BrownGrass.png',
+            'Goldcobblestone.png', 'GoldenCobblestone.png', 'GrayGround.png',
+            'GreenGrass.png', 'Grey Cobblestone.png', 'LightBrownCobblestone.png',
+            'LightGreyCobblestone.png', 'LightGreyGround.png', 'LightSand.png',
+            'PurpleCobblestone.png', 'RedCobblestone.png', 'Sand.png',
+            'WoodenPlanks.png', 'WoodenTile.png', 'YellowGrass.png'
+        ];
         let loadedCount = 0;
 
-        for (let i = 0; i < textureCount; i++) {
+        groundFiles.forEach(filename => {
             const img = new Image();
-            const filename = i === 0 ? '_Group_.png' : `_Group_ (${i}).png`;
-            img.src = `/assets/Grounds/${filename}`;
+            img.src = `/assets/tank/Grounds/${filename}`;
             
             img.onload = () => {
                 loadedCount++;
-                if (loadedCount === textureCount) {
+                if (loadedCount === groundFiles.length) {
                     this.texturesLoaded = true;
                 }
             };
@@ -38,13 +44,13 @@ const Renderer = {
             img.onerror = () => {
                 console.warn(`Failed to load ground texture: ${filename}`);
                 loadedCount++;
-                if (loadedCount === textureCount) {
+                if (loadedCount === groundFiles.length) {
                     this.texturesLoaded = true;
                 }
             };
             
             this.groundTextures.push(img);
-        }
+        });
     },
 
     resize() {

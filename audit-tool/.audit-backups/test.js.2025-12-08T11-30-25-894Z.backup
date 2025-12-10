@@ -1,0 +1,16 @@
+
+function usedFunction() {
+  const element = document.getElementById('existingElement');
+  return element;
+}
+
+function unusedFunction1() {
+  return 'unused1';
+}
+
+function unusedFunction2() {
+  return 'unused2';
+}
+
+// This function is called
+usedFunction();
