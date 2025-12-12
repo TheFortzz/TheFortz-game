@@ -1840,7 +1840,7 @@ body {
 
 .map-button {
   background: rgba(255, 215, 0, 0.2);
-  color: #000000;
+  color: #ffffff;
   text-shadow: 0 1px 4px rgba(255, 255, 255, 0.5);
   border: 3px solid rgba(255, 215, 0, 0.9);
   margin-right: 15px;
@@ -3667,7 +3667,7 @@ Loading Animation */
 /* Jet Button (Middle) */
 #lobbyScreen .vehicle-type-buttons .vehicle-btn-middle {
   background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #ffff99 100%) !important;
-  color: black !important;
+  color: white !important;
   border-color: rgba(255, 215, 0, 0.5) !important;
 }
 
