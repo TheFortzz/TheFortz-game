@@ -1,64 +1,8 @@
-// Create Map System - Simplified (View Only)
-let createMapAnimationId = null;
-
-const MAP_BUTTONS = [
-    { id: 'created-map', name: 'Created Maps', color: '#00f7ff', icon: '🗺️' },
-    { id: 'analyze', name: 'Analytics', color: '#FFD700', icon: '📊' }
-];
-
-let selectedButton = 'created-map';
-
-let createdMaps = [];
-let hoveredMapIndex = -1;
-let mapCardAnimations = [];
-
-function captureMapThumbnail() {
-    let sourceCanvas = document.getElementById('mapCreatorMinimapCanvas');
-    if ((!sourceCanvas || !sourceCanvas.width || !sourceCanvas.height) && typeof window !== 'undefined') {
-        sourceCanvas = document.getElementById('mapCreatorCanvas');
-    }
-
-    if (!sourceCanvas || !sourceCanvas.width || !sourceCanvas.height) {
-        console.warn('No canvas available for thumbnail capture');
-        return null;
-    }
-
-    try {
-        const targetWidth = 320;
-        const targetHeight = 180;
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = targetWidth;
-        tempCanvas.height = targetHeight;
-        const ctx = tempCanvas.getContext('2d');
-
-        ctx.fillStyle = '#041020';
-        ctx.fillRect(0, 0, targetWidth, targetHeight);
-
-        const aspectRatio = sourceCanvas.width / sourceCanvas.height;
-        let drawWidth = targetWidth;
-        let drawHeight = drawWidth / aspectRatio;
-
-        if (drawHeight < targetHeight) {
-            drawHeight = targetHeight;
-            drawWidth = drawHeight * aspectRatio;
-        }
-
-        const offsetX = (targetWidth - drawWidth) / 2;
-        const offsetY = (targetHeight - drawHeight) / 2;
-
-        ctx.drawImage(sourceCanvas, offsetX, offsetY, drawWidth, drawHeight);
-
-        try {
-            return tempCanvas.toDataURL('image/webp', 0.85);
-        } catch (err) {
-            console.warn('WebP thumbnail capture failed, falling back to PNG', err);
-            return tempCanvas.toDataURL('image/png');
-        }
-    } catch (error) {
-        console.warn('Failed to capture map thumbnail', error);
-        return null;
-    }
-}
+// creatmap.backup.js neutralized
+// The legacy create-map backup has been consolidated into
+// /src/client/js/mapCreator/TankMapCreator.js. This file is
+// intentionally left as a stub to avoid duplicate implementations.
+console.warn('creatmap.backup.js stub active — use TankMapCreator.js');
 
 let playerStatsData = {
     dailyPlayers: [
@@ -732,23 +676,6 @@ function switchCreateMapTab(tabName) {
 function openBlankMapCreator() {
     console.log('Opening map name input...');
 
-    // Ensure a visible debug banner exists for environments without devtools
-    let debugBanner = document.getElementById('mapCreatorDebugBanner');
-    if (!debugBanner) {
-        debugBanner = document.createElement('div');
-        debugBanner.id = 'mapCreatorDebugBanner';
-        debugBanner.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ffcc00;color:#fff;padding:6px 10px;z-index:100001;font-weight:bold;text-align:left;';
-        debugBanner.textContent = 'MapCreator: opening name input...';
-        document.body.appendChild(debugBanner);
-        // Auto-hide debug banner after a short period to avoid persistent text
-        setTimeout(() => {
-            try { debugBanner.remove(); } catch (e) { debugBanner.style.display = 'none'; }
-        }, 3000);
-    } else {
-        debugBanner.textContent = 'MapCreator: opening name input...';
-        debugBanner.style.display = 'block';
-    }
-
     // Create modal overlay
     const modal = document.createElement('div');
     modal.style.cssText = `
@@ -777,16 +704,7 @@ function openBlankMapCreator() {
     `;
 
     container.innerHTML = `
-        <h2 style="color: #00f7ff; margin-bottom: 8px;">🗺️ Create New Map</h2>
-
-        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
-            <button id="vehicleTankBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;font-weight:700;cursor:pointer;">Tank</button>
-            <button id="vehicleJetBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;cursor:pointer;">Jet</button>
-            <button id="vehicleRaceBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;cursor:pointer;">Race</button>
-        </div>
-
-        <h3 id="vehicleInfo" style="color: rgba(255,255,255,0.85); font-size:14px; margin-bottom:12px;">Selected: Tank — ready to create a Tank map.</h3>
-
+        <h2 style="color: #00f7ff; margin-bottom: 20px;">🗺️ Name Your Map</h2>
         <input 
             type="text" 
             id="mapNameInput" 
@@ -816,7 +734,7 @@ function openBlankMapCreator() {
             <button id="createBtn" style="
                 padding: 10px 20px;
                 background: #00f7ff;
-                color: #fff;
+                color: black;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
@@ -828,108 +746,35 @@ function openBlankMapCreator() {
     modal.appendChild(container);
     document.body.appendChild(modal);
 
-    // Use container-scoped selectors to avoid ID collisions
-    const input = container.querySelector('#mapNameInput');
-    if (input) input.focus();
+    // Focus the input
+    const input = document.getElementById('mapNameInput');
+    input.focus();
 
-    const cancelBtnScoped = container.querySelector('#cancelBtn');
-    const createBtnScoped = container.querySelector('#createBtn');
+    // Handle cancel
+    document.getElementById('cancelBtn').onclick = () => {
+        modal.remove();
+    };
 
-    // Vehicle selection: default to tank
-    let selectedVehicle = 'tank';
-    const tankBtn = container.querySelector('#vehicleTankBtn');
-    const jetBtn = container.querySelector('#vehicleJetBtn');
-    const raceBtn = container.querySelector('#vehicleRaceBtn');
-    const vehicleInfo = container.querySelector('#vehicleInfo');
-
-    function setVehicle(v) {
-        selectedVehicle = v;
-        // Common dark blue text for all states
-        const textColor = '#002b5c';
-        const selectedBg = '#bfeeff'; // light blue background for selection
-        const unselectedBg = 'transparent';
-        const borderColor = '#004080';
-
-        [tankBtn, jetBtn, raceBtn].forEach(btn => {
-            if (!btn) return;
-            btn.style.background = unselectedBg;
-            btn.style.color = textColor;
-            btn.style.border = `2px solid rgba(0,0,0,0)`;
-            btn.style.boxShadow = 'none';
-        });
-
-        // Apply selected style
-        const activeBtn = (v === 'tank') ? tankBtn : (v === 'jet') ? jetBtn : raceBtn;
-        if (activeBtn) {
-            activeBtn.style.background = selectedBg;
-            activeBtn.style.color = textColor;
-            activeBtn.style.border = `2px solid ${borderColor}`;
-            activeBtn.style.boxShadow = '0 4px 10px rgba(0,64,128,0.15)';
+    // Handle create
+    document.getElementById('createBtn').onclick = () => {
+        const mapName = input.value.trim();
+        if (!mapName) {
+            alert('Please enter a map name!');
+            return;
         }
 
-        if (vehicleInfo) {
-            if (v === 'tank') vehicleInfo.textContent = 'Selected: Tank — ready to create a Tank map.';
-            else vehicleInfo.textContent = `Selected: ${v.charAt(0).toUpperCase() + v.slice(1)} — coming soon.`;
-            vehicleInfo.style.color = textColor;
+        // Store map name and open editor
+        window.currentMapName = mapName;
+        modal.remove();
+        startMapEditor();
+    };
+
+    // Handle Enter key
+    input.onkeypress = (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('createBtn').click();
         }
-    }
-
-    if (tankBtn) tankBtn.onclick = () => setVehicle('tank');
-    if (jetBtn) jetBtn.onclick = () => setVehicle('jet');
-    if (raceBtn) raceBtn.onclick = () => setVehicle('race');
-
-    // Apply default visual selection
-    setVehicle('tank');
-
-    if (cancelBtnScoped) {
-        cancelBtnScoped.onclick = () => {
-            debugBanner.textContent = 'MapCreator: cancelled';
-            modal.remove();
-        };
-    }
-
-    if (createBtnScoped) {
-        createBtnScoped.onclick = () => {
-            try {
-                // Only allow Tank for now
-                if (selectedVehicle !== 'tank') {
-                    alert((selectedVehicle.charAt(0).toUpperCase() + selectedVehicle.slice(1)) + ' editor coming soon!');
-                    return;
-                }
-                const mapName = input ? input.value.trim() : '';
-                if (!mapName) {
-                    // visible feedback for users without console
-                    debugBanner.textContent = 'MapCreator: please enter a map name';
-                    alert('Please enter a map name!');
-                    return;
-                }
-
-                // Store map name and open editor
-                window.currentMapName = mapName;
-                debugBanner.textContent = `MapCreator: starting editor for "${mapName}"...`;
-                modal.remove();
-
-                // Attempt to start editor and show visible errors if it fails
-                try {
-                    startMapEditor();
-                    debugBanner.textContent = `MapCreator: editor opened for "${mapName}"`;
-                } catch (err) {
-                    debugBanner.textContent = `MapCreator ERROR: ${err && err.message ? err.message : err}`;
-                    alert('Failed to open map editor: ' + (err && err.message ? err.message : err));
-                }
-            } catch (outerErr) {
-                debugBanner.textContent = 'MapCreator outer error: ' + (outerErr && outerErr.message ? outerErr.message : outerErr);
-                alert('Unexpected error: ' + (outerErr && outerErr.message ? outerErr.message : outerErr));
-            }
-        };
-    }
-
-    // Handle Enter key inside modal
-    if (input) {
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && createBtnScoped) createBtnScoped.click();
-        });
-    }
+    };
 }
 
 function startMapEditor() {
@@ -965,12 +810,6 @@ function startMapEditor() {
 
         // Load initial assets
         loadAssets(currentAssetCategory);
-
-        // Hide debug banner if present (editor opened)
-        const debugBanner = document.getElementById('mapCreatorDebugBanner');
-        if (debugBanner) {
-            try { debugBanner.remove(); } catch (e) { debugBanner.style.display = 'none'; }
-        }
     }, 100);
 }
 
@@ -1089,23 +928,6 @@ function createZoomSlider() {
 
         // Update target zoom for smooth interpolation
         targetCanvasZoom = zoomValue;
-
-        // ALSO update the target camera offset so the zoom centers on the
-        // current screen center (prevents zooming to the original start position)
-        const canvas = document.getElementById('mapCreatorCanvas');
-        if (canvas) {
-            const rect = canvas.getBoundingClientRect();
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            // Calculate world position of the center before zoom
-            const worldX = (centerX - canvasOffsetX) / canvasZoom;
-            const worldY = (centerY - canvasOffsetY) / canvasZoom;
-
-            // Adjust target offsets so the same world point stays at screen center
-            targetCanvasOffsetX = centerX - worldX * zoomValue;
-            targetCanvasOffsetY = centerY - worldY * zoomValue;
-        }
 
         // Update slider visuals
         const min = parseFloat(input.min);
@@ -1571,36 +1393,7 @@ const objectFileNameMap = {
 };
 
 function loadAssets(category) {
-    let assetsGrid = document.getElementById('assetsGrid');
-
-    // If assets grid/panel doesn't exist in DOM, create a floating panel
-    if (!assetsGrid) {
-        const assetsPanel = document.createElement('div');
-        assetsPanel.id = 'assetsPanel';
-        assetsPanel.style.cssText = 'position: fixed; right: 10px; top: 80px; width: 260px; max-height: 70vh; overflow: auto; background: rgba(0,0,0,0.8); border: 2px solid rgba(0,247,255,0.08); padding: 10px; border-radius: 8px; z-index: 100000; color: white;';
-
-        // Category buttons
-        const catRow = document.createElement('div');
-        catRow.style.cssText = 'display:flex; gap:6px; margin-bottom:8px;';
-        ['ground','asteroids','buildings','tanks'].forEach(cat => {
-            const b = document.createElement('button');
-            b.className = 'asset-category-btn';
-            b.dataset.category = cat;
-            b.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-            b.style.cssText = 'flex:1;padding:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);color:#fff;cursor:pointer;';
-            b.onclick = () => switchAssetCategory(cat);
-            catRow.appendChild(b);
-        });
-
-        assetsPanel.appendChild(catRow);
-
-        assetsGrid = document.createElement('div');
-        assetsGrid.id = 'assetsGrid';
-        assetsGrid.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
-        assetsPanel.appendChild(assetsGrid);
-
-        document.body.appendChild(assetsPanel);
-    }
+    const assetsGrid = document.getElementById('assetsGrid');
     assetsGrid.innerHTML = '';
 
     // If we're viewing a specific object's files, show those
@@ -1609,25 +1402,26 @@ function loadAssets(category) {
         return;
     }
 
-    // Ground PNG textures (use tank asset folder)
+    // Ground PNG textures - all 18 ground tiles
     const groundTextures = [
-        { name: 'Blue Grass', type: 'bluegrass', file: 'tank/Grounds/BlueGrass.png' },
-        { name: 'Brown Cobblestone', type: 'browncobble', file: 'tank/Grounds/BrownCobblestone.png' },
-        { name: 'Brown Grass', type: 'browngrass', file: 'tank/Grounds/BrownGrass.png' },
-        { name: 'Gold Cobblestone', type: 'goldcobble', file: 'tank/Grounds/Goldcobblestone.png' },
-        { name: 'Golden Cobblestone', type: 'goldencobble', file: 'tank/Grounds/GoldenCobblestone.png' },
-        { name: 'Gray Ground', type: 'grayground', file: 'tank/Grounds/GrayGround.png' },
-        { name: 'Green Grass', type: 'greengrass', file: 'tank/Grounds/GreenGrass.png' },
-        { name: 'Light Brown Cobblestone', type: 'lightbrowncobble', file: 'tank/Grounds/LightBrownCobblestone.png' },
-        { name: 'Light Grey Cobblestone', type: 'lightgreycobble', file: 'tank/Grounds/LightGreyCobblestone.png' },
-        { name: 'Light Grey Ground', type: 'lightgreyground', file: 'tank/Grounds/LightGreyGround.png' },
-        { name: 'Light Sand', type: 'lightsand', file: 'tank/Grounds/LightSand.png' },
-        { name: 'Purple Cobblestone', type: 'purplecobble', file: 'tank/Grounds/PurpleCobblestone.png' },
-        { name: 'Red Cobblestone', type: 'redcobble', file: 'tank/Grounds/RedCobblestone.png' },
-        { name: 'Sand', type: 'sand', file: 'tank/Grounds/Sand.png' },
-        { name: 'Wooden Planks', type: 'woodenplanks', file: 'tank/Grounds/WoodenPlanks.png' },
-        { name: 'Wooden Tile', type: 'woodentile', file: 'tank/Grounds/WoodenTile.png' },
-        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' }
+        { name: 'Ground 1', type: 'ground1', file: 'Grounds/_Group_.png' },
+        { name: 'Ground 2', type: 'ground2', file: 'Grounds/_Group_ (1).png' },
+        { name: 'Ground 3', type: 'ground3', file: 'Grounds/_Group_ (2).png' },
+        { name: 'Ground 4', type: 'ground4', file: 'Grounds/_Group_ (3).png' },
+        { name: 'Ground 5', type: 'ground5', file: 'Grounds/_Group_ (4).png' },
+        { name: 'Ground 6', type: 'ground6', file: 'Grounds/_Group_ (5).png' },
+        { name: 'Ground 7', type: 'ground7', file: 'Grounds/_Group_ (6).png' },
+        { name: 'Ground 8', type: 'ground8', file: 'Grounds/_Group_ (7).png' },
+        { name: 'Ground 9', type: 'ground9', file: 'Grounds/_Group_ (8).png' },
+        { name: 'Ground 10', type: 'ground10', file: 'Grounds/_Group_ (9).png' },
+        { name: 'Ground 11', type: 'ground11', file: 'Grounds/_Group_ (10).png' },
+        { name: 'Ground 12', type: 'ground12', file: 'Grounds/_Group_ (11).png' },
+        { name: 'Ground 13', type: 'ground13', file: 'Grounds/_Group_ (12).png' },
+        { name: 'Ground 14', type: 'ground14', file: 'Grounds/_Group_ (13).png' },
+        { name: 'Ground 15', type: 'ground15', file: 'Grounds/_Group_ (14).png' },
+        { name: 'Ground 16', type: 'ground16', file: 'Grounds/_Group_ (15).png' },
+        { name: 'Ground 17', type: 'ground17', file: 'Grounds/_Group_ (16).png' },
+        { name: 'Ground 18', type: 'ground18', file: 'Grounds/_Group_ (17).png' }
     ];
 
     // Show only ground textures if ground category is selected
@@ -1644,10 +1438,7 @@ function loadAssets(category) {
                 image: `/assets/${ground.file}`,
                 isFolder: false,
                 isGround: true,
-                // Use the file path as the groundType key so it matches
-                // the keys stored in `groundTextureImages` (they are stored
-                // by filename like 'tank/Grounds/BlueGrass.png').
-                groundType: ground.file,
+                groundType: ground.type,
                 groundFile: ground.file
             };
 
@@ -1754,7 +1545,7 @@ function loadAssets(category) {
                 frontName = 'font'; // Typo in actual file
             }
 
-            const imagePath = `/assets/tank/${viewFolder}/${objName}/spr_${viewFolderName}_${fileName}_${frontName}.png`;
+            const imagePath = `/assets/${viewFolder}/${objName}/spr_${viewFolderName}_${fileName}_${frontName}.png`;
 
             const asset = {
                 name: objName.replace(/_/g, ' '),
@@ -1780,52 +1571,6 @@ function loadAssets(category) {
 
             assetsGrid.appendChild(assetItem);
         });
-        
-        return;
-    }
-
-    // Show tanks/vehicles category
-    if (category === 'tanks' || category === 'vehicles') {
-        const colors = ['blue', 'camo', 'desert', 'purple', 'red'];
-
-        colors.forEach(color => {
-            const assetItem = document.createElement('div');
-            assetItem.className = 'asset-item-list';
-
-            // Prefer the halftrack body PNG, fallback to tracks image
-            let imagePath = `/assets/tank/tanks/${color}/${color}_body_halftrack.png`;
-            // Some folders use different naming - provide fallback
-            const fallback = `/assets/tank/tanks/${color}/${color}_body_tracks.png`;
-
-            const asset = {
-                name: `${color.charAt(0).toUpperCase() + color.slice(1)} Tank`,
-                folder: color,
-                fileName: imagePath.split('/').pop(),
-                image: imagePath,
-                isFolder: false
-            };
-
-            assetItem.onclick = () => selectAsset(asset, assetItem);
-
-            assetItem.innerHTML = `
-                <div style="width: 50px; height: 50px; background: rgba(20, 30, 50, 0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,255,255,0.08);">
-                    <img src="${imagePath}" onerror="this.src='${fallback}'" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: contain;">
-                </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-                    <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
-                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 11px;">Click to place</div>
-                </div>
-            `;
-
-            assetsGrid.appendChild(assetItem);
-        });
-
-        const infoMsg = document.createElement('div');
-        infoMsg.style.cssText = 'padding: 12px; margin-top: 10px; background: rgba(0, 247, 255, 0.04); border: 1px solid rgba(0, 247, 255, 0.06); border-radius: 8px; color: rgba(255,255,255,0.7); font-size: 12px;';
-        infoMsg.innerHTML = '<strong>Vehicles:</strong> Select a tank to place a vehicle prefab. Use the palette to select colors.';
-        assetsGrid.appendChild(infoMsg);
-
-        return;
     }
 }
 
@@ -1886,7 +1631,7 @@ function loadObjectFiles(asset) {
             directionSuffix = 'right_';
         }
 
-        const imagePath = `/assets/tank/${asset.viewFolder}/${asset.folder}/spr_${viewFolderName}_${fileName}_${directionSuffix}.png`;
+        const imagePath = `/assets/${asset.viewFolder}/${asset.folder}/spr_${viewFolderName}_${fileName}_${directionSuffix}.png`;
 
         const fileAsset = {
             name: `${asset.name} ${direction}`,
@@ -1926,8 +1671,6 @@ function selectAsset(asset, element) {
     element.style.borderColor = 'rgba(100, 150, 255, 0.4)';
 
     console.log('Selected asset:', asset.name);
-    // Force a render so hover/preview updates immediately after selection
-    renderMapCreatorCanvas();
 }
 
 
@@ -2002,10 +1745,10 @@ function saveMap() {
                 let groundType, groundImage;
                 if (distFromMapCenter > MAP_RADIUS * 0.85) {
                     groundType = 'ground1';  // Water at outer edges
-                    groundImage = '/assets/tank/Grounds/BlueGrass.png';
+                    groundImage = '/assets/Grounds/_Group_.png';
                 } else {
                     groundType = 'ground13'; // Default ground in center
-                    groundImage = '/assets/tank/Grounds/LightGreyGround.png';
+                    groundImage = '/assets/Grounds/_Group_ (12).png';
                 }
                 
                 tileData = {
@@ -2145,8 +1888,9 @@ function initMapCreatorCanvas() {
     // Load custom ground texture
     loadCustomGroundTexture();
 
-    // Add event listeners for interaction (wheel handled by setupSmoothWheelZoom)
+    // Add event listeners for interaction
     canvas.addEventListener('click', handleCanvasClick);
+    canvas.addEventListener('wheel', handleCanvasWheel);
     canvas.addEventListener('mousedown', handleCanvasMouseDown);
     canvas.addEventListener('mousemove', handleCanvasMouseMove);
     canvas.addEventListener('mouseup', handleCanvasMouseUp);
@@ -2675,51 +2419,46 @@ function startPanningLoop() {
 
 // Draw isometric water tiles as background
 function drawIsometricWater(ctx, camera, viewWidth, viewHeight) {
-    // Draw a base water background for the visible area so water is always
-    // visible even when no individual water tiles fall inside the limited draw window.
-    const mapRadiusPixels = 2500;
-    const baseFillPadding = Math.max(viewWidth, viewHeight) * 1.5;
-    ctx.save();
-    ctx.fillStyle = '#2a7ab8';
-    // Fill a generous area around the viewport (in world coordinates)
-    ctx.fillRect(camera.x - baseFillPadding, camera.y - baseFillPadding, viewWidth + baseFillPadding * 2, viewHeight + baseFillPadding * 2);
-    ctx.restore();
+    console.log('🌊 Drawing water tiles...', { camera, viewWidth, viewHeight });
+    
+    const tileWidth = 120;
+    const tileHeight = 30;
+    const drawHeight = 70;
 
-    // Limit water tile iteration to a relatively small window around the viewport center
-    const waterScale = 1.0; // normal tile size
-    const tileWidth = 120 * waterScale;
-    const tileHeight = 30 * waterScale;
-    const drawHeight = 70 * waterScale;
+    // OPTIMIZATION: Calculate visible viewport bounds in world coordinates
+    const viewLeft = camera.x;
+    const viewTop = camera.y;
+    const viewRight = camera.x + viewWidth;
+    const viewBottom = camera.y + viewHeight;
 
-    const centerWorldX = camera.x + viewWidth / 2;
-    const centerWorldY = camera.y + viewHeight / 2;
-    const centerCol = Math.floor(centerWorldX / tileWidth);
-    const centerRow = Math.floor(centerWorldY / tileHeight);
+    // Add generous padding to ensure full screen coverage
+    // Use drawHeight for Y padding since tiles are taller than their spacing
+    const paddingX = tileWidth * 4;
+    const paddingY = drawHeight * 6; // Extra padding for tile overlap
 
-    // Increase coverage ~2x so water appears noticeably larger (more tiles
-    // drawn around the viewport) while keeping each tile the same size.
-    const radiusCols = Math.ceil((viewWidth / tileWidth) * 3.2) + 8;
-    const radiusRows = Math.ceil((viewHeight / tileHeight) * 3.2) + 8;
+    // Calculate tile range - only visible tiles
+    const startCol = Math.floor((viewLeft - paddingX) / tileWidth);
+    const endCol = Math.ceil((viewRight + paddingX) / tileWidth);
+    const startRow = Math.floor((viewTop - paddingY) / tileHeight);
+    const endRow = Math.ceil((viewBottom + paddingY) / tileHeight);
 
-    const maxGridRange = Math.ceil(mapRadiusPixels / tileHeight);
-    const startCol = Math.max(-maxGridRange, centerCol - radiusCols);
-    const endCol = Math.min(maxGridRange, centerCol + radiusCols);
-    const startRow = Math.max(-maxGridRange, centerRow - radiusRows);
-    const endRow = Math.min(maxGridRange, centerRow + radiusRows);
+    console.log('🌊 Water tile range:', { startCol, endCol, startRow, endRow });
 
     let tilesDrawn = 0;
+    // Draw water tiles
     for (let row = startRow; row <= endRow; row++) {
         for (let col = startCol; col <= endCol; col++) {
+            // Calculate isometric position
             const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
             const isoY = row * tileHeight;
 
-            const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
-            if (distFromMapCenter > mapRadiusPixels) continue;
-
+            // Draw water tile with isometric shape
             drawWaterTile(ctx, isoX, isoY, tileWidth, drawHeight);
             tilesDrawn++;
         }
     }
+    
+    console.log('🌊 Drew', tilesDrawn, 'water tiles');
 }
 
 // Draw a single isometric water tile
@@ -2738,7 +2477,7 @@ function drawWaterTile(ctx, x, y, width, height) {
         gradient.addColorStop(0.7, '#2a7ab8');  // Darker blue
         gradient.addColorStop(1, '#1a6aa8');    // Deep blue (bottom-right, shadow)
 
-        // Draw the water diamond (scaled size passed from caller)
+        // Draw the water diamond
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.moveTo(top.x, top.y);
@@ -3395,23 +3134,24 @@ let groundTexturesLoaded = false;
 function loadCustomGroundTexture() {
     // Load all 18 ground PNG textures
     const groundFiles = [
-        'tank/Grounds/BlueGrass.png',
-        'tank/Grounds/BrownCobblestone.png',
-        'tank/Grounds/BrownGrass.png',
-        'tank/Grounds/Goldcobblestone.png',
-        'tank/Grounds/GoldenCobblestone.png',
-        'tank/Grounds/GrayGround.png',
-        'tank/Grounds/GreenGrass.png',
-        'tank/Grounds/LightBrownCobblestone.png',
-        'tank/Grounds/LightGreyCobblestone.png',
-        'tank/Grounds/LightGreyGround.png',
-        'tank/Grounds/LightSand.png',
-        'tank/Grounds/PurpleCobblestone.png',
-        'tank/Grounds/RedCobblestone.png',
-        'tank/Grounds/Sand.png',
-        'tank/Grounds/WoodenPlanks.png',
-        'tank/Grounds/WoodenTile.png',
-        'tank/Grounds/YellowGrass.png'
+        'Grounds/_Group_.png',
+        'Grounds/_Group_ (1).png',
+        'Grounds/_Group_ (2).png',
+        'Grounds/_Group_ (3).png',
+        'Grounds/_Group_ (4).png',
+        'Grounds/_Group_ (5).png',
+        'Grounds/_Group_ (6).png',
+        'Grounds/_Group_ (7).png',
+        'Grounds/_Group_ (8).png',
+        'Grounds/_Group_ (9).png',
+        'Grounds/_Group_ (10).png',
+        'Grounds/_Group_ (11).png',
+        'Grounds/_Group_ (12).png',
+        'Grounds/_Group_ (13).png',
+        'Grounds/_Group_ (14).png',
+        'Grounds/_Group_ (15).png',
+        'Grounds/_Group_ (16).png',
+        'Grounds/_Group_ (17).png'
     ];
 
     let loadedCount = 0;
@@ -3859,7 +3599,6 @@ function easeOutCubic(t) {
 function smoothCameraUpdate() {
     // Smoothly interpolate zoom with ease-out
     const zoomDiff = targetCanvasZoom - canvasZoom;
-    let didChange = false;
     if (Math.abs(zoomDiff) > 0.001) {
         // Calculate easing factor based on distance (closer = slower)
         const distance = Math.abs(zoomDiff);
@@ -3868,7 +3607,6 @@ function smoothCameraUpdate() {
 
         canvasZoom += zoomDiff * easedFactor;
         window.canvasZoom = canvasZoom;
-        didChange = true;
     }
 
     // Smoothly interpolate position with ease-out
@@ -3883,11 +3621,7 @@ function smoothCameraUpdate() {
 
         canvasOffsetX += offsetXDiff * easedFactor;
         canvasOffsetY += offsetYDiff * easedFactor;
-        didChange = true;
     }
-
-    // If camera changed, request a render so the user sees updated zoom/pan immediately
-    if (didChange) renderMapCreatorCanvas();
 
     requestAnimationFrame(smoothCameraUpdate);
 }
@@ -4174,18 +3908,6 @@ document.addEventListener('DOMContentLoaded', loadSavedMaps);
 window.loadSavedMaps = loadSavedMaps;
 window.editMap = editMap;
 window.analyzeMap = analyzeMap;
-window.deleteMap = deleteMap;
+window.deleteMap = deleteMap; window.de
+leteMap = deleteMap;
 window.openBlankMapCreator = openBlankMapCreator;
-
-// Editor starters / compatibility exports
-window.startMapEditor = typeof startMapEditor === 'function' ? startMapEditor : function() { console.warn('startMapEditor not defined'); };
-window.startTankEditor = window.startMapEditor;
-window.startJetEditor = function() { alert('Jet editor is not available in this build.'); };
-window.startRaceEditor = function() { alert('Race editor is not available in this build.'); };
-
-// Zoom controls
-if (typeof zoomIn === 'function') window.zoomIn = zoomIn;
-if (typeof zoomOut === 'function') window.zoomOut = zoomOut;
-
-// Utilities
-window.captureMapThumbnail = captureMapThumbnail;

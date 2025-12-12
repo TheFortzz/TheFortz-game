@@ -1220,7 +1220,7 @@ function showMapNameInput(vehicleType) {
             <button id="createBtn" style="
                 padding: 10px 20px;
                 background: #00f7ff;
-                color: black;
+                color: #fff;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
