@@ -82,7 +82,7 @@ let isInMapCreator = false;
 function startCreateMapRendering() {
     if (createMapAnimationId) return;
 
-    const canvas = document.getElementById('tankLobbyBackground');
+    const canvas = document.getElementById('lobbyBackground');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
@@ -704,19 +704,6 @@ let placedObjects = [];
 // Ground tile customization - store custom ground textures per tile
 let customGroundTiles = new Map(); // key: "x,y", value: texture type
 
-// Grid snapping for clean object placement
-const TANK_GRID_SIZE = 32;
-let tankGridSnapEnabled = true;
-
-// Snap position to grid
-function tankSnapToGrid(x, y, gridSize) {
-    if (!tankGridSnapEnabled) return { x, y };
-    return {
-        x: Math.round(x / gridSize) * gridSize,
-        y: Math.round(y / gridSize) * gridSize
-    };
-}
-
 // Hover preview state
 let hoverWorldX = 0;
 let hoverWorldY = 0;
@@ -742,257 +729,25 @@ function switchCreateMapTab(tabName) {
     event.target.classList.add('active');
 }
 
-// Show tank map name input (called when clicking CREATE from lobby with no maps)
-function showTankMapNameInput() {
-    console.log('Opening tank map name input...');
-
-    const modal = document.createElement('div');
-    modal.id = 'tankMapNameModal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 99999;
-    `;
-
-    const container = document.createElement('div');
-    container.style.cssText = `
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        border: 3px solid #0088ff;
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        max-width: 400px;
-        width: 90%;
-        box-shadow: 0 0 30px rgba(0, 136, 255, 0.3);
-    `;
-
-    container.innerHTML = `
-        <h2 style="color: #0088ff; margin-bottom: 10px;">🚗 TANK MAP CREATOR</h2>
-        <p style="color: #ccc; margin-bottom: 20px;">Create a tank battle arena</p>
-        <input 
-            type="text" 
-            id="tankMapNameInput" 
-            placeholder="Enter map name..." 
-            maxlength="30"
-            style="
-                width: 100%;
-                padding: 12px;
-                font-size: 16px;
-                border: 2px solid #0088ff;
-                border-radius: 8px;
-                background: #0a0a1a;
-                color: white;
-                margin-bottom: 20px;
-                outline: none;
-            "
-        />
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <button id="tankCancelBtn" style="
-                padding: 10px 20px;
-                background: #666;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-            ">Cancel</button>
-            <button id="tankCreateBtn" style="
-                padding: 10px 20px;
-                background: #0088ff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-weight: bold;
-            ">Create Tank Map</button>
-        </div>
-    `;
-
-    modal.appendChild(container);
-    document.body.appendChild(modal);
-
-    const input = document.getElementById('tankMapNameInput');
-    input.focus();
-
-    document.getElementById('tankCancelBtn').onclick = () => modal.remove();
-
-    document.getElementById('tankCreateBtn').onclick = () => {
-        const mapName = input.value.trim();
-        if (!mapName) {
-            alert('Please enter a map name!');
-            return;
-        }
-        
-        // Clear previous map data
-        window.currentMapId = null;
-        placedObjects = [];
-        customGroundTiles.clear();
-        
-        window.currentMapName = mapName;
-        window.currentMapVehicleType = 'tank';
-        modal.remove();
-        startMapEditor('tank');
-    };
-
-    input.onkeypress = (e) => {
-        if (e.key === 'Enter') {
-            document.getElementById('tankCreateBtn').click();
-        }
-    };
-}
-
-// Make showTankMapNameInput globally available
-window.showTankMapNameInput = showTankMapNameInput;
-
 function openBlankMapCreator() {
-    console.log('Opening vehicle type selection...');
-    showVehicleTypeSelection();
-}
+    console.log('Opening map name input...');
 
-function showVehicleTypeSelection() {
-    // Create modal overlay
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 99999;
-    `;
-
-    // Create selection container
-    const container = document.createElement('div');
-    container.style.cssText = `
-        background: #1a2a3a;
-        border: 3px solid #00f7ff;
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        max-width: 500px;
-        width: 90%;
-    `;
-
-    container.innerHTML = `
-        <h2 style="color: #00f7ff; margin-bottom: 30px;">🚀 Select Vehicle Type</h2>
-        <p style="color: #ccc; margin-bottom: 30px;">Choose the vehicle type for your map:</p>
-        
-        <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 30px;">
-            <button class="vehicle-type-btn" data-vehicle="tank" style="
-                padding: 20px;
-                background: #0066cc;
-                color: white;
-                border: 3px solid #0088ff;
-                border-radius: 10px;
-                cursor: pointer;
-                font-weight: bold;
-                font-size: 16px;
-                min-width: 120px;
-                transition: all 0.3s ease;
-            ">
-                🚗 TANK
-            </button>
-            
-            <button class="vehicle-type-btn" data-vehicle="jet" style="
-                padding: 20px;
-                background: #cc6600;
-                color: white;
-                border: 3px solid #ff8800;
-                border-radius: 10px;
-                cursor: pointer;
-                font-weight: bold;
-                font-size: 16px;
-                min-width: 120px;
-                transition: all 0.3s ease;
-            ">
-                ✈️ JET
-            </button>
-            
-            <button class="vehicle-type-btn" data-vehicle="race" style="
-                padding: 20px;
-                background: #cc0066;
-                color: white;
-                border: 3px solid #ff0088;
-                border-radius: 10px;
-                cursor: pointer;
-                font-weight: bold;
-                font-size: 16px;
-                min-width: 120px;
-                transition: all 0.3s ease;
-            ">
-                🏎️ RACE
-            </button>
-        </div>
-        
-        <button id="cancelVehicleBtn" style="
-            padding: 10px 20px;
-            background: #666;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        ">Cancel</button>
-    `;
-
-    modal.appendChild(container);
-    document.body.appendChild(modal);
-
-    // Add hover effects
-    const vehicleBtns = container.querySelectorAll('.vehicle-type-btn');
-    vehicleBtns.forEach(btn => {
-        btn.onmouseenter = () => {
-            btn.style.transform = 'scale(1.05)';
-            btn.style.boxShadow = '0 0 20px rgba(0, 247, 255, 0.5)';
-        };
-        btn.onmouseleave = () => {
-            btn.style.transform = 'scale(1)';
-            btn.style.boxShadow = 'none';
-        };
-        
-        btn.onclick = () => {
-            const vehicleType = btn.dataset.vehicle;
-            window.selectedMapVehicleType = vehicleType;
-            modal.remove();
-            
-            // Call the appropriate map creator based on vehicle type
-            if (vehicleType === 'tank') {
-                showMapNameInput(vehicleType);
-            } else if (vehicleType === 'jet') {
-                // Call jet map creator
-                if (typeof showJetMapNameInput === 'function') {
-                    showJetMapNameInput();
-                } else {
-                    alert('Jet map creator not loaded!');
-                }
-            } else if (vehicleType === 'race') {
-                // Call race map creator
-                if (typeof showRaceMapNameInput === 'function') {
-                    showRaceMapNameInput();
-                } else {
-                    alert('Race map creator not loaded!');
-                }
-            }
-        };
-    });
-
-    // Handle cancel
-    document.getElementById('cancelVehicleBtn').onclick = () => {
-        modal.remove();
-    };
-}
-
-function showMapNameInput(vehicleType) {
-    console.log('Opening map name input for vehicle type:', vehicleType);
+    // Ensure a visible debug banner exists for environments without devtools
+    let debugBanner = document.getElementById('mapCreatorDebugBanner');
+    if (!debugBanner) {
+        debugBanner = document.createElement('div');
+        debugBanner.id = 'mapCreatorDebugBanner';
+        debugBanner.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ffcc00;color:#fff;padding:6px 10px;z-index:100001;font-weight:bold;text-align:left;';
+        debugBanner.textContent = 'MapCreator: opening name input...';
+        document.body.appendChild(debugBanner);
+        // Auto-hide debug banner after a short period to avoid persistent text
+        setTimeout(() => {
+            try { debugBanner.remove(); } catch (e) { debugBanner.style.display = 'none'; }
+        }, 3000);
+    } else {
+        debugBanner.textContent = 'MapCreator: opening name input...';
+        debugBanner.style.display = 'block';
+    }
 
     // Create modal overlay
     const modal = document.createElement('div');
@@ -1021,12 +776,17 @@ function showMapNameInput(vehicleType) {
         width: 90%;
     `;
 
-    const vehicleEmoji = vehicleType === 'tank' ? '🚗' : vehicleType === 'jet' ? '✈️' : '🏎️';
-    const vehicleName = vehicleType.toUpperCase();
-
     container.innerHTML = `
-        <h2 style="color: #00f7ff; margin-bottom: 10px;">🗺️ Name Your ${vehicleName} Map</h2>
-        <p style="color: #ccc; margin-bottom: 20px;">${vehicleEmoji} Creating map for ${vehicleName} vehicles</p>
+        <h2 style="color: #00f7ff; margin-bottom: 8px;">🗺️ Create New Map</h2>
+
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
+            <button id="vehicleTankBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;font-weight:700;cursor:pointer;">Tank</button>
+            <button id="vehicleJetBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;cursor:pointer;">Jet</button>
+            <button id="vehicleRaceBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;cursor:pointer;">Race</button>
+        </div>
+
+        <h3 id="vehicleInfo" style="color: rgba(255,255,255,0.85); font-size:14px; margin-bottom:12px;">Selected: Tank — ready to create a Tank map.</h3>
+
         <input 
             type="text" 
             id="mapNameInput" 
@@ -1045,18 +805,18 @@ function showMapNameInput(vehicleType) {
             "
         />
         <div style="display: flex; gap: 10px; justify-content: center;">
-            <button id="backBtn" style="
+            <button id="cancelBtn" style="
                 padding: 10px 20px;
                 background: #666;
                 color: white;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
-            ">Back</button>
+            ">Cancel</button>
             <button id="createBtn" style="
                 padding: 10px 20px;
                 background: #00f7ff;
-                color: black;
+                color: #fff;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
@@ -1068,227 +828,120 @@ function showMapNameInput(vehicleType) {
     modal.appendChild(container);
     document.body.appendChild(modal);
 
-    // Focus the input
-    const input = document.getElementById('mapNameInput');
-    input.focus();
+    // Use container-scoped selectors to avoid ID collisions
+    const input = container.querySelector('#mapNameInput');
+    if (input) input.focus();
 
-    // Handle back
-    document.getElementById('backBtn').onclick = () => {
-        modal.remove();
-        showVehicleTypeSelection();
-    };
+    const cancelBtnScoped = container.querySelector('#cancelBtn');
+    const createBtnScoped = container.querySelector('#createBtn');
 
-    // Handle create
-    document.getElementById('createBtn').onclick = () => {
-        const mapName = input.value.trim();
-        if (!mapName) {
-            alert('Please enter a map name!');
-            return;
+    // Vehicle selection: default to tank
+    let selectedVehicle = 'tank';
+    const tankBtn = container.querySelector('#vehicleTankBtn');
+    const jetBtn = container.querySelector('#vehicleJetBtn');
+    const raceBtn = container.querySelector('#vehicleRaceBtn');
+    const vehicleInfo = container.querySelector('#vehicleInfo');
+
+    function setVehicle(v) {
+        selectedVehicle = v;
+        // Common dark blue text for all states
+        const textColor = '#002b5c';
+        const selectedBg = '#bfeeff'; // light blue background for selection
+        const unselectedBg = 'transparent';
+        const borderColor = '#004080';
+
+        [tankBtn, jetBtn, raceBtn].forEach(btn => {
+            if (!btn) return;
+            btn.style.background = unselectedBg;
+            btn.style.color = textColor;
+            btn.style.border = `2px solid rgba(0,0,0,0)`;
+            btn.style.boxShadow = 'none';
+        });
+
+        // Apply selected style
+        const activeBtn = (v === 'tank') ? tankBtn : (v === 'jet') ? jetBtn : raceBtn;
+        if (activeBtn) {
+            activeBtn.style.background = selectedBg;
+            activeBtn.style.color = textColor;
+            activeBtn.style.border = `2px solid ${borderColor}`;
+            activeBtn.style.boxShadow = '0 4px 10px rgba(0,64,128,0.15)';
         }
 
-        // Clear previous map data - IMPORTANT: prevents editing wrong map
-        window.currentMapId = null; // New map gets new ID when saved
-        placedObjects = []; // Clear placed objects from previous map
-        customGroundTiles.clear(); // Clear custom ground tiles from previous map
-
-        // Store map name and vehicle type, then open editor
-        window.currentMapName = mapName;
-        window.selectedMapVehicleType = vehicleType;
-        modal.remove();
-        startMapEditor(vehicleType);
-    };
-
-    // Handle Enter key
-    input.onkeypress = (e) => {
-        if (e.key === 'Enter') {
-            document.getElementById('createBtn').click();
+        if (vehicleInfo) {
+            if (v === 'tank') vehicleInfo.textContent = 'Selected: Tank — ready to create a Tank map.';
+            else vehicleInfo.textContent = `Selected: ${v.charAt(0).toUpperCase() + v.slice(1)} — coming soon.`;
+            vehicleInfo.style.color = textColor;
         }
-    };
-}
+    }
 
-// Show map creator loading screen
-function showMapCreatorLoading() {
-    let loadingScreen = document.getElementById('mapCreatorLoadingScreen');
-    if (!loadingScreen) {
-        loadingScreen = document.createElement('div');
-        loadingScreen.id = 'mapCreatorLoadingScreen';
-        loadingScreen.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999;
-        `;
-        loadingScreen.innerHTML = `
-            <div class="map-creator-loader" style="
-                width: fit-content;
-                font-size: 50px;
-                font-family: monospace;
-                font-weight: bold;
-                text-transform: uppercase;
-                color: transparent;
-                -webkit-text-stroke: 2px #00f7ff;
-                background: conic-gradient(#00f7ff 0 0) no-repeat text;
-                background-size: 0% 100%;
-                animation: mapLoadText 2s linear infinite;
-            ">Loading Map</div>
-            <div style="
-                margin-top: 20px;
-                font-size: 40px;
-                color: #00f7ff;
-                animation: dotPulse 1.5s ease-in-out infinite;
-            ">...</div>
-            <div class="map-creator-progress" style="
-                width: 300px;
-                height: 16px;
-                margin-top: 30px;
-                background: #333;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 0 20px rgba(0, 247, 255, 0.3);
-            ">
-                <div id="mapLoadProgress" style="
-                    width: 0%;
-                    height: 100%;
-                    background: linear-gradient(90deg, #00f7ff, #0088ff, #00f7ff);
-                    background-size: 200% 100%;
-                    animation: progressShine 1s linear infinite;
-                    transition: width 0.3s ease;
-                "></div>
-            </div>
-            <div id="mapLoadStatus" style="
-                margin-top: 15px;
-                color: #888;
-                font-size: 14px;
-            ">Initializing...</div>
-        `;
-        
-        // Add keyframe animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes mapLoadText {
-                0% { background-size: 0% 100%; }
-                50% { background-size: 100% 100%; }
-                100% { background-size: 0% 100%; }
+    if (tankBtn) tankBtn.onclick = () => setVehicle('tank');
+    if (jetBtn) jetBtn.onclick = () => setVehicle('jet');
+    if (raceBtn) raceBtn.onclick = () => setVehicle('race');
+
+    // Apply default visual selection
+    setVehicle('tank');
+
+    if (cancelBtnScoped) {
+        cancelBtnScoped.onclick = () => {
+            debugBanner.textContent = 'MapCreator: cancelled';
+            modal.remove();
+        };
+    }
+
+    if (createBtnScoped) {
+        createBtnScoped.onclick = () => {
+            try {
+                // Only allow Tank for now
+                if (selectedVehicle !== 'tank') {
+                    alert((selectedVehicle.charAt(0).toUpperCase() + selectedVehicle.slice(1)) + ' editor coming soon!');
+                    return;
+                }
+                const mapName = input ? input.value.trim() : '';
+                if (!mapName) {
+                    // visible feedback for users without console
+                    debugBanner.textContent = 'MapCreator: please enter a map name';
+                    alert('Please enter a map name!');
+                    return;
+                }
+
+                // Store map name and open editor
+                window.currentMapName = mapName;
+                debugBanner.textContent = `MapCreator: starting editor for "${mapName}"...`;
+                modal.remove();
+
+                // Attempt to start editor and show visible errors if it fails
+                try {
+                    startMapEditor();
+                    debugBanner.textContent = `MapCreator: editor opened for "${mapName}"`;
+                } catch (err) {
+                    debugBanner.textContent = `MapCreator ERROR: ${err && err.message ? err.message : err}`;
+                    alert('Failed to open map editor: ' + (err && err.message ? err.message : err));
+                }
+            } catch (outerErr) {
+                debugBanner.textContent = 'MapCreator outer error: ' + (outerErr && outerErr.message ? outerErr.message : outerErr);
+                alert('Unexpected error: ' + (outerErr && outerErr.message ? outerErr.message : outerErr));
             }
-            @keyframes dotPulse {
-                0%, 100% { opacity: 0.3; transform: scale(1); }
-                50% { opacity: 1; transform: scale(1.2); }
-            }
-            @keyframes progressShine {
-                0% { background-position: 200% 0; }
-                100% { background-position: -200% 0; }
-            }
-        `;
-        document.head.appendChild(style);
-        document.body.appendChild(loadingScreen);
+        };
     }
-    loadingScreen.style.display = 'flex';
-}
 
-// Update loading progress
-function updateMapCreatorLoadingProgress(percent, status) {
-    const progressBar = document.getElementById('mapLoadProgress');
-    const statusText = document.getElementById('mapLoadStatus');
-    if (progressBar) progressBar.style.width = percent + '%';
-    if (statusText) statusText.textContent = status;
-}
-
-// Hide map creator loading screen
-function hideMapCreatorLoading() {
-    const loadingScreen = document.getElementById('mapCreatorLoadingScreen');
-    if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-            loadingScreen.style.opacity = '1';
-        }, 500);
+    // Handle Enter key inside modal
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && createBtnScoped) createBtnScoped.click();
+        });
     }
 }
 
-function startMapEditor(vehicleType = 'tank') {
-    console.log('Starting map editor for:', window.currentMapName, 'Vehicle type:', vehicleType);
+function startMapEditor() {
+    console.log('Starting map editor for:', window.currentMapName);
 
-    // Show loading screen
-    showMapCreatorLoading();
-    updateMapCreatorLoadingProgress(10, 'Initializing editor...');
-
-    // Store the vehicle type for the map
-    window.currentMapVehicleType = vehicleType;
-
-    // Route to the correct editor based on vehicle type
-    if (vehicleType === 'jet') {
-        hideMapCreatorLoading();
-        if (typeof window.startJetMapEditor === 'function') {
-            window.currentJetMapName = window.currentMapName;
-            window.startJetMapEditor();
-            return;
-        }
-    } else if (vehicleType === 'race') {
-        hideMapCreatorLoading();
-        if (typeof window.startRaceMapEditor === 'function') {
-            window.currentRaceMapName = window.currentMapName;
-            window.startRaceMapEditor();
-            return;
-        }
-    }
-
-    updateMapCreatorLoadingProgress(20, 'Setting up canvas...');
-
-    // Default: Tank editor
-    // Hide lobby screen first
-    const lobbyScreen = document.getElementById('lobbyScreen');
-    if (lobbyScreen) {
-        lobbyScreen.classList.add('hidden');
-    }
-    
-    // Show createMapScreen (contains blankMapCreator)
-    const createMapScreen = document.getElementById('createMapScreen');
-    if (createMapScreen) {
-        createMapScreen.classList.remove('hidden');
-        // Hide the tabs and other content, only show blankMapCreator
-        const tabsContainer = createMapScreen.querySelector('.tabs-container');
-        if (tabsContainer) tabsContainer.style.display = 'none';
-        const createdMapTab = document.getElementById('createdMapTab');
-        if (createdMapTab) createdMapTab.classList.add('hidden');
-        const analyzeTab = document.getElementById('analyzeTab');
-        if (analyzeTab) analyzeTab.classList.add('hidden');
-    }
-    
-    // Show blank creator - move it to body to avoid parent visibility issues
+    // Show blank creator
     const blankCreator = document.getElementById('blankMapCreator');
     if (blankCreator) {
-        // Move blankMapCreator to body so it's not affected by parent visibility
-        document.body.appendChild(blankCreator);
-        
         blankCreator.classList.remove('hidden');
-        blankCreator.style.display = 'block';
-        blankCreator.style.visibility = 'visible';
-        blankCreator.style.position = 'fixed';
-        blankCreator.style.top = '0';
-        blankCreator.style.left = '0';
-        blankCreator.style.width = '100vw';
-        blankCreator.style.height = '100vh';
-        blankCreator.style.zIndex = '9999';
-        console.log('✅ blankMapCreator moved to body and shown');
-        
-        // Hide the createMapScreen close button when in editor
-        const createMapCloseBtn = document.getElementById('createMapCloseBtn');
-        if (createMapCloseBtn) {
-            createMapCloseBtn.style.display = 'none';
-        }
-        
-        // Update the title to show vehicle type
-        updateMapCreatorTitle(vehicleType);
+        console.log('✅ Blank creator shown');
     } else {
-        console.error('❌ blankMapCreator element not found!');
+        console.error('❌ Blank creator element not found');
     }
 
     // Hide game minimap if it exists
@@ -1302,248 +955,23 @@ function startMapEditor(vehicleType = 'tank') {
     targetCanvasZoom = 0.5;
     window.canvasZoom = 0.5;
 
-    // Load ground textures first, then continue
-    updateMapCreatorLoadingProgress(25, 'Loading ground textures...');
-    
-    loadCustomGroundTexture().then(() => {
-        updateMapCreatorLoadingProgress(60, 'Initializing canvas...');
-        
-        // Initialize map creator canvas
+    // Wait a bit for DOM to update, then initialize canvas
+    setTimeout(() => {
+        // Initialize map creator canvas (this will center the camera)
         initMapCreatorCanvas();
-        
-        setTimeout(() => {
-            updateMapCreatorLoadingProgress(70, 'Loading building assets...');
-            
-            // Create zoom slider
-            createZoomSlider();
-            
-            setTimeout(() => {
-                updateMapCreatorLoadingProgress(80, 'Loading assets...');
-                
-                // Load initial assets
-                loadAssetsForVehicleType(vehicleType);
-                
-                setTimeout(() => {
-                    updateMapCreatorLoadingProgress(90, 'Setting up controls...');
-                    
-                    // Setup draggable editor panel
-                    setupTankEditorDrag();
-                    
-                    setTimeout(() => {
-                        updateMapCreatorLoadingProgress(100, 'Ready!');
-                        
-                        // Hide loading screen after a brief moment
-                        setTimeout(() => {
-                            hideMapCreatorLoading();
-                        }, 300);
-                    }, 100);
-                }, 100);
-            }, 100);
-        }, 100);
+
+        // Create zoom slider if it doesn't exist
+        createZoomSlider();
+
+        // Load initial assets
+        loadAssets(currentAssetCategory);
+
+        // Hide debug banner if present (editor opened)
+        const debugBanner = document.getElementById('mapCreatorDebugBanner');
+        if (debugBanner) {
+            try { debugBanner.remove(); } catch (e) { debugBanner.style.display = 'none'; }
+        }
     }, 100);
-}
-
-function updateMapCreatorTitle(vehicleType) {
-    // Find the title element in the map creator
-    const titleElement = document.querySelector('#blankMapCreator h2, #blankMapCreator .map-creator-title');
-    if (titleElement) {
-        const vehicleEmoji = vehicleType === 'tank' ? '🚗' : vehicleType === 'jet' ? '✈️' : '🏎️';
-        const vehicleName = vehicleType.toUpperCase();
-        titleElement.textContent = `${vehicleEmoji} ${vehicleName} Map Creator - ${window.currentMapName}`;
-        titleElement.style.color = vehicleType === 'tank' ? '#0088ff' : vehicleType === 'jet' ? '#ff8800' : '#ff0088';
-    }
-}
-
-function loadAssetsForVehicleType(vehicleType) {
-    console.log('Loading assets for vehicle type:', vehicleType);
-    
-    // For now, all vehicle types use the same assets (buildings and grounds)
-    // In the future, you could customize assets per vehicle type
-    loadAssets(currentAssetCategory);
-    
-    // Add vehicle type indicator to the interface
-    addVehicleTypeIndicator(vehicleType);
-}
-
-function addVehicleTypeIndicator(vehicleType) {
-    // Remove existing indicator if any
-    const existingIndicator = document.getElementById('vehicleTypeIndicator');
-    if (existingIndicator) {
-        existingIndicator.remove();
-    }
-    
-    // Get the current map name
-    const mapName = window.currentMapName || 'Untitled Map';
-    
-    // Create new indicator - positioned at bottom center
-    const indicator = document.createElement('div');
-    indicator.id = 'vehicleTypeIndicator';
-    indicator.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: ${vehicleType === 'tank' ? '#0066cc' : vehicleType === 'jet' ? '#cc6600' : '#cc0066'};
-        color: white;
-        padding: 12px 25px;
-        border-radius: 10px;
-        font-weight: bold;
-        font-size: 16px;
-        z-index: 1000;
-        border: 2px solid ${vehicleType === 'tank' ? '#0088ff' : vehicleType === 'jet' ? '#ff8800' : '#ff0088'};
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    `;
-    
-    const vehicleEmoji = vehicleType === 'tank' ? '🚗' : vehicleType === 'jet' ? '✈️' : '🏎️';
-    indicator.innerHTML = `${vehicleEmoji} <span id="mapNameDisplay">${mapName}</span> <span style="opacity: 0.6; font-size: 12px;">✏️ click to rename</span>`;
-    
-    // Add hover effect
-    indicator.onmouseenter = () => {
-        indicator.style.background = vehicleType === 'tank' ? '#0077dd' : vehicleType === 'jet' ? '#dd7700' : '#dd0077';
-        indicator.style.transform = 'translateX(-50%) scale(1.05)';
-    };
-    indicator.onmouseleave = () => {
-        indicator.style.background = vehicleType === 'tank' ? '#0066cc' : vehicleType === 'jet' ? '#cc6600' : '#cc0066';
-        indicator.style.transform = 'translateX(-50%) scale(1)';
-    };
-    
-    // Add click handler to rename map
-    indicator.onclick = () => {
-        showRenameMapDialog(vehicleType);
-    };
-    
-    document.body.appendChild(indicator);
-}
-
-// Function to show rename map dialog
-function showRenameMapDialog(vehicleType) {
-    const currentName = window.currentMapName || 'Untitled Map';
-    
-    // Create modal
-    const modal = document.createElement('div');
-    modal.id = 'renameMapModal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 99999;
-    `;
-    
-    const container = document.createElement('div');
-    container.style.cssText = `
-        background: #1a2a3a;
-        border: 3px solid ${vehicleType === 'tank' ? '#0088ff' : vehicleType === 'jet' ? '#ff8800' : '#ff0088'};
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        max-width: 400px;
-        width: 90%;
-    `;
-    
-    container.innerHTML = `
-        <h2 style="color: ${vehicleType === 'tank' ? '#0088ff' : vehicleType === 'jet' ? '#ff8800' : '#ff0088'}; margin-bottom: 20px;">✏️ Rename Map</h2>
-        <input 
-            type="text" 
-            id="renameMapInput" 
-            value="${currentName}"
-            placeholder="Enter new map name..." 
-            maxlength="30"
-            style="
-                width: 100%;
-                padding: 15px;
-                font-size: 18px;
-                border: 2px solid #333;
-                border-radius: 8px;
-                background: #0a1520;
-                color: white;
-                margin-bottom: 20px;
-                box-sizing: border-box;
-            "
-        />
-        <div style="display: flex; gap: 15px; justify-content: center;">
-            <button id="cancelRenameBtn" style="
-                padding: 12px 30px;
-                background: #444;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 16px;
-            ">Cancel</button>
-            <button id="confirmRenameBtn" style="
-                padding: 12px 30px;
-                background: ${vehicleType === 'tank' ? '#0066cc' : vehicleType === 'jet' ? '#cc6600' : '#cc0066'};
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: bold;
-            ">Rename</button>
-        </div>
-    `;
-    
-    modal.appendChild(container);
-    document.body.appendChild(modal);
-    
-    // Focus input and select all text
-    const input = document.getElementById('renameMapInput');
-    input.focus();
-    input.select();
-    
-    // Handle Enter key
-    input.onkeydown = (e) => {
-        if (e.key === 'Enter') {
-            confirmRename();
-        } else if (e.key === 'Escape') {
-            modal.remove();
-        }
-    };
-    
-    // Cancel button
-    document.getElementById('cancelRenameBtn').onclick = () => {
-        modal.remove();
-    };
-    
-    // Confirm button
-    document.getElementById('confirmRenameBtn').onclick = confirmRename;
-    
-    function confirmRename() {
-        const newName = input.value.trim();
-        if (!newName) {
-            alert('Please enter a map name!');
-            return;
-        }
-        
-        // Update the map name
-        window.currentMapName = newName;
-        
-        // Update the indicator display
-        const mapNameDisplay = document.getElementById('mapNameDisplay');
-        if (mapNameDisplay) {
-            mapNameDisplay.textContent = newName;
-        }
-        
-        console.log('✅ Map renamed to:', newName);
-        modal.remove();
-    }
-    
-    // Close on background click
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    };
 }
 
 // Create zoom slider dynamically
@@ -1602,8 +1030,8 @@ function createZoomSlider() {
     input.type = 'range';
     input.id = 'mapZoomSlider';
     input.className = 'map-zoom-slider';
-    input.min = '0.3';
-    input.max = '4';
+    input.min = '0.5';
+    input.max = '3';
     input.step = '0.1';
     input.value = '0.5';
     input.style.cssText = `
@@ -1661,6 +1089,23 @@ function createZoomSlider() {
 
         // Update target zoom for smooth interpolation
         targetCanvasZoom = zoomValue;
+
+        // ALSO update the target camera offset so the zoom centers on the
+        // current screen center (prevents zooming to the original start position)
+        const canvas = document.getElementById('mapCreatorCanvas');
+        if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Calculate world position of the center before zoom
+            const worldX = (centerX - canvasOffsetX) / canvasZoom;
+            const worldY = (centerY - canvasOffsetY) / canvasZoom;
+
+            // Adjust target offsets so the same world point stays at screen center
+            targetCanvasOffsetX = centerX - worldX * zoomValue;
+            targetCanvasOffsetY = centerY - worldY * zoomValue;
+        }
 
         // Update slider visuals
         const min = parseFloat(input.min);
@@ -1842,8 +1287,7 @@ function updateMinimapViewer() {
 
     // Draw ground tiles background - matching main canvas with circular boundary
     const mapRadiusPixels = 2500; // Same as main canvas map boundary
-    const outerRadiusPixels = 2900; // Extended boundary for LightSand (40% smaller than before)
-    const scale = width / (outerRadiusPixels * 2); // Scale to show full sand area
+    const scale = width / (mapRadiusPixels * 2);
     const worldTileWidth = 120;
     const worldTileHeight = 30;
     const minimapTileWidth = worldTileWidth * scale;
@@ -1854,55 +1298,55 @@ function updateMinimapViewer() {
     const screenCenterWorldX = mainCanvas ? (mainCanvas.width / 2 - canvasOffsetX) / canvasZoom : 0;
     const screenCenterWorldY = mainCanvas ? (mainCanvas.height / 2 - canvasOffsetY) / canvasZoom : 0;
 
-    // Draw black background first (outside map area)
-    ctx.fillStyle = '#000000';
+    // Draw water background first with enhanced color
+    ctx.fillStyle = '#2a7ab8';
     ctx.fillRect(0, 0, width, height);
 
-    // Draw ground PNG textures (textures should be loaded before map opens)
-    // Calculate visible tile range around screen center (use outer radius for full sand area)
-    const maxGridRange = Math.ceil(outerRadiusPixels / worldTileHeight);
-    const startRow = Math.max(-maxGridRange, Math.floor((screenCenterWorldY - radius / scale) / worldTileHeight));
-    const endRow = Math.min(maxGridRange, Math.ceil((screenCenterWorldY + radius / scale) / worldTileHeight));
-    const startCol = Math.max(-maxGridRange, Math.floor((screenCenterWorldX - radius / scale) / worldTileWidth));
-    const endCol = Math.min(maxGridRange, Math.ceil((screenCenterWorldX + radius / scale) / worldTileWidth));
+    // Draw ground PNG textures if available
+    if (typeof groundTextureImages !== 'undefined' && groundTextureImages.size > 0) {
+        const groundTypes = Array.from(groundTextureImages.keys());
 
-    for (let row = startRow; row <= endRow; row++) {
-        for (let col = startCol; col <= endCol; col++) {
-            // Calculate isometric position (same as main canvas)
-            const isoX = col * worldTileWidth + (row % 2) * (worldTileWidth / 2);
-            const isoY = row * worldTileHeight;
+        // Calculate visible tile range around screen center
+        const maxGridRange = Math.ceil(mapRadiusPixels / worldTileHeight);
+        const startRow = Math.max(-maxGridRange, Math.floor((screenCenterWorldY - radius / scale) / worldTileHeight));
+        const endRow = Math.min(maxGridRange, Math.ceil((screenCenterWorldY + radius / scale) / worldTileHeight));
+        const startCol = Math.max(-maxGridRange, Math.floor((screenCenterWorldX - radius / scale) / worldTileWidth));
+        const endCol = Math.min(maxGridRange, Math.ceil((screenCenterWorldX + radius / scale) / worldTileWidth));
 
-            // Check if within extended map boundary (world coordinates)
-            const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
-            if (distFromMapCenter > outerRadiusPixels) continue;
+        for (let row = startRow; row <= endRow; row++) {
+            for (let col = startCol; col <= endCol; col++) {
+                // Calculate isometric position (same as main canvas)
+                const isoX = col * worldTileWidth + (row % 2) * (worldTileWidth / 2);
+                const isoY = row * worldTileHeight;
 
-            // Convert world position to minimap position - tiles move relative to fixed center
-            const minimapX = centerX + (isoX - screenCenterWorldX) * scale;
-            const minimapY = centerY + (isoY - screenCenterWorldY) * scale;
+                // Check if within circular map boundary (world coordinates)
+                const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
+                if (distFromMapCenter > mapRadiusPixels) continue;
 
-            // Check if tile is within minimap circle
-            const dist = Math.sqrt((minimapX - centerX) ** 2 + (minimapY - centerY) ** 2);
-            if (dist < radius) {
-                // Check if user placed custom ground tile
-                const tileKey = `${col},${row}`;
-                let groundType;
+                // Convert world position to minimap position - tiles move relative to fixed center
+                const minimapX = centerX + (isoX - screenCenterWorldX) * scale;
+                const minimapY = centerY + (isoY - screenCenterWorldY) * scale;
 
-                if (typeof customGroundTiles !== 'undefined' && customGroundTiles.has(tileKey)) {
-                    // Use custom ground tile placed by user
-                    const customTile = customGroundTiles.get(tileKey);
-                    groundType = customTile.type;
-                } else {
-                    // Use LightSand at edges, GreenGrass in center
-                    if (distFromMapCenter > mapRadiusPixels * 0.85) {
-                        groundType = 'LightSand';
+                // Check if tile is within minimap circle
+                const dist = Math.sqrt((minimapX - centerX) ** 2 + (minimapY - centerY) ** 2);
+                if (dist < radius) {
+                    // Check if user placed custom ground tile
+                    const tileKey = `${col},${row}`;
+                    let groundType;
+
+                    if (typeof customGroundTiles !== 'undefined' && customGroundTiles.has(tileKey)) {
+                        // Use custom ground tile placed by user
+                        const customTile = customGroundTiles.get(tileKey);
+                        groundType = customTile.type; // Extract the type from the object
                     } else {
-                        groundType = 'GreenGrass';
+                        // Use ground12 as default (same as main canvas)
+                        groundType = 'ground12';
                     }
-                }
 
-                const groundImg = groundTextureImages.get(groundType);
-                if (groundImg && groundImg.complete) {
-                    ctx.drawImage(groundImg, minimapX, minimapY, minimapTileWidth, minimapTileWidth * 0.6);
+                    const groundImg = groundTextureImages.get(groundType);
+                    if (groundImg && groundImg.complete) {
+                        ctx.drawImage(groundImg, minimapX, minimapY, minimapTileWidth, minimapTileWidth * 0.6);
+                    }
                 }
             }
         }
@@ -1967,33 +1411,12 @@ function closeBlankMapCreator() {
     console.log('Closing blank map creator...');
 
     // Hide blank creator
-    const blankCreator = document.getElementById('blankMapCreator');
-    if (blankCreator) {
-        blankCreator.classList.add('hidden');
-        blankCreator.style.display = 'none';
-    }
+    document.getElementById('blankMapCreator').classList.add('hidden');
 
-    // Show the lobby screen
-    const lobbyScreen = document.getElementById('lobbyScreen');
-    if (lobbyScreen) {
-        lobbyScreen.classList.remove('hidden');
-    }
-
-    // Show the create map screen
+    // Show the create map screen again
     const createMapScreen = document.getElementById('createMapScreen');
     if (createMapScreen) {
         createMapScreen.classList.remove('hidden');
-        // Restore tabs visibility
-        const tabsContainer = createMapScreen.querySelector('.feature-tabs');
-        if (tabsContainer) tabsContainer.style.display = '';
-        const createdMapTab = document.getElementById('createdMapTab');
-        if (createdMapTab) createdMapTab.classList.remove('hidden');
-    }
-    
-    // Show the createMapScreen close button again
-    const createMapCloseBtn = document.getElementById('createMapCloseBtn');
-    if (createMapCloseBtn) {
-        createMapCloseBtn.style.display = '';
     }
 
     // Refresh the saved maps display
@@ -2003,18 +1426,14 @@ function closeBlankMapCreator() {
     const slider = document.getElementById('mapCreatorZoomSlider');
     if (slider) {
         slider.remove();
+        console.log('Zoom slider removed');
     }
 
     // Remove minimap
     const minimap = document.getElementById('mapCreatorMinimap');
     if (minimap) {
         minimap.remove();
-    }
-
-    // Remove vehicle type indicator
-    const vehicleIndicator = document.getElementById('vehicleTypeIndicator');
-    if (vehicleIndicator) {
-        vehicleIndicator.remove();
+        console.log('Minimap removed');
     }
 
     // Remove help button
@@ -2031,8 +1450,6 @@ function closeBlankMapCreator() {
 
     // Show the create new map button again
     createInteractiveElements();
-    
-    console.log('✅ Returned to createMapScreen');
 }
 
 function toggleAssetsPanel() {
@@ -2054,43 +1471,6 @@ function toggleAssetsPanel() {
     }
 }
 
-// Setup draggable editor panel for tank
-function setupTankEditorDrag() {
-    const panel = document.getElementById('assetsPanel');
-    const header = document.getElementById('tankEditorHeader');
-    if (!panel || !header) return;
-
-    let isDragging = false;
-    let startX, startY, initialX, initialY;
-
-    header.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains('minimize-btn')) return;
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        const rect = panel.getBoundingClientRect();
-        initialX = rect.left;
-        initialY = rect.top;
-        panel.style.transition = 'none';
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        panel.style.left = (initialX + dx) + 'px';
-        panel.style.top = (initialY + dy) + 'px';
-        panel.style.right = 'auto';
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            panel.style.transition = '';
-        }
-    });
-}
-
 function switchAssetCategory(category) {
     currentAssetCategory = category;
 
@@ -2099,15 +1479,15 @@ function switchAssetCategory(category) {
         btn.classList.remove('active');
         if (btn.dataset.category === category) {
             btn.classList.add('active');
-            // Update button styling based on category
+            // Update button styling
             if (category === 'ground') {
                 btn.style.background = 'rgba(139, 69, 19, 0.5)';
                 btn.style.borderColor = 'rgba(139, 69, 19, 0.8)';
                 btn.style.color = '#d2691e';
-            } else if (category === 'players') {
-                btn.style.background = 'rgba(255, 100, 100, 0.5)';
-                btn.style.borderColor = 'rgba(255, 100, 100, 0.8)';
-                btn.style.color = '#ff6464';
+            } else if (category === 'asteroids') {
+                btn.style.background = 'rgba(255, 165, 0, 0.4)';
+                btn.style.borderColor = 'rgba(255, 165, 0, 0.8)';
+                btn.style.color = '#ffa500';
             } else {
                 btn.style.background = 'rgba(0, 247, 255, 0.3)';
                 btn.style.borderColor = '#00f7ff';
@@ -2119,9 +1499,9 @@ function switchAssetCategory(category) {
                 btn.style.background = 'rgba(139, 69, 19, 0.3)';
                 btn.style.borderColor = 'rgba(139, 69, 19, 0.6)';
                 btn.style.color = 'rgba(255, 255, 255, 0.8)';
-            } else if (btn.dataset.category === 'players') {
-                btn.style.background = 'rgba(255, 100, 100, 0.3)';
-                btn.style.borderColor = 'rgba(255, 100, 100, 0.6)';
+            } else if (btn.dataset.category === 'asteroids') {
+                btn.style.background = 'rgba(255, 165, 0, 0.2)';
+                btn.style.borderColor = 'rgba(255, 165, 0, 0.6)';
                 btn.style.color = 'rgba(255, 255, 255, 0.8)';
             } else {
                 btn.style.background = 'rgba(0, 247, 255, 0.2)';
@@ -2131,19 +1511,8 @@ function switchAssetCategory(category) {
         }
     });
 
-    // Show/hide panels based on category
-    const assetsGrid = document.getElementById('assetsGrid');
-    const playersPanel = document.getElementById('playersPanel');
-    
-    if (category === 'players') {
-        if (assetsGrid) assetsGrid.style.display = 'none';
-        if (playersPanel) playersPanel.style.display = 'block';
-    } else {
-        if (assetsGrid) assetsGrid.style.display = 'grid';
-        if (playersPanel) playersPanel.style.display = 'none';
-        // Load assets for this category
-        loadAssets(category);
-    }
+    // Load assets for this category
+    loadAssets(category);
 }
 
 // Track if we're viewing object details
@@ -2202,7 +1571,36 @@ const objectFileNameMap = {
 };
 
 function loadAssets(category) {
-    const assetsGrid = document.getElementById('assetsGrid');
+    let assetsGrid = document.getElementById('assetsGrid');
+
+    // If assets grid/panel doesn't exist in DOM, create a floating panel
+    if (!assetsGrid) {
+        const assetsPanel = document.createElement('div');
+        assetsPanel.id = 'assetsPanel';
+        assetsPanel.style.cssText = 'position: fixed; right: 10px; top: 80px; width: 260px; max-height: 70vh; overflow: auto; background: rgba(0,0,0,0.8); border: 2px solid rgba(0,247,255,0.08); padding: 10px; border-radius: 8px; z-index: 100000; color: white;';
+
+        // Category buttons
+        const catRow = document.createElement('div');
+        catRow.style.cssText = 'display:flex; gap:6px; margin-bottom:8px;';
+        ['ground','asteroids','buildings','tanks'].forEach(cat => {
+            const b = document.createElement('button');
+            b.className = 'asset-category-btn';
+            b.dataset.category = cat;
+            b.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+            b.style.cssText = 'flex:1;padding:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04);color:#fff;cursor:pointer;';
+            b.onclick = () => switchAssetCategory(cat);
+            catRow.appendChild(b);
+        });
+
+        assetsPanel.appendChild(catRow);
+
+        assetsGrid = document.createElement('div');
+        assetsGrid.id = 'assetsGrid';
+        assetsGrid.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+        assetsPanel.appendChild(assetsGrid);
+
+        document.body.appendChild(assetsPanel);
+    }
     assetsGrid.innerHTML = '';
 
     // If we're viewing a specific object's files, show those
@@ -2211,26 +1609,25 @@ function loadAssets(category) {
         return;
     }
 
-    // Ground PNG textures - all ground tiles with descriptive names
+    // Ground PNG textures (use tank asset folder)
     const groundTextures = [
-        { name: 'Blue Grass', type: 'BlueGrass', file: 'tank/Grounds/BlueGrass.png' },
-        { name: 'Brown Cobblestone', type: 'BrownCobblestone', file: 'tank/Grounds/BrownCobblestone.png' },
-        { name: 'Brown Grass', type: 'BrownGrass', file: 'tank/Grounds/BrownGrass.png' },
-        { name: 'Gold Cobblestone', type: 'Goldcobblestone', file: 'tank/Grounds/Goldcobblestone.png' },
-        { name: 'Golden Cobblestone', type: 'GoldenCobblestone', file: 'tank/Grounds/GoldenCobblestone.png' },
-        { name: 'Gray Ground', type: 'GrayGround', file: 'tank/Grounds/GrayGround.png' },
-        { name: 'Green Grass', type: 'GreenGrass', file: 'tank/Grounds/GreenGrass.png' },
-        { name: 'Grey Cobblestone', type: 'GreyCobblestone', file: 'tank/Grounds/Grey Cobblestone.png' },
-        { name: 'Light Brown Cobblestone', type: 'LightBrownCobblestone', file: 'tank/Grounds/LightBrownCobblestone.png' },
-        { name: 'Light Grey Cobblestone', type: 'LightGreyCobblestone', file: 'tank/Grounds/LightGreyCobblestone.png' },
-        { name: 'Light Grey Ground', type: 'LightGreyGround', file: 'tank/Grounds/LightGreyGround.png' },
-        { name: 'Light Sand', type: 'LightSand', file: 'tank/Grounds/LightSand.png' },
-        { name: 'Purple Cobblestone', type: 'PurpleCobblestone', file: 'tank/Grounds/PurpleCobblestone.png' },
-        { name: 'Red Cobblestone', type: 'RedCobblestone', file: 'tank/Grounds/RedCobblestone.png' },
-        { name: 'Sand', type: 'Sand', file: 'tank/Grounds/Sand.png' },
-        { name: 'Wooden Planks', type: 'WoodenPlanks', file: 'tank/Grounds/WoodenPlanks.png' },
-        { name: 'Wooden Tile', type: 'WoodenTile', file: 'tank/Grounds/WoodenTile.png' },
-        { name: 'Yellow Grass', type: 'YellowGrass', file: 'tank/Grounds/YellowGrass.png' }
+        { name: 'Blue Grass', type: 'bluegrass', file: 'tank/Grounds/BlueGrass.png' },
+        { name: 'Brown Cobblestone', type: 'browncobble', file: 'tank/Grounds/BrownCobblestone.png' },
+        { name: 'Brown Grass', type: 'browngrass', file: 'tank/Grounds/BrownGrass.png' },
+        { name: 'Gold Cobblestone', type: 'goldcobble', file: 'tank/Grounds/Goldcobblestone.png' },
+        { name: 'Golden Cobblestone', type: 'goldencobble', file: 'tank/Grounds/GoldenCobblestone.png' },
+        { name: 'Gray Ground', type: 'grayground', file: 'tank/Grounds/GrayGround.png' },
+        { name: 'Green Grass', type: 'greengrass', file: 'tank/Grounds/GreenGrass.png' },
+        { name: 'Light Brown Cobblestone', type: 'lightbrowncobble', file: 'tank/Grounds/LightBrownCobblestone.png' },
+        { name: 'Light Grey Cobblestone', type: 'lightgreycobble', file: 'tank/Grounds/LightGreyCobblestone.png' },
+        { name: 'Light Grey Ground', type: 'lightgreyground', file: 'tank/Grounds/LightGreyGround.png' },
+        { name: 'Light Sand', type: 'lightsand', file: 'tank/Grounds/LightSand.png' },
+        { name: 'Purple Cobblestone', type: 'purplecobble', file: 'tank/Grounds/PurpleCobblestone.png' },
+        { name: 'Red Cobblestone', type: 'redcobble', file: 'tank/Grounds/RedCobblestone.png' },
+        { name: 'Sand', type: 'sand', file: 'tank/Grounds/Sand.png' },
+        { name: 'Wooden Planks', type: 'woodenplanks', file: 'tank/Grounds/WoodenPlanks.png' },
+        { name: 'Wooden Tile', type: 'woodentile', file: 'tank/Grounds/WoodenTile.png' },
+        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' }
     ];
 
     // Show only ground textures if ground category is selected
@@ -2247,7 +1644,10 @@ function loadAssets(category) {
                 image: `/assets/${ground.file}`,
                 isFolder: false,
                 isGround: true,
-                groundType: ground.type,
+                // Use the file path as the groundType key so it matches
+                // the keys stored in `groundTextureImages` (they are stored
+                // by filename like 'tank/Grounds/BlueGrass.png').
+                groundType: ground.file,
                 groundFile: ground.file
             };
 
@@ -2279,9 +1679,61 @@ function loadAssets(category) {
         return;
     }
 
+    // Show asteroids category
+    if (category === 'asteroids') {
+        const asteroidSizes = ['Large 1', 'Large 2', 'Medium 1', 'Medium 2', 'Small 1', 'Small 2'];
+        const asteroidTypes = ['Rock', 'Ice', 'Gold'];
+
+        asteroidSizes.forEach(size => {
+            asteroidTypes.forEach(type => {
+                const assetItem = document.createElement('div');
+                assetItem.className = 'asset-item-list';
+
+                // Use first frame of asteroid animation
+                const imagePath = `/assets/Asteroids/Asteroid ${size}/${type}/spr_asteroids_${size.toLowerCase().replace(' ', '')}_${type.toLowerCase()}_01.png`;
+
+                const asset = {
+                    name: `${size} ${type} Asteroid`,
+                    folder: 'Asteroids',
+                    fileName: `spr_asteroids_${size.toLowerCase().replace(' ', '')}_${type.toLowerCase()}_01.png`,
+                    image: imagePath,
+                    isFolder: false,
+                    asteroidSize: size,
+                    asteroidType: type
+                };
+
+                assetItem.onclick = () => selectAsset(asset, assetItem);
+
+                assetItem.innerHTML = `
+                    <div style="width: 50px; height: 50px; background: rgba(20, 30, 50, 0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,165,0,0.2);">
+                        <img src="${imagePath}" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
+                        <div style="color: rgba(255, 165, 0, 0.6); font-size: 11px;">Click to place</div>
+                    </div>
+                `;
+
+                assetsGrid.appendChild(assetItem);
+            });
+        });
+
+        // Add info message
+        const infoMsg = document.createElement('div');
+        infoMsg.style.cssText = 'padding: 15px; margin-top: 10px; background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 8px; color: rgba(255, 255, 255, 0.7); font-size: 12px; line-height: 1.5;';
+        infoMsg.innerHTML = `
+            <div style="font-weight: 600; color: #ffa500; margin-bottom: 5px;">🌌 Asteroid Placement</div>
+            Select an asteroid and click on the map to place it!<br>
+            Asteroids add visual interest and obstacles to your battle arena.
+        `;
+        assetsGrid.appendChild(infoMsg);
+
+        return;
+    }
+
     // Show buildings category
     if (category === 'buildings') {
-        // Use Buildings folder - actual path is /assets/tank/Buildings/
+        // Use Buildings folder
         const viewFolder = 'Buildings';
 
         // List of all objects in the view folders
@@ -2328,6 +1780,52 @@ function loadAssets(category) {
 
             assetsGrid.appendChild(assetItem);
         });
+        
+        return;
+    }
+
+    // Show tanks/vehicles category
+    if (category === 'tanks' || category === 'vehicles') {
+        const colors = ['blue', 'camo', 'desert', 'purple', 'red'];
+
+        colors.forEach(color => {
+            const assetItem = document.createElement('div');
+            assetItem.className = 'asset-item-list';
+
+            // Prefer the halftrack body PNG, fallback to tracks image
+            let imagePath = `/assets/tank/tanks/${color}/${color}_body_halftrack.png`;
+            // Some folders use different naming - provide fallback
+            const fallback = `/assets/tank/tanks/${color}/${color}_body_tracks.png`;
+
+            const asset = {
+                name: `${color.charAt(0).toUpperCase() + color.slice(1)} Tank`,
+                folder: color,
+                fileName: imagePath.split('/').pop(),
+                image: imagePath,
+                isFolder: false
+            };
+
+            assetItem.onclick = () => selectAsset(asset, assetItem);
+
+            assetItem.innerHTML = `
+                <div style="width: 50px; height: 50px; background: rgba(20, 30, 50, 0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,255,255,0.08);">
+                    <img src="${imagePath}" onerror="this.src='${fallback}'" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                    <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
+                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 11px;">Click to place</div>
+                </div>
+            `;
+
+            assetsGrid.appendChild(assetItem);
+        });
+
+        const infoMsg = document.createElement('div');
+        infoMsg.style.cssText = 'padding: 12px; margin-top: 10px; background: rgba(0, 247, 255, 0.04); border: 1px solid rgba(0, 247, 255, 0.06); border-radius: 8px; color: rgba(255,255,255,0.7); font-size: 12px;';
+        infoMsg.innerHTML = '<strong>Vehicles:</strong> Select a tank to place a vehicle prefab. Use the palette to select colors.';
+        assetsGrid.appendChild(infoMsg);
+
+        return;
     }
 }
 
@@ -2428,6 +1926,8 @@ function selectAsset(asset, element) {
     element.style.borderColor = 'rgba(100, 150, 255, 0.4)';
 
     console.log('Selected asset:', asset.name);
+    // Force a render so hover/preview updates immediately after selection
+    renderMapCreatorCanvas();
 }
 
 
@@ -2470,22 +1970,21 @@ function saveMap() {
     const TILE_WIDTH = 120;
     const TILE_HEIGHT = 30;
     const MAP_RADIUS = 2500;
-    const OUTER_RADIUS = 4000; // Extended boundary for LightSand edges
     const DRAW_HEIGHT = 70;
 
     const serializedGroundTiles = [];
-    const maxGridRange = Math.ceil(OUTER_RADIUS / TILE_HEIGHT);
+    const maxGridRange = Math.ceil(MAP_RADIUS / TILE_HEIGHT);
 
-    // Generate tiles covering extended boundary with correct textures
+    // Generate tiles covering entire map boundary with correct textures
     for (let row = -maxGridRange; row <= maxGridRange; row++) {
         for (let col = -maxGridRange; col <= maxGridRange; col++) {
             // Calculate isometric position (same as editor rendering)
             const isoX = col * TILE_WIDTH + (row % 2) * (TILE_WIDTH / 2);
             const isoY = row * TILE_HEIGHT;
             
-            // Check if tile is within extended boundary
+            // Check if tile is within circular map boundary
             const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
-            if (distFromMapCenter > OUTER_RADIUS) continue;
+            if (distFromMapCenter > MAP_RADIUS) continue;
 
             const tileKey = `${col},${row}`;
             let tileData;
@@ -2499,14 +1998,14 @@ function saveMap() {
                     image: customTile.image
                 };
             } else {
-                // LightSand outside green grass area, GreenGrass in center
+                // Use same logic as drawGroundSamples: water at edges, grass in center
                 let groundType, groundImage;
                 if (distFromMapCenter > MAP_RADIUS * 0.85) {
-                    groundType = 'LightSand';  // LightSand at outer edges (extends beyond map)
-                    groundImage = '/assets/tank/Grounds/LightSand.png';
+                    groundType = 'ground1';  // Water at outer edges
+                    groundImage = '/assets/tank/Grounds/BlueGrass.png';
                 } else {
-                    groundType = 'GreenGrass'; // Default green ground in center
-                    groundImage = '/assets/tank/Grounds/GreenGrass.png';
+                    groundType = 'ground13'; // Default ground in center
+                    groundImage = '/assets/tank/Grounds/LightGreyGround.png';
                 }
                 
                 tileData = {
@@ -2524,32 +2023,14 @@ function saveMap() {
     const mapId = window.currentMapId ? String(window.currentMapId) : String(Date.now());
     const thumbnail = captureMapThumbnail();
 
-    // Serialize AI bots for the map
-    const serializedAIBots = mapAIBots.map(bot => ({
-        id: bot.id,
-        name: bot.name,
-        team: bot.team,
-        target: bot.target,
-        behavior: bot.behavior,
-        difficulty: bot.difficulty,
-        health: bot.health,
-        fireRate: bot.fireRate,
-        damage: bot.damage,
-        speed: bot.speed,
-        accuracy: bot.accuracy,
-        vehicleType: bot.vehicleType || 'tank'
-    }));
-
     const mapData = {
         id: mapId,
         name: mapName,
         created: new Date().toISOString(),
         objects: serializedObjects,
         groundTiles: serializedGroundTiles,
-        aiBots: serializedAIBots, // Save AI bots with the map
         version: '1.0',
         isUserCreated: true,
-        vehicleType: window.currentMapVehicleType || 'tank', // Store the vehicle type
         settings: {
             tileWidth: TILE_WIDTH,
             tileHeight: TILE_HEIGHT,
@@ -2634,18 +2115,10 @@ function initMapCreatorCanvas() {
         console.error('❌ Map creator canvas not found!');
         return;
     }
-    
-    console.log('✅ Canvas element found:', canvas);
-    console.log('   Parent:', canvas.parentElement?.id);
-    console.log('   Canvas visible:', canvas.offsetParent !== null);
 
     // Set canvas dimensions
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
-    // Force canvas to be visible
-    canvas.style.display = 'block';
-    canvas.style.visibility = 'visible';
     
     console.log('✅ Canvas dimensions set:', canvas.width, 'x', canvas.height);
 
@@ -2665,14 +2138,15 @@ function initMapCreatorCanvas() {
     }
 
     // Test render to make sure canvas is working
-
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(0, 0, 100, 100);
+    console.log('✅ Test render completed');
 
     // Load custom ground texture
     loadCustomGroundTexture();
 
-    // Add event listeners for interaction
+    // Add event listeners for interaction (wheel handled by setupSmoothWheelZoom)
     canvas.addEventListener('click', handleCanvasClick);
-    canvas.addEventListener('wheel', handleCanvasWheel);
     canvas.addEventListener('mousedown', handleCanvasMouseDown);
     canvas.addEventListener('mousemove', handleCanvasMouseMove);
     canvas.addEventListener('mouseup', handleCanvasMouseUp);
@@ -2728,9 +2202,22 @@ function actualRenderMapCreatorCanvas() {
         canvas.height = window.innerHeight;
     }
 
-    // Clear canvas with background color
+    // Clear canvas completely
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Fill with a solid background color to ensure water is visible
     ctx.fillStyle = '#0a1a2a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add a test pattern to make sure canvas is working
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(50, 50, 100, 100);
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(200, 50, 100, 100);
+    ctx.fillStyle = '#0000ff';
+    ctx.fillRect(350, 50, 100, 100);
+    
+    console.log('✅ Test pattern drawn at canvas top');
 
     // Save context state
     ctx.save();
@@ -2764,19 +2251,6 @@ function actualRenderMapCreatorCanvas() {
 
     // Render custom painted ground tiles on top
     renderCustomGroundTiles(ctx, camera, canvas.width / canvasZoom, canvas.height / canvasZoom);
-
-    // Update and render preview AI tanks
-    if (previewAITanks && previewAITanks.length > 0) {
-        updatePreviewAITanks();
-        renderPreviewAITanks(ctx);
-        
-        // Debug: show AI count
-        ctx.save();
-        ctx.fillStyle = 'rgba(255, 100, 100, 0.9)';
-        ctx.font = 'bold 14px Arial';
-        ctx.fillText(`AI Bots: ${previewAITanks.length}`, 10, canvas.height - 10);
-        ctx.restore();
-    }
 
     // Draw placed objects
     placedObjects.forEach((obj, index) => {
@@ -2896,8 +2370,14 @@ function actualRenderMapCreatorCanvas() {
 }
 
 function handleCanvasClick(e) {
+    console.log('=== CANVAS CLICK EVENT ===');
+    console.log('Button:', e.button, 'isDragging:', isDragging);
+
     // Only handle left clicks (button 0)
-    if (e.button !== 0) return;
+    if (e.button !== 0) {
+        console.log('Not a left click, ignoring');
+        return;
+    }
 
     // Check if this was a drag (mouse moved more than 5 pixels or took more than 300ms)
     const mouseMoveDistance = Math.sqrt(
@@ -2906,8 +2386,19 @@ function handleCanvasClick(e) {
     );
     const clickDuration = Date.now() - mouseDownTime;
 
-    if (isDragging || mouseMoveDistance > 5 || clickDuration > 300) return;
-    if (!selectedAsset) return;
+    console.log('Mouse move distance:', mouseMoveDistance, 'Duration:', clickDuration);
+
+    if (isDragging || mouseMoveDistance > 5 || clickDuration > 300) {
+        console.log('❌ Ignoring click - was dragging or mouse moved too much');
+        return;
+    }
+
+    if (!selectedAsset) {
+        console.log('❌ No asset selected');
+        return;
+    }
+
+    console.log('✓ Selected asset:', selectedAsset.name, 'isGround:', selectedAsset.isGround);
 
     const canvas = document.getElementById('mapCreatorCanvas');
     const rect = canvas.getBoundingClientRect();
@@ -2917,15 +2408,10 @@ function handleCanvasClick(e) {
     const mouseY = e.clientY - rect.top;
 
     // Convert to world space (accounting for zoom and pan)
-    let worldX = (mouseX - canvasOffsetX) / canvasZoom;
-    let worldY = (mouseY - canvasOffsetY) / canvasZoom;
+    const worldX = (mouseX - canvasOffsetX) / canvasZoom;
+    const worldY = (mouseY - canvasOffsetY) / canvasZoom;
 
-    // Snap to grid for clean placement (buildings only, not ground tiles)
-    if (!selectedAsset.isGround) {
-        const snapped = tankSnapToGrid(worldX, worldY, TANK_GRID_SIZE);
-        worldX = snapped.x;
-        worldY = snapped.y;
-    }
+    console.log('✓ Click at world position:', worldX, worldY);
 
     // Check if this is a ground texture (paint mode)
     if (selectedAsset.isGround) {
@@ -2949,11 +2435,14 @@ function handleCanvasClick(e) {
             image: selectedAsset.image
         });
 
+        console.log('✓ Painted ground tile at:', tileCol, tileRow, 'with type:', selectedAsset.groundType, 'at world pos:', worldX, worldY);
         renderMapCreatorCanvas();
         return;
     }
 
     // Place building/object
+    console.log('✓ Attempting to place building:', selectedAsset.name);
+    console.log('✓ Image source:', selectedAsset.image);
 
     const img = new Image();
     img.src = selectedAsset.image;
@@ -2968,7 +2457,11 @@ function handleCanvasClick(e) {
                 image: img
             });
 
+            console.log('✓✓✓ Successfully placed object at:', worldX, worldY);
+            console.log('Total objects:', placedObjects.length);
             renderMapCreatorCanvas();
+        } else {
+            console.error('❌ Image loaded but has no dimensions');
         }
     };
 
@@ -2998,24 +2491,20 @@ function handleCanvasWheel(e) {
     lastMouseX = mouseX;
     lastMouseY = mouseY;
 
-    // Zoom toward screen center for straight zoom
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    // Calculate world position before zoom (the point under the mouse)
+    const worldX = (mouseX - canvasOffsetX) / canvasZoom;
+    const worldY = (mouseY - canvasOffsetY) / canvasZoom;
 
-    // Calculate world position at screen center before zoom
-    const worldX = (centerX - canvasOffsetX) / canvasZoom;
-    const worldY = (centerY - canvasOffsetY) / canvasZoom;
-
-    // Calculate new zoom target with smooth animation (larger steps)
-    const zoomDelta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newZoom = Math.max(0.3, Math.min(4, targetCanvasZoom * zoomDelta));
+    // Calculate new zoom target with smooth animation
+    const zoomDelta = e.deltaY > 0 ? 0.95 : 1.05; // Smaller steps for smoother animation
+    const newZoom = Math.max(0.5, Math.min(3, targetCanvasZoom * zoomDelta));
 
     // Update target zoom for smooth animation
     targetCanvasZoom = newZoom;
 
-    // Adjust target offset to keep screen center stable
-    targetCanvasOffsetX = centerX - worldX * newZoom;
-    targetCanvasOffsetY = centerY - worldY * newZoom;
+    // Adjust target offset to keep the world position under the mouse
+    targetCanvasOffsetX = mouseX - worldX * newZoom;
+    targetCanvasOffsetY = mouseY - worldY * newZoom;
 
     // Update zoom display
     const zoomDisplay = document.getElementById('zoomDisplay');
@@ -3068,13 +2557,6 @@ function handleCanvasMouseMove(e) {
     // Calculate world position for hover preview
     hoverWorldX = (lastMouseX - canvasOffsetX) / canvasZoom;
     hoverWorldY = (lastMouseY - canvasOffsetY) / canvasZoom;
-    
-    // Snap hover preview to grid for buildings (not ground tiles)
-    if (selectedAsset && !selectedAsset.isGround) {
-        const snapped = tankSnapToGrid(hoverWorldX, hoverWorldY, TANK_GRID_SIZE);
-        hoverWorldX = snapped.x;
-        hoverWorldY = snapped.y;
-    }
     isHovering = true;
 
     if (isDragging) {
@@ -3193,37 +2675,49 @@ function startPanningLoop() {
 
 // Draw isometric water tiles as background
 function drawIsometricWater(ctx, camera, viewWidth, viewHeight) {
-    
-    const tileWidth = 120;
-    const tileHeight = 30;
-    const drawHeight = 70;
+    // Draw a base water background for the visible area so water is always
+    // visible even when no individual water tiles fall inside the limited draw window.
+    const mapRadiusPixels = 2500;
+    const baseFillPadding = Math.max(viewWidth, viewHeight) * 1.5;
+    ctx.save();
+    ctx.fillStyle = '#2a7ab8';
+    // Fill a generous area around the viewport (in world coordinates)
+    ctx.fillRect(camera.x - baseFillPadding, camera.y - baseFillPadding, viewWidth + baseFillPadding * 2, viewHeight + baseFillPadding * 2);
+    ctx.restore();
 
-    // OPTIMIZATION: Calculate visible viewport bounds in world coordinates
-    const viewLeft = camera.x;
-    const viewTop = camera.y;
-    const viewRight = camera.x + viewWidth;
-    const viewBottom = camera.y + viewHeight;
+    // Limit water tile iteration to a relatively small window around the viewport center
+    const waterScale = 1.0; // normal tile size
+    const tileWidth = 120 * waterScale;
+    const tileHeight = 30 * waterScale;
+    const drawHeight = 70 * waterScale;
 
-    // Add generous padding to ensure full screen coverage
-    // Use drawHeight for Y padding since tiles are taller than their spacing
-    const paddingX = tileWidth * 4;
-    const paddingY = drawHeight * 6; // Extra padding for tile overlap
+    const centerWorldX = camera.x + viewWidth / 2;
+    const centerWorldY = camera.y + viewHeight / 2;
+    const centerCol = Math.floor(centerWorldX / tileWidth);
+    const centerRow = Math.floor(centerWorldY / tileHeight);
 
-    // Calculate tile range - only visible tiles
-    const startCol = Math.floor((viewLeft - paddingX) / tileWidth);
-    const endCol = Math.ceil((viewRight + paddingX) / tileWidth);
-    const startRow = Math.floor((viewTop - paddingY) / tileHeight);
-    const endRow = Math.ceil((viewBottom + paddingY) / tileHeight);
+    // Increase coverage ~2x so water appears noticeably larger (more tiles
+    // drawn around the viewport) while keeping each tile the same size.
+    const radiusCols = Math.ceil((viewWidth / tileWidth) * 3.2) + 8;
+    const radiusRows = Math.ceil((viewHeight / tileHeight) * 3.2) + 8;
 
-    // Draw water tiles
+    const maxGridRange = Math.ceil(mapRadiusPixels / tileHeight);
+    const startCol = Math.max(-maxGridRange, centerCol - radiusCols);
+    const endCol = Math.min(maxGridRange, centerCol + radiusCols);
+    const startRow = Math.max(-maxGridRange, centerRow - radiusRows);
+    const endRow = Math.min(maxGridRange, centerRow + radiusRows);
+
+    let tilesDrawn = 0;
     for (let row = startRow; row <= endRow; row++) {
         for (let col = startCol; col <= endCol; col++) {
-            // Calculate isometric position
             const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
             const isoY = row * tileHeight;
 
-            // Draw water tile with isometric shape
+            const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
+            if (distFromMapCenter > mapRadiusPixels) continue;
+
             drawWaterTile(ctx, isoX, isoY, tileWidth, drawHeight);
+            tilesDrawn++;
         }
     }
 }
@@ -3244,7 +2738,7 @@ function drawWaterTile(ctx, x, y, width, height) {
         gradient.addColorStop(0.7, '#2a7ab8');  // Darker blue
         gradient.addColorStop(1, '#1a6aa8');    // Deep blue (bottom-right, shadow)
 
-        // Draw the water diamond
+        // Draw the water diamond (scaled size passed from caller)
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.moveTo(top.x, top.y);
@@ -3302,8 +2796,78 @@ function drawWaterTile(ctx, x, y, width, height) {
     }
 }
 
-// NOTE: This function is overridden by the drawGroundSamples function defined later in the file
-// The later function uses correct texture names (GreenGrass, LightSand) and is the one actually used
+// Draw ground textures randomly scattered in a circular map
+function drawGroundSamples(ctx, camera, viewWidth, viewHeight) {
+    if (!groundTexturesLoaded) {
+        console.warn('⚠️ Ground textures not loaded yet');
+        return;
+    }
+    if (groundTextureImages.size === 0) {
+        console.warn('⚠️ No ground texture images available');
+        return;
+    }
+
+    // Same dimensions as custom ground tiles
+    const tileWidth = 120;
+    const tileHeight = 30;  // Vertical spacing between rows
+    const drawHeight = 70;  // Actual height to draw the image
+
+    // Overall map circular boundary (in world pixels)
+    const mapRadiusPixels = 2500; // Radius in actual pixels for a true circle
+
+    // OPTIMIZATION: Calculate visible viewport bounds in world coordinates
+    const viewLeft = camera.x;
+    const viewTop = camera.y;
+    const viewRight = camera.x + viewWidth;
+    const viewBottom = camera.y + viewHeight;
+
+    // Add generous padding to ensure full screen coverage
+    const paddingX = tileWidth * 4;
+    const paddingY = drawHeight * 6;
+
+    // Calculate visible tile range
+    const startRow = Math.floor((viewTop - paddingY) / tileHeight);
+    const endRow = Math.ceil((viewBottom + paddingY) / tileHeight);
+    const startCol = Math.floor((viewLeft - paddingX) / tileWidth);
+    const endCol = Math.ceil((viewRight + paddingX) / tileWidth);
+
+    // Clamp to map boundaries
+    const maxGridRange = Math.ceil(mapRadiusPixels / tileHeight);
+    const clampedStartRow = Math.max(-maxGridRange, startRow);
+    const clampedEndRow = Math.min(maxGridRange, endRow);
+    const clampedStartCol = Math.max(-maxGridRange, startCol);
+    const clampedEndCol = Math.min(maxGridRange, endCol);
+
+    // Draw tiles with ground12 (green grass) in center and water at edges
+    for (let row = clampedStartRow; row <= clampedEndRow; row++) {
+        for (let col = clampedStartCol; col <= clampedEndCol; col++) {
+            // Calculate isometric position
+            const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
+            const isoY = row * tileHeight;
+
+            // Check distance from center
+            const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
+            if (distFromMapCenter > mapRadiusPixels) continue;
+
+            // Use water (ground1) at edges, ground13 in center
+            let groundType;
+            if (distFromMapCenter > mapRadiusPixels * 0.85) {
+                groundType = 'ground1'; // Water at outer edges
+            } else {
+                groundType = 'ground13'; // Default ground in center
+            }
+
+            if (!groundTextureImages.has(groundType)) continue;
+
+            const groundImg = groundTextureImages.get(groundType);
+
+            // Only draw if image is loaded
+            if (groundImg && groundImg.complete && groundImg.naturalWidth > 0) {
+                ctx.drawImage(groundImg, isoX, isoY, tileWidth, drawHeight);
+            }
+        }
+    }
+}
 
 function drawIsometricTile(ctx, x, y, width, height) {
     // Isometric parallelogram points (diamond shape from top view)
@@ -3416,7 +2980,7 @@ playerStatsData.avgRating = 0;
 
 // Handle clicks on the create map canvas
 function handleMapCreatorClick(e) {
-    const canvas = document.getElementById('tankLobbyBackground');
+    const canvas = document.getElementById('lobbyBackground');
     if (!canvas) {
         console.log('❌ Canvas not found');
         return;
@@ -3464,878 +3028,6 @@ if (typeof window !== 'undefined') {
     window.publishMap = publishMap;
     window.getPublishedMaps = getPublishedMaps;
     window.getMostPlayedMap = getMostPlayedMap;
-    window.testMap = testMap;
-    window.toggleGroupsMode = toggleGroupsMode;
-    window.addAIBot = addAIBot;
-    window.openAIBotConfig = openAIBotConfig;
-    window.closeAIConfigModal = closeAIConfigModal;
-    window.saveAIBotConfig = saveAIBotConfig;
-    window.deleteAIBot = deleteAIBot;
-}
-
-// ========== MAP TEST SYSTEM ==========
-
-// Test the current map with a vehicle
-function testMap() {
-    const vehicleType = window.currentVehicleType || 'tank';
-    
-    // Save the current map first
-    saveMap();
-    
-    // Create test mode overlay
-    const testOverlay = document.createElement('div');
-    testOverlay.id = 'mapTestOverlay';
-    testOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    `;
-    
-    // Create test canvas
-    const testCanvas = document.createElement('canvas');
-    testCanvas.id = 'mapTestCanvas';
-    testCanvas.width = window.innerWidth;
-    testCanvas.height = window.innerHeight;
-    testCanvas.style.cssText = 'position: absolute; top: 0; left: 0;';
-    testOverlay.appendChild(testCanvas);
-    
-    // Create exit button
-    const exitBtn = document.createElement('button');
-    exitBtn.textContent = 'EXIT TEST';
-    exitBtn.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 30px;
-        background: linear-gradient(180deg, #ff4444, #cc0000);
-        border: 2px solid #ff6666;
-        border-radius: 8px;
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 10001;
-    `;
-    exitBtn.onclick = () => {
-        stopMapTest();
-        testOverlay.remove();
-    };
-    testOverlay.appendChild(exitBtn);
-    
-    // Create controls info
-    const controlsInfo = document.createElement('div');
-    controlsInfo.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 15px 30px;
-        background: rgba(0, 0, 0, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        color: white;
-        font-size: 14px;
-        z-index: 10001;
-    `;
-    controlsInfo.innerHTML = 'WASD or Arrow Keys to move | Mouse to aim | Click to shoot';
-    testOverlay.appendChild(controlsInfo);
-    
-    document.body.appendChild(testOverlay);
-    
-    // Start test mode
-    startMapTest(testCanvas, vehicleType);
-}
-
-// Test mode state
-let testModeActive = false;
-let testPlayer = null;
-let testAnimationId = null;
-let testKeys = { w: false, a: false, s: false, d: false };
-let testMouseX = 0;
-let testMouseY = 0;
-
-function startMapTest(canvas, vehicleType) {
-    testModeActive = true;
-    const ctx = canvas.getContext('2d');
-    
-    // Initialize test player at center
-    testPlayer = {
-        x: 0,
-        y: 0,
-        angle: 0,
-        speed: 0,
-        maxSpeed: vehicleType === 'jet' ? 8 : vehicleType === 'race' ? 10 : 5,
-        vehicleType: vehicleType,
-        color: 'blue',
-        body: 'body_halftrack',
-        weapon: 'turret_01_mk1',
-        jetType: 'ship1',
-        raceType: 'endurance'
-    };
-    
-    // Set up controls
-    const handleKeyDown = (e) => {
-        if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') testKeys.w = true;
-        if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') testKeys.a = true;
-        if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') testKeys.s = true;
-        if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') testKeys.d = true;
-        if (e.key === 'Escape') {
-            stopMapTest();
-            document.getElementById('mapTestOverlay')?.remove();
-        }
-    };
-    
-    const handleKeyUp = (e) => {
-        if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') testKeys.w = false;
-        if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') testKeys.a = false;
-        if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') testKeys.s = false;
-        if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') testKeys.d = false;
-    };
-    
-    const handleMouseMove = (e) => {
-        testMouseX = e.clientX;
-        testMouseY = e.clientY;
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    // Store handlers for cleanup
-    canvas._testHandlers = { handleKeyDown, handleKeyUp, handleMouseMove };
-    
-    // Start render loop
-    function renderTestMode() {
-        if (!testModeActive) return;
-        
-        // Update player position
-        let dx = 0, dy = 0;
-        if (testKeys.w) dy -= 1;
-        if (testKeys.s) dy += 1;
-        if (testKeys.a) dx -= 1;
-        if (testKeys.d) dx += 1;
-        
-        if (dx !== 0 || dy !== 0) {
-            const len = Math.sqrt(dx * dx + dy * dy);
-            dx /= len;
-            dy /= len;
-            testPlayer.x += dx * testPlayer.maxSpeed;
-            testPlayer.y += dy * testPlayer.maxSpeed;
-        }
-        
-        // Calculate angle to mouse
-        const screenCenterX = canvas.width / 2;
-        const screenCenterY = canvas.height / 2;
-        testPlayer.angle = Math.atan2(testMouseY - screenCenterY, testMouseX - screenCenterX);
-        
-        // Clear canvas
-        ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw ground tiles (centered on player)
-        const camera = {
-            x: testPlayer.x - canvas.width / 2,
-            y: testPlayer.y - canvas.height / 2
-        };
-        
-        drawGroundSamples(ctx, camera, canvas.width, canvas.height);
-        
-        // Draw placed objects
-        ctx.save();
-        ctx.translate(-camera.x, -camera.y);
-        placedObjects.forEach(obj => {
-            if (obj.image && obj.image.complete) {
-                ctx.drawImage(obj.image, obj.x - obj.image.width / 2, obj.y - obj.image.height / 2);
-            }
-        });
-        ctx.restore();
-        
-        // Draw player vehicle at center
-        if (vehicleType === 'tank') {
-            const tankImg = window.lobbyTankImages?.[testPlayer.color]?.[testPlayer.body];
-            const weaponImg = window.lobbyWeaponImages?.[testPlayer.color]?.[testPlayer.weapon];
-            
-            // Calculate body angle based on movement direction
-            if (dx !== 0 || dy !== 0) {
-                testPlayer.bodyAngle = Math.atan2(dy, dx);
-            }
-            const bodyAngle = testPlayer.bodyAngle || 0;
-            
-            // Draw tank body (rotates with movement)
-            if (tankImg && tankImg.complete) {
-                ctx.save();
-                ctx.translate(screenCenterX, screenCenterY);
-                ctx.rotate(bodyAngle + Math.PI / 2);
-                const scale = 0.5;
-                ctx.drawImage(tankImg, -tankImg.width * scale / 2, -tankImg.height * scale / 2, tankImg.width * scale, tankImg.height * scale);
-                ctx.restore();
-            }
-            
-            // Draw weapon/turret (rotates to follow mouse)
-            if (weaponImg && weaponImg.complete) {
-                ctx.save();
-                ctx.translate(screenCenterX, screenCenterY);
-                ctx.rotate(testPlayer.angle + Math.PI / 2);
-                const scale = 0.45;
-                ctx.drawImage(weaponImg, -weaponImg.width * scale / 2, -weaponImg.height * scale / 2, weaponImg.width * scale, weaponImg.height * scale);
-                ctx.restore();
-            }
-        } else if (vehicleType === 'jet') {
-            ctx.save();
-            ctx.translate(screenCenterX, screenCenterY);
-            ctx.rotate(testPlayer.angle + Math.PI / 2);
-            const imagePath = `/assets/jet/spr_${testPlayer.jetType}_${testPlayer.color}.png`;
-            if (window.jetImageCache && window.jetImageCache[imagePath]?.complete) {
-                const img = window.jetImageCache[imagePath];
-                const scale = 0.8;
-                ctx.drawImage(img, -img.width * scale / 2, -img.height * scale / 2, img.width * scale, img.height * scale);
-            }
-            ctx.restore();
-        } else if (vehicleType === 'race') {
-            ctx.save();
-            ctx.translate(screenCenterX, screenCenterY);
-            ctx.rotate(testPlayer.angle + Math.PI / 2);
-            const imagePath = `/assets/race/sprites/cars/${testPlayer.raceType}_${testPlayer.color}.png`;
-            if (window.raceImageCache && window.raceImageCache[imagePath]?.complete) {
-                const img = window.raceImageCache[imagePath];
-                const scale = 0.6;
-                ctx.drawImage(img, -img.width * scale / 2, -img.height * scale / 2, img.width * scale, img.height * scale);
-            }
-            ctx.restore();
-        }
-        
-        // Draw position info
-        ctx.fillStyle = 'white';
-        ctx.font = '14px Arial';
-        ctx.fillText(`Position: ${Math.round(testPlayer.x)}, ${Math.round(testPlayer.y)}`, 20, 30);
-        ctx.fillText(`Vehicle: ${vehicleType}`, 20, 50);
-        
-        testAnimationId = requestAnimationFrame(renderTestMode);
-    }
-    
-    renderTestMode();
-}
-
-function stopMapTest() {
-    testModeActive = false;
-    
-    if (testAnimationId) {
-        cancelAnimationFrame(testAnimationId);
-        testAnimationId = null;
-    }
-    
-    // Remove event listeners
-    const canvas = document.getElementById('mapTestCanvas');
-    if (canvas && canvas._testHandlers) {
-        window.removeEventListener('keydown', canvas._testHandlers.handleKeyDown);
-        window.removeEventListener('keyup', canvas._testHandlers.handleKeyUp);
-        window.removeEventListener('mousemove', canvas._testHandlers.handleMouseMove);
-    }
-    
-    testKeys = { w: false, a: false, s: false, d: false };
-}
-
-// ========== AI BOT SYSTEM ==========
-
-// Store AI bots and spawn points for the current map
-let mapAIBots = [];
-let mapSpawnPoints = [];
-let currentEditingBotIndex = -1;
-
-// Toggle groups/teams mode
-function toggleGroupsMode() {
-    const toggle = document.getElementById('groupsToggle');
-    const teamsOptions = document.getElementById('teamsOptions');
-    const isEnabled = toggle ? toggle.checked : false;
-    
-    if (teamsOptions) {
-        teamsOptions.style.display = isEnabled ? 'block' : 'none';
-    }
-}
-
-// Add spawn point (placeholder - will be placed on map click)
-function addSpawnPoint() {
-    alert('Click on the map to place a spawn point');
-    window.placingSpawnPoint = true;
-}
-
-// Add AI preset (quick add multiple bots)
-function addAIPreset(difficulty, count) {
-    const vehicleType = window.currentVehicleType || 'tank';
-    
-    for (let i = 0; i < count; i++) {
-        const botNumber = mapAIBots.length + 1;
-        const difficultyStats = {
-            easy: { health: 80, fireRate: 70, damage: 70, speed: 80, accuracy: 40 },
-            medium: { health: 100, fireRate: 100, damage: 100, speed: 100, accuracy: 70 },
-            hard: { health: 130, fireRate: 130, damage: 130, speed: 110, accuracy: 90 }
-        };
-        const stats = difficultyStats[difficulty] || difficultyStats.medium;
-        
-        const newBot = {
-            id: Date.now() + i,
-            name: `AI ${botNumber}`,
-            team: 'none',
-            target: 'nearest',
-            behavior: difficulty === 'hard' ? 'aggressive' : 'patrol',
-            difficulty: difficulty,
-            ...stats,
-            vehicleType: vehicleType
-        };
-        
-        mapAIBots.push(newBot);
-        
-        // Create preview tank with slight delay for spread positioning
-        setTimeout(() => {
-            const previewTank = createPreviewAITank(newBot);
-            if (previewTank) {
-                // Offset spawn position for each bot
-                previewTank.x += (i - count/2) * 100;
-                previewAITanks.push(previewTank);
-            }
-        }, i * 100);
-    }
-    
-    renderAIBotsList();
-}
-
-// Export new functions
-window.addSpawnPoint = addSpawnPoint;
-window.addAIPreset = addAIPreset;
-
-// ========== AI PREVIEW TANKS ON MAP ==========
-// Store preview AI tanks that move around the map
-let previewAITanks = [];
-const MAP_RADIUS = 2500; // Match the ground samples radius
-const AI_SAFE_RADIUS = MAP_RADIUS * 0.8; // Keep AI within 80% of map
-
-// Create a preview AI tank on the map - spawns near current screen/camera position
-function createPreviewAITank(bot) {
-    // Get current camera/screen center position in world coordinates
-    const zoom = canvasZoom || 1;
-    const offsetX = canvasOffsetX || 0;
-    const offsetY = canvasOffsetY || 0;
-    
-    // Calculate the center of the current view in world coordinates
-    const canvas = document.getElementById('mapCreatorCanvas');
-    const canvasWidth = canvas ? canvas.width : window.innerWidth;
-    const canvasHeight = canvas ? canvas.height : window.innerHeight;
-    
-    // Screen center in world coordinates
-    const screenCenterWorldX = (canvasWidth / 2 - offsetX) / zoom;
-    const screenCenterWorldY = (canvasHeight / 2 - offsetY) / zoom;
-    
-    // Spawn near the current screen position with some random offset
-    const randomAngle = Math.random() * Math.PI * 2;
-    const randomDist = 100 + Math.random() * 300; // Spawn within 100-400 units of screen center
-    
-    const spawnX = screenCenterWorldX + Math.cos(randomAngle) * randomDist;
-    const spawnY = screenCenterWorldY + Math.sin(randomAngle) * randomDist;
-    
-    // Random target near spawn position
-    const targetAngle = Math.random() * Math.PI * 2;
-    const targetDist = Math.random() * 400;
-    
-    console.log('✅ Creating AI tank:', bot.name, 'at:', Math.round(spawnX), Math.round(spawnY), 'color:', getTeamColorForTank(bot.team), 'screen center:', Math.round(screenCenterWorldX), Math.round(screenCenterWorldY));
-    
-    return {
-        id: bot.id,
-        name: bot.name,
-        x: spawnX,
-        y: spawnY,
-        // Smooth position for interpolation
-        displayX: spawnX,
-        displayY: spawnY,
-        targetX: spawnX + Math.cos(targetAngle) * targetDist,
-        targetY: spawnY + Math.sin(targetAngle) * targetDist,
-        angle: Math.random() * Math.PI * 2,
-        displayAngle: Math.random() * Math.PI * 2, // Smooth angle for rendering
-        speed: (bot.speed / 100) * 2.5, // Base speed 2.5, modified by bot stats
-        color: getTeamColorForTank(bot.team),
-        difficulty: bot.difficulty,
-        lastTargetChange: Date.now(),
-        // Animation properties
-        trackOffset: 0, // For track animation
-        turretAngle: 0, // Independent turret rotation
-        enginePulse: 0 // For engine idle animation
-    };
-}
-
-// Get tank color based on team
-function getTeamColorForTank(team) {
-    const colors = {
-        'none': 'blue',
-        'red': 'red',
-        'blue': 'blue',
-        'green': 'green',
-        'yellow': 'yellow'
-    };
-    return colors[team] || 'blue';
-}
-
-// Update AI tank positions - AI tanks roam around the map with smooth movement
-function updatePreviewAITanks() {
-    const now = Date.now();
-    
-    previewAITanks.forEach(tank => {
-        // Calculate distance to target
-        const dx = tank.targetX - tank.x;
-        const dy = tank.targetY - tank.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        // If close to target or time to change, pick new target near current position
-        if (dist < 50 || now - tank.lastTargetChange > 5000) {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 200 + Math.random() * 400; // Move 200-600 units
-            tank.targetX = tank.x + Math.cos(angle) * distance;
-            tank.targetY = tank.y + Math.sin(angle) * distance;
-            tank.lastTargetChange = now;
-        }
-        
-        // Move towards target with smooth acceleration
-        if (dist > 5) {
-            const moveAngle = Math.atan2(dy, dx);
-            
-            // Smooth angle rotation (tank turns gradually)
-            let angleDiff = moveAngle - tank.angle;
-            // Normalize angle difference to [-PI, PI]
-            while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-            while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-            
-            // Smooth rotation (0.08 = rotation speed)
-            tank.angle += angleDiff * 0.08;
-            
-            // Only move forward if roughly facing the target
-            if (Math.abs(angleDiff) < Math.PI / 2) {
-                // Smooth acceleration based on distance
-                const speedFactor = Math.min(1, dist / 100);
-                tank.x += Math.cos(tank.angle) * tank.speed * speedFactor;
-                tank.y += Math.sin(tank.angle) * tank.speed * speedFactor;
-                
-                // Animate tracks when moving
-                tank.trackOffset = (tank.trackOffset + tank.speed * 0.1) % 10;
-            }
-            
-            // Keep within map safe radius (from world center 0,0)
-            const distFromCenter = Math.sqrt(tank.x * tank.x + tank.y * tank.y);
-            if (distFromCenter > AI_SAFE_RADIUS) {
-                const clampAngle = Math.atan2(tank.y, tank.x);
-                tank.x = Math.cos(clampAngle) * AI_SAFE_RADIUS;
-                tank.y = Math.sin(clampAngle) * AI_SAFE_RADIUS;
-                // Pick new target towards center
-                tank.targetX = 0;
-                tank.targetY = 0;
-            }
-        }
-        
-        // Smooth display position interpolation (for ultra-smooth rendering)
-        tank.displayX += (tank.x - tank.displayX) * 0.15;
-        tank.displayY += (tank.y - tank.displayY) * 0.15;
-        
-        // Smooth display angle interpolation
-        let displayAngleDiff = tank.angle - tank.displayAngle;
-        while (displayAngleDiff > Math.PI) displayAngleDiff -= Math.PI * 2;
-        while (displayAngleDiff < -Math.PI) displayAngleDiff += Math.PI * 2;
-        tank.displayAngle += displayAngleDiff * 0.2;
-        
-        // Turret slowly rotates independently (looking around)
-        tank.turretAngle += Math.sin(now * 0.001 + tank.id) * 0.02;
-        
-        // Engine idle pulse animation
-        tank.enginePulse = Math.sin(now * 0.005) * 0.03;
-    });
-}
-
-// Render preview AI tanks on the map creator canvas
-// NOTE: This function is called AFTER ctx.translate/scale transformations are applied
-// So we render in WORLD coordinates directly (tank.x, tank.y are world positions)
-function renderPreviewAITanks(ctx) {
-    if (!previewAITanks || previewAITanks.length === 0) return;
-    
-    const zoom = canvasZoom || 1;
-    const offsetX = canvasOffsetX || 0;
-    const offsetY = canvasOffsetY || 0;
-    
-    // Calculate visible viewport in world coordinates
-    const canvas = ctx.canvas;
-    const viewLeft = -offsetX / zoom - 300;
-    const viewRight = (canvas.width - offsetX) / zoom + 300;
-    const viewTop = -offsetY / zoom - 300;
-    const viewBottom = (canvas.height - offsetY) / zoom + 300;
-    
-    previewAITanks.forEach(tank => {
-        // Use smooth display position for rendering
-        const worldX = tank.displayX !== undefined ? tank.displayX : tank.x;
-        const worldY = tank.displayY !== undefined ? tank.displayY : tank.y;
-        const displayAngle = tank.displayAngle !== undefined ? tank.displayAngle : tank.angle;
-        
-        // Skip if off screen (check in world coordinates)
-        if (worldX < viewLeft || worldX > viewRight ||
-            worldY < viewTop || worldY > viewBottom) return;
-        
-        // Scale for tank size - 2X BIGGER (0.8 instead of 0.4)
-        const scale = 0.8;
-        const size = 100; // 2x bigger base size
-        
-        // Try to use actual GIF images from global window object
-        const tankImg = window.lobbyTankImages?.[tank.color]?.['body_halftrack'];
-        const weaponImg = window.lobbyWeaponImages?.[tank.color]?.['turret_01_mk1'];
-        
-        // Draw shadow first
-        ctx.save();
-        ctx.translate(worldX + 8, worldY + 8);
-        ctx.rotate(displayAngle + Math.PI / 2);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.beginPath();
-        ctx.ellipse(0, 0, size * 0.45, size * 0.3, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-        
-        // Draw tank body at world position (context transform handles screen conversion)
-        ctx.save();
-        ctx.translate(worldX, worldY);
-        
-        // Apply engine pulse for idle animation
-        const pulseScale = 1 + (tank.enginePulse || 0);
-        ctx.scale(pulseScale, pulseScale);
-        
-        ctx.rotate(displayAngle + Math.PI / 2);
-        
-        if (tankImg && tankImg.complete) {
-            const w = tankImg.width * scale;
-            const h = tankImg.height * scale;
-            ctx.drawImage(tankImg, -w / 2, -h / 2, w, h);
-        } else {
-            // Fallback: draw a detailed tank shape
-            // Tank body
-            ctx.fillStyle = getTankBodyColor(tank.color);
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 3;
-            
-            // Main body rectangle
-            ctx.beginPath();
-            ctx.roundRect(-size * 0.35, -size * 0.5, size * 0.7, size, 8);
-            ctx.fill();
-            ctx.stroke();
-            
-            // Track details (left)
-            ctx.fillStyle = '#333';
-            ctx.fillRect(-size * 0.4, -size * 0.45, size * 0.12, size * 0.9);
-            // Track details (right)
-            ctx.fillRect(size * 0.28, -size * 0.45, size * 0.12, size * 0.9);
-            
-            // Track pattern
-            ctx.strokeStyle = '#555';
-            ctx.lineWidth = 2;
-            const trackOffset = tank.trackOffset || 0;
-            for (let i = 0; i < 6; i++) {
-                const y = -size * 0.4 + (i * size * 0.15) + (trackOffset % (size * 0.15));
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.4, y);
-                ctx.lineTo(-size * 0.28, y);
-                ctx.moveTo(size * 0.28, y);
-                ctx.lineTo(size * 0.4, y);
-                ctx.stroke();
-            }
-            
-            // Body highlight
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.fillRect(-size * 0.25, -size * 0.4, size * 0.5, size * 0.3);
-        }
-        
-        // Draw weapon/turret on top with independent rotation
-        ctx.rotate(tank.turretAngle || 0);
-        
-        if (weaponImg && weaponImg.complete) {
-            const w = weaponImg.width * scale * 0.9;
-            const h = weaponImg.height * scale * 0.9;
-            ctx.drawImage(weaponImg, -w / 2, -h / 2, w, h);
-        } else {
-            // Fallback: detailed turret
-            // Turret base
-            ctx.fillStyle = getTankTurretColor(tank.color);
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(0, 0, size * 0.22, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            
-            // Barrel
-            ctx.fillStyle = '#444';
-            ctx.fillRect(-size * 0.06, -size * 0.55, size * 0.12, size * 0.4);
-            ctx.strokeRect(-size * 0.06, -size * 0.55, size * 0.12, size * 0.4);
-            
-            // Barrel tip
-            ctx.fillStyle = '#222';
-            ctx.fillRect(-size * 0.04, -size * 0.58, size * 0.08, size * 0.08);
-            
-            // Turret highlight
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.beginPath();
-            ctx.arc(-size * 0.05, -size * 0.05, size * 0.1, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        ctx.restore();
-        
-        // Draw name tag (not rotated) - at world position
-        ctx.save();
-        ctx.font = 'bold 14px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        const tagWidth = Math.max(ctx.measureText(tank.name).width + 30, 80);
-        const tagHeight = 26;
-        const tagY = worldY - size * 0.6 - 20;
-        
-        // Tag background with gradient
-        const gradient = ctx.createLinearGradient(worldX - tagWidth/2, tagY, worldX + tagWidth/2, tagY);
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
-        gradient.addColorStop(0.5, 'rgba(30, 30, 30, 0.9)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
-        
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.roundRect(worldX - tagWidth/2, tagY - tagHeight/2, tagWidth, tagHeight, 6);
-        ctx.fill();
-        
-        // Tag border with team color
-        ctx.strokeStyle = getTankBodyColor(tank.color);
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        // AI icon
-        ctx.fillStyle = '#ff6b6b';
-        ctx.font = 'bold 12px Arial';
-        ctx.fillText('🤖', worldX - tagWidth/2 + 15, tagY);
-        
-        // Name text
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 13px Arial';
-        ctx.fillText(tank.name, worldX + 10, tagY);
-        
-        // Difficulty indicator
-        const diffColors = { easy: '#4CAF50', medium: '#FF9800', hard: '#f44336', expert: '#9C27B0' };
-        ctx.fillStyle = diffColors[tank.difficulty] || '#888';
-        ctx.beginPath();
-        ctx.arc(worldX + tagWidth/2 - 12, tagY, 5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.restore();
-    });
-}
-
-function getTankBodyColor(color) {
-    const colors = {
-        'blue': '#2196F3',
-        'red': '#f44336',
-        'green': '#4CAF50',
-        'yellow': '#FFEB3B'
-    };
-    return colors[color] || colors.blue;
-}
-
-function getTankTurretColor(color) {
-    const colors = {
-        'blue': '#1565C0',
-        'red': '#c62828',
-        'green': '#2E7D32',
-        'yellow': '#F9A825'
-    };
-    return colors[color] || colors.blue;
-}
-
-// Sync preview tanks with mapAIBots
-function syncPreviewAITanks() {
-    // Remove tanks that no longer exist in mapAIBots
-    previewAITanks = previewAITanks.filter(tank => 
-        mapAIBots.some(bot => bot.id === tank.id)
-    );
-    
-    // Add new tanks for bots that don't have preview tanks
-    mapAIBots.forEach(bot => {
-        if (!previewAITanks.some(tank => tank.id === bot.id)) {
-            const newTank = createPreviewAITank(bot);
-            if (newTank) previewAITanks.push(newTank);
-        }
-    });
-}
-
-// Add a new AI bot
-function addAIBot() {
-    const vehicleType = window.currentVehicleType || 'tank';
-    const botNumber = mapAIBots.length + 1;
-    
-    const newBot = {
-        id: Date.now(),
-        name: `AI ${botNumber}`,
-        team: 'none',
-        target: 'nearest',
-        behavior: 'aggressive',
-        difficulty: 'medium',
-        health: 100,
-        fireRate: 100,
-        damage: 100,
-        speed: 100,
-        accuracy: 70,
-        vehicleType: vehicleType
-    };
-    
-    mapAIBots.push(newBot);
-    
-    // Create preview tank on map
-    const previewTank = createPreviewAITank(newBot);
-    if (previewTank) previewAITanks.push(previewTank);
-    
-    renderAIBotsList();
-    
-    // Open config for the new bot
-    currentEditingBotIndex = mapAIBots.length - 1;
-    openAIBotConfig(currentEditingBotIndex);
-}
-
-// Render the AI bots list
-function renderAIBotsList() {
-    const container = document.getElementById('aiBotsListContainer');
-    if (!container) return;
-    
-    if (mapAIBots.length === 0) {
-        container.innerHTML = '<p class="empty-list-msg">No AI bots added yet</p>';
-        return;
-    }
-    
-    const difficultyColors = {
-        easy: '#4CAF50',
-        medium: '#FF9800',
-        hard: '#f44336',
-        expert: '#9C27B0'
-    };
-    
-    container.innerHTML = mapAIBots.map((bot, index) => `
-        <div class="ai-bot-item" onclick="openAIBotConfig(${index})">
-            <div class="ai-bot-info">
-                <span class="ai-bot-name">🤖 ${bot.name}</span>
-                <span class="ai-bot-difficulty" style="color: ${difficultyColors[bot.difficulty] || '#888'}">${bot.difficulty}</span>
-            </div>
-            <div class="ai-bot-badges">
-                <span class="ai-bot-team" style="background: ${getTeamColor(bot.team)}20; color: ${getTeamColor(bot.team)}; border: 1px solid ${getTeamColor(bot.team)}50">${bot.team === 'none' ? 'FFA' : bot.team}</span>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Get team color
-function getTeamColor(team) {
-    const colors = {
-        'none': '#888',
-        'red': '#ff4444',
-        'blue': '#4444ff',
-        'green': '#44ff44',
-        'yellow': '#ffff44'
-    };
-    return colors[team] || '#888';
-}
-
-// Open AI bot configuration modal
-function openAIBotConfig(index) {
-    currentEditingBotIndex = index;
-    const bot = mapAIBots[index];
-    if (!bot) return;
-    
-    // Populate form fields
-    document.getElementById('aiBotName').value = bot.name;
-    document.getElementById('aiBotTeam').value = bot.team;
-    document.getElementById('aiBotTarget').value = bot.target;
-    document.getElementById('aiBotBehavior').value = bot.behavior;
-    document.getElementById('aiBotDifficulty').value = bot.difficulty;
-    
-    // Stats sliders
-    document.getElementById('aiBotHealth').value = bot.health;
-    document.getElementById('aiBotHealthValue').textContent = bot.health;
-    document.getElementById('aiBotFireRate').value = bot.fireRate;
-    document.getElementById('aiBotFireRateValue').textContent = bot.fireRate + '%';
-    document.getElementById('aiBotDamage').value = bot.damage;
-    document.getElementById('aiBotDamageValue').textContent = bot.damage + '%';
-    document.getElementById('aiBotSpeed').value = bot.speed;
-    document.getElementById('aiBotSpeedValue').textContent = bot.speed + '%';
-    document.getElementById('aiBotAccuracy').value = bot.accuracy;
-    document.getElementById('aiBotAccuracyValue').textContent = bot.accuracy + '%';
-    
-    // Add slider event listeners
-    setupSliderListeners();
-    
-    // Show modal
-    document.getElementById('aiBotConfigModal').classList.remove('hidden');
-}
-
-// Setup slider event listeners
-function setupSliderListeners() {
-    const sliders = [
-        { id: 'aiBotHealth', valueId: 'aiBotHealthValue', suffix: '' },
-        { id: 'aiBotFireRate', valueId: 'aiBotFireRateValue', suffix: '%' },
-        { id: 'aiBotDamage', valueId: 'aiBotDamageValue', suffix: '%' },
-        { id: 'aiBotSpeed', valueId: 'aiBotSpeedValue', suffix: '%' },
-        { id: 'aiBotAccuracy', valueId: 'aiBotAccuracyValue', suffix: '%' }
-    ];
-    
-    sliders.forEach(slider => {
-        const el = document.getElementById(slider.id);
-        if (el) {
-            el.oninput = () => {
-                document.getElementById(slider.valueId).textContent = el.value + slider.suffix;
-            };
-        }
-    });
-}
-
-// Close AI config modal
-function closeAIConfigModal() {
-    document.getElementById('aiBotConfigModal').classList.add('hidden');
-    currentEditingBotIndex = -1;
-}
-
-// Save AI bot configuration
-function saveAIBotConfig() {
-    if (currentEditingBotIndex < 0 || !mapAIBots[currentEditingBotIndex]) return;
-    
-    const bot = mapAIBots[currentEditingBotIndex];
-    
-    bot.name = document.getElementById('aiBotName').value || `AI ${currentEditingBotIndex + 1}`;
-    bot.team = document.getElementById('aiBotTeam').value;
-    bot.target = document.getElementById('aiBotTarget').value;
-    bot.behavior = document.getElementById('aiBotBehavior').value;
-    bot.difficulty = document.getElementById('aiBotDifficulty').value;
-    bot.health = parseInt(document.getElementById('aiBotHealth').value);
-    bot.fireRate = parseInt(document.getElementById('aiBotFireRate').value);
-    bot.damage = parseInt(document.getElementById('aiBotDamage').value);
-    bot.speed = parseInt(document.getElementById('aiBotSpeed').value);
-    bot.accuracy = parseInt(document.getElementById('aiBotAccuracy').value);
-    
-    renderAIBotsList();
-    closeAIConfigModal();
-}
-
-// Delete AI bot
-function deleteAIBot() {
-    if (currentEditingBotIndex < 0) return;
-    
-    const botId = mapAIBots[currentEditingBotIndex]?.id;
-    mapAIBots.splice(currentEditingBotIndex, 1);
-    
-    // Remove preview tank from map
-    previewAITanks = previewAITanks.filter(tank => tank.id !== botId);
-    
-    renderAIBotsList();
-    closeAIConfigModal();
 }
 
 // ========== MAP PUBLISHING SYSTEM ==========
@@ -4565,7 +3257,7 @@ function renderCustomGroundTiles(ctx, camera, viewWidth, viewHeight) {
     const viewRight = camera.x + viewWidth;
     const viewBottom = camera.y + viewHeight;
 
-
+    console.log('🎨 Rendering custom ground tiles:', customGroundTiles.size, 'total tiles');
 
     // Add generous padding to ensure full screen coverage
     // Use drawHeight for Y padding since tiles are taller than their spacing
@@ -4603,7 +3295,9 @@ function renderCustomGroundTiles(ctx, camera, viewWidth, viewHeight) {
         }
     }
 
-
+    if (customTilesRendered > 0) {
+        console.log('✅ Rendered', customTilesRendered, 'custom ground tiles');
+    }
 }
 
 // Old terrain rendering function (kept for reference, not used)
@@ -4698,192 +3392,56 @@ function drawParallelogramTile(ctx, x, y, width, height, terrainType) {
 let groundTextureImages = new Map();
 let groundTexturesLoaded = false;
 
-// Load ground textures and return a Promise
 function loadCustomGroundTexture() {
-    return new Promise((resolve) => {
-        // If already loaded, resolve immediately
-        if (groundTexturesLoaded && groundTextureImages.size > 0) {
-            resolve();
-            return;
-        }
+    // Load all 18 ground PNG textures
+    const groundFiles = [
+        'tank/Grounds/BlueGrass.png',
+        'tank/Grounds/BrownCobblestone.png',
+        'tank/Grounds/BrownGrass.png',
+        'tank/Grounds/Goldcobblestone.png',
+        'tank/Grounds/GoldenCobblestone.png',
+        'tank/Grounds/GrayGround.png',
+        'tank/Grounds/GreenGrass.png',
+        'tank/Grounds/LightBrownCobblestone.png',
+        'tank/Grounds/LightGreyCobblestone.png',
+        'tank/Grounds/LightGreyGround.png',
+        'tank/Grounds/LightSand.png',
+        'tank/Grounds/PurpleCobblestone.png',
+        'tank/Grounds/RedCobblestone.png',
+        'tank/Grounds/Sand.png',
+        'tank/Grounds/WoodenPlanks.png',
+        'tank/Grounds/WoodenTile.png',
+        'tank/Grounds/YellowGrass.png'
+    ];
 
-        // Load all ground PNG textures with descriptive names
-        const groundFiles = [
-            { file: 'tank/Grounds/BlueGrass.png', type: 'BlueGrass' },
-            { file: 'tank/Grounds/BrownCobblestone.png', type: 'BrownCobblestone' },
-            { file: 'tank/Grounds/BrownGrass.png', type: 'BrownGrass' },
-            { file: 'tank/Grounds/Goldcobblestone.png', type: 'Goldcobblestone' },
-            { file: 'tank/Grounds/GoldenCobblestone.png', type: 'GoldenCobblestone' },
-            { file: 'tank/Grounds/GrayGround.png', type: 'GrayGround' },
-            { file: 'tank/Grounds/GreenGrass.png', type: 'GreenGrass' },
-            { file: 'tank/Grounds/Grey Cobblestone.png', type: 'GreyCobblestone' },
-            { file: 'tank/Grounds/LightBrownCobblestone.png', type: 'LightBrownCobblestone' },
-            { file: 'tank/Grounds/LightGreyCobblestone.png', type: 'LightGreyCobblestone' },
-            { file: 'tank/Grounds/LightGreyGround.png', type: 'LightGreyGround' },
-            { file: 'tank/Grounds/LightSand.png', type: 'LightSand' },
-            { file: 'tank/Grounds/PurpleCobblestone.png', type: 'PurpleCobblestone' },
-            { file: 'tank/Grounds/RedCobblestone.png', type: 'RedCobblestone' },
-            { file: 'tank/Grounds/Sand.png', type: 'Sand' },
-            { file: 'tank/Grounds/WoodenPlanks.png', type: 'WoodenPlanks' },
-            { file: 'tank/Grounds/WoodenTile.png', type: 'WoodenTile' },
-            { file: 'tank/Grounds/YellowGrass.png', type: 'YellowGrass' }
-        ];
+    let loadedCount = 0;
 
-        let loadedCount = 0;
-        const totalFiles = groundFiles.length;
+    groundFiles.forEach((file, index) => {
+        const img = new Image();
+        const groundType = `ground${index + 1}`;
 
-        groundFiles.forEach((ground) => {
-            const img = new Image();
-            const groundType = ground.type;
+        img.onload = () => {
+            groundTextureImages.set(groundType, img);
+            groundTextureImages.set(file, img); // Also store by filename
+            loadedCount++;
 
-            img.onload = () => {
-                groundTextureImages.set(groundType, img);
-                groundTextureImages.set(ground.file, img);
-                loadedCount++;
+            if (loadedCount === groundFiles.length) {
+                groundTexturesLoaded = true;
+                console.log(`✓ All ${groundFiles.length} ground textures loaded`);
+            }
+        };
 
-                // Update loading progress
-                if (typeof updateMapCreatorLoadingProgress === 'function') {
-                    const percent = 30 + Math.floor((loadedCount / totalFiles) * 30);
-                    updateMapCreatorLoadingProgress(percent, `Loading textures... ${loadedCount}/${totalFiles}`);
-                }
+        img.onerror = () => {
+            console.warn(`Failed to load ground texture: ${file}`);
+            loadedCount++;
 
-                if (loadedCount === totalFiles) {
-                    groundTexturesLoaded = true;
-                    console.log(`✓ All ${totalFiles} ground textures loaded`);
-                    resolve();
-                }
-            };
+            if (loadedCount === groundFiles.length) {
+                groundTexturesLoaded = true;
+            }
+        };
 
-            img.onerror = () => {
-                console.warn(`Failed to load ground texture: ${ground.file}`);
-                loadedCount++;
-
-                if (loadedCount === totalFiles) {
-                    groundTexturesLoaded = true;
-                    resolve();
-                }
-            };
-
-            img.src = `/assets/${ground.file}`;
-        });
+        img.src = `/assets/${file}`;
     });
-}
-
-// Draw LightSand at edges and beyond (outside the green grass area)
-function drawIsometricWater(ctx, camera, viewWidth, viewHeight) {
-    const tileWidth = 120;
-    const tileHeight = 30;
-    const drawHeight = 70;
-    const mapRadius = 2500;
-    const outerRadius = 4000; // Extended outer boundary for LightSand
-
-    const paddingX = tileWidth * 4;
-    const paddingY = drawHeight * 6;
-
-    const startCol = Math.floor((camera.x - paddingX) / tileWidth);
-    const endCol = Math.ceil((camera.x + viewWidth + paddingX) / tileWidth);
-    const startRow = Math.floor((camera.y - paddingY) / tileHeight);
-    const endRow = Math.ceil((camera.y + viewHeight + paddingY) / tileHeight);
-
-    const maxGridRange = Math.ceil(outerRadius / tileHeight);
-
-    // Draw LightSand outside the green grass area (extends beyond map boundary)
-    const edgeImg = groundTextureImages.get('LightSand');
-    
-    for (let row = Math.max(-maxGridRange, startRow); row <= Math.min(maxGridRange, endRow); row++) {
-        for (let col = Math.max(-maxGridRange, startCol); col <= Math.min(maxGridRange, endCol); col++) {
-            const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
-            const isoY = row * tileHeight;
-
-            const distFromCenter = Math.sqrt(isoX * isoX + isoY * isoY);
-            
-            // Skip if too far out
-            if (distFromCenter > outerRadius) continue;
-            
-            // Only draw OUTSIDE the green grass area (beyond 85% of mapRadius)
-            if (distFromCenter > mapRadius * 0.85) {
-                if (edgeImg && edgeImg.complete && edgeImg.naturalWidth > 0) {
-                    ctx.drawImage(edgeImg, isoX, isoY, tileWidth, drawHeight);
-                } else {
-                    // Fallback to beige color for LightSand
-                    ctx.fillStyle = '#e8d4a0';
-                    ctx.beginPath();
-                    ctx.moveTo(isoX + tileWidth / 2, isoY);
-                    ctx.lineTo(isoX + tileWidth, isoY + drawHeight / 2);
-                    ctx.lineTo(isoX + tileWidth / 2, isoY + drawHeight);
-                    ctx.lineTo(isoX, isoY + drawHeight / 2);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-            }
-        }
-    }
-}
-
-// Draw default ground samples (LightSand at edges, GreenGrass in center)
-function drawGroundSamples(ctx, camera, viewWidth, viewHeight) {
-    const tileWidth = 120;
-    const tileHeight = 30;
-    const drawHeight = 70;
-    const mapRadius = 2500;
-    const outerRadius = 2900; // Extended boundary for LightSand (40% smaller)
-
-    const paddingX = tileWidth * 2;
-    const paddingY = drawHeight * 3;
-
-    const startCol = Math.floor((camera.x - paddingX) / tileWidth);
-    const endCol = Math.ceil((camera.x + viewWidth + paddingX) / tileWidth);
-    const startRow = Math.floor((camera.y - paddingY) / tileHeight);
-    const endRow = Math.ceil((camera.y + viewHeight + paddingY) / tileHeight);
-
-    const maxGridRange = Math.ceil(outerRadius / tileHeight);
-
-    // Get ground textures
-    const greenGrassImg = groundTextureImages.get('GreenGrass');
-    const lightSandImg = groundTextureImages.get('LightSand');
-    
-    for (let row = Math.max(-maxGridRange, startRow); row <= Math.min(maxGridRange, endRow); row++) {
-        for (let col = Math.max(-maxGridRange, startCol); col <= Math.min(maxGridRange, endCol); col++) {
-            const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
-            const isoY = row * tileHeight;
-
-            const distFromCenter = Math.sqrt(isoX * isoX + isoY * isoY);
-            if (distFromCenter > outerRadius) continue;
-
-            // Draw LightSand at edges (outside 85% of map radius)
-            if (distFromCenter > mapRadius * 0.85) {
-                if (lightSandImg && lightSandImg.complete && lightSandImg.naturalWidth > 0) {
-                    ctx.drawImage(lightSandImg, isoX, isoY, tileWidth, drawHeight);
-                } else {
-                    // Fallback to sand color
-                    ctx.fillStyle = '#d4c4a8';
-                    ctx.beginPath();
-                    ctx.moveTo(isoX + tileWidth / 2, isoY);
-                    ctx.lineTo(isoX + tileWidth, isoY + drawHeight / 2);
-                    ctx.lineTo(isoX + tileWidth / 2, isoY + drawHeight);
-                    ctx.lineTo(isoX, isoY + drawHeight / 2);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-            }
-            // Draw GreenGrass in center (inner 85%)
-            else {
-                if (greenGrassImg && greenGrassImg.complete && greenGrassImg.naturalWidth > 0) {
-                    ctx.drawImage(greenGrassImg, isoX, isoY, tileWidth, drawHeight);
-                } else {
-                    // Fallback to green color
-                    ctx.fillStyle = '#7cbc4a';
-                    ctx.beginPath();
-                    ctx.moveTo(isoX + tileWidth / 2, isoY);
-                    ctx.lineTo(isoX + tileWidth, isoY + drawHeight / 2);
-                    ctx.lineTo(isoX + tileWidth / 2, isoY + drawHeight);
-                    ctx.lineTo(isoX, isoY + drawHeight / 2);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-            }
-        }
-    }
 }
 
 function drawTexturedParallelogram(ctx, x, y, width, height, terrainType) {
@@ -5299,38 +3857,37 @@ function easeOutCubic(t) {
 }
 
 function smoothCameraUpdate() {
-    let needsRender = false;
-    
-    // Smoothly interpolate zoom - faster easing for snappier feel
+    // Smoothly interpolate zoom with ease-out
     const zoomDiff = targetCanvasZoom - canvasZoom;
-    if (Math.abs(zoomDiff) > 0.002) {
-        canvasZoom += zoomDiff * 0.15; // Direct lerp, faster
+    let didChange = false;
+    if (Math.abs(zoomDiff) > 0.001) {
+        // Calculate easing factor based on distance (closer = slower)
+        const distance = Math.abs(zoomDiff);
+        const normalizedDistance = Math.min(distance / 2, 1); // Normalize to 0-1
+        const easedFactor = easeOutCubic(normalizedDistance) * smoothingFactor + 0.05;
+
+        canvasZoom += zoomDiff * easedFactor;
         window.canvasZoom = canvasZoom;
-        needsRender = true;
-    } else if (Math.abs(zoomDiff) > 0) {
-        canvasZoom = targetCanvasZoom; // Snap to target
-        window.canvasZoom = canvasZoom;
-        needsRender = true;
+        didChange = true;
     }
 
-    // Smoothly interpolate position - faster easing
+    // Smoothly interpolate position with ease-out
     const offsetXDiff = targetCanvasOffsetX - canvasOffsetX;
     const offsetYDiff = targetCanvasOffsetY - canvasOffsetY;
 
-    if (Math.abs(offsetXDiff) > 1 || Math.abs(offsetYDiff) > 1) {
-        canvasOffsetX += offsetXDiff * 0.15; // Direct lerp, faster
-        canvasOffsetY += offsetYDiff * 0.15;
-        needsRender = true;
-    } else if (Math.abs(offsetXDiff) > 0 || Math.abs(offsetYDiff) > 0) {
-        canvasOffsetX = targetCanvasOffsetX; // Snap to target
-        canvasOffsetY = targetCanvasOffsetY;
-        needsRender = true;
+    if (Math.abs(offsetXDiff) > 0.1 || Math.abs(offsetYDiff) > 0.1) {
+        // Calculate easing factor based on distance (closer = slower)
+        const distance = Math.sqrt(offsetXDiff * offsetXDiff + offsetYDiff * offsetYDiff);
+        const normalizedDistance = Math.min(distance / 500, 1); // Normalize to 0-1
+        const easedFactor = easeOutCubic(normalizedDistance) * smoothingFactor + 0.05;
+
+        canvasOffsetX += offsetXDiff * easedFactor;
+        canvasOffsetY += offsetYDiff * easedFactor;
+        didChange = true;
     }
 
-    // Trigger render only if camera changed
-    if (needsRender && typeof actualRenderMapCreatorCanvas === 'function') {
-        actualRenderMapCreatorCanvas(); // Call directly, skip throttle for smooth animation
-    }
+    // If camera changed, request a render so the user sees updated zoom/pan immediately
+    if (didChange) renderMapCreatorCanvas();
 
     requestAnimationFrame(smoothCameraUpdate);
 }
@@ -5350,22 +3907,21 @@ function setupSmoothWheelZoom() {
         e.preventDefault();
 
         const rect = canvas.getBoundingClientRect();
-        // Zoom toward screen center instead of mouse position
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
 
-        // Calculate world position at screen center before zoom
-        const worldX = (centerX - canvasOffsetX) / canvasZoom;
-        const worldY = (centerY - canvasOffsetY) / canvasZoom;
+        // Calculate world position before zoom
+        const worldX = (mouseX - canvasOffsetX) / canvasZoom;
+        const worldY = (mouseY - canvasOffsetY) / canvasZoom;
 
-        // Update zoom target smoothly (larger steps for faster zoom)
-        const zoomDelta = e.deltaY > 0 ? 0.9 : 1.1;
-        const newZoom = Math.max(0.3, Math.min(4, targetCanvasZoom * zoomDelta));
+        // Update zoom target smoothly
+        const zoomDelta = e.deltaY > 0 ? 0.95 : 1.05;
+        const newZoom = Math.max(0.5, Math.min(3, targetCanvasZoom * zoomDelta));
         targetCanvasZoom = newZoom;
 
-        // Adjust offset target to keep screen center stable
-        targetCanvasOffsetX = centerX - worldX * newZoom;
-        targetCanvasOffsetY = centerY - worldY * newZoom;
+        // Adjust offset target to keep mouse position stable
+        targetCanvasOffsetX = mouseX - worldX * newZoom;
+        targetCanvasOffsetY = mouseY - worldY * newZoom;
 
         // Update slider
         updateZoomSlider(newZoom);
@@ -5520,17 +4076,7 @@ function displayMapCards(maps) {
 
         const stats = document.createElement('div');
         stats.className = 'map-card-stats';
-        
-        // Get vehicle type info
-        const vehicleType = map.vehicleType || 'tank';
-        const vehicleEmoji = vehicleType === 'tank' ? '🚗' : vehicleType === 'jet' ? '✈️' : '🏎️';
-        const vehicleName = vehicleType.toUpperCase();
-        
         stats.innerHTML = `
-            <div class="map-card-stat">
-                <span class="map-card-stat-icon">${vehicleEmoji}</span>
-                <span>${vehicleName} Map</span>
-            </div>
             <div class="map-card-stat">
                 <span class="map-card-stat-icon">🗺️</span>
                 <span>${map.objects ? map.objects.length : 0} Objects</span>
@@ -5571,83 +4117,15 @@ function editMap(mapId) {
         return;
     }
 
-    const vehicleType = map.vehicleType || 'tank';
-
     // Set current map info
     window.currentMapName = map.name;
     window.currentMapId = mapId;
-    window.currentMapVehicleType = vehicleType;
 
-    console.log('Loading map for editing:', map.name, 'Vehicle type:', vehicleType);
+    // Load the map data (you'll need to implement loadMap function)
+    console.log('Loading map for editing:', map.name);
 
-    // Route to correct editor and load map data
-    if (vehicleType === 'jet') {
-        window.currentJetMapName = map.name;
-        window.currentJetMapData = map;
-        if (typeof window.startJetMapEditor === 'function') {
-            window.startJetMapEditor();
-        }
-    } else if (vehicleType === 'race') {
-        window.currentRaceMapName = map.name;
-        window.currentRaceMapData = map;
-        if (typeof window.startRaceMapEditor === 'function') {
-            window.startRaceMapEditor();
-        }
-    } else {
-        // Tank editor - show loading and load map data
-        showMapCreatorLoading();
-        updateMapCreatorLoadingProgress(10, 'Loading map data...');
-        
-        setTimeout(() => {
-            updateMapCreatorLoadingProgress(30, 'Loading ground tiles...');
-            loadMap(map);
-            
-            setTimeout(() => {
-                updateMapCreatorLoadingProgress(60, 'Loading buildings...');
-                startMapEditorWithoutLoading('tank');
-            }, 200);
-        }, 100);
-    }
-}
-
-// Start map editor without showing loading (used when editMap already shows it)
-function startMapEditorWithoutLoading(vehicleType) {
-    window.currentMapVehicleType = vehicleType;
-
-    const blankCreator = document.getElementById('blankMapCreator');
-    if (blankCreator) {
-        blankCreator.classList.remove('hidden');
-        const createMapCloseBtn = document.getElementById('createMapCloseBtn');
-        if (createMapCloseBtn) createMapCloseBtn.style.display = 'none';
-        updateMapCreatorTitle(vehicleType);
-    }
-
-    const gameMinimap = document.getElementById('minimap');
-    if (gameMinimap) gameMinimap.style.display = 'none';
-
-    canvasZoom = 0.5;
-    targetCanvasZoom = 0.5;
-    window.canvasZoom = 0.5;
-
-    // Load ground textures first
-    updateMapCreatorLoadingProgress(65, 'Loading ground textures...');
-    
-    loadCustomGroundTexture().then(() => {
-        updateMapCreatorLoadingProgress(75, 'Initializing canvas...');
-        initMapCreatorCanvas();
-        createZoomSlider();
-        
-        setTimeout(() => {
-            updateMapCreatorLoadingProgress(85, 'Loading assets...');
-            loadAssetsForVehicleType(vehicleType);
-            setupTankEditorDrag();
-            
-            setTimeout(() => {
-                updateMapCreatorLoadingProgress(100, 'Ready!');
-                setTimeout(() => hideMapCreatorLoading(), 300);
-            }, 100);
-        }, 100);
-    });
+    // Open the editor
+    startMapEditor();
 }
 
 // Analyze map function
@@ -5696,6 +4174,17 @@ document.addEventListener('DOMContentLoaded', loadSavedMaps);
 window.loadSavedMaps = loadSavedMaps;
 window.editMap = editMap;
 window.analyzeMap = analyzeMap;
-window.deleteMap = deleteMap; window.de
-leteMap = deleteMap;
+window.deleteMap = deleteMap;
 window.openBlankMapCreator = openBlankMapCreator;
+
+// Editor starters / compatibility exports
+window.startMapEditor = typeof startMapEditor === 'function' ? startMapEditor : function() { console.warn('startMapEditor not defined'); };
+window.startTankEditor = window.startMapEditor;
+window.startJetEditor = function() { alert('Jet editor is not available in this build.'); };
+window.startRaceEditor = function() { alert('Race editor is not available in this build.'); };
+
+// Zoom controls
+if (typeof zoomIn === 'function') window.zoomIn = zoomIn;
+if (typeof zoomOut === 'function') window.zoomOut = zoomOut;
+
+// Utilities

@@ -21,7 +21,7 @@ const Renderer = {
 
     loadGroundTextures() {
         const groundFiles = [
-            'BlueGrass.png', 'BrownCobblestone.png', 'BrownGrass.png',
+            'water.png', 'WaterBlue.png', 'BlueGrass.png', 'BrownCobblestone.png', 'BrownGrass.png',
             'Goldcobblestone.png', 'GoldenCobblestone.png', 'GrayGround.png',
             'GreenGrass.png', 'Grey Cobblestone.png', 'LightBrownCobblestone.png',
             'LightGreyCobblestone.png', 'LightGreyGround.png', 'LightSand.png',

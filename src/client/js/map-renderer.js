@@ -28,7 +28,9 @@ class MapRenderer {
   async preloadAssets() {
     // Preload ground textures with descriptive names
     const groundTextures = [
-    { type: 'BlueGrass', file: 'BlueGrass.png' },
+    { type: 'water', file: 'water.png' },
+    { type: 'waterblue', file: 'WaterBlue.png' },
+    { type: 'bluegrass', file: 'BlueGrass.png' },
     { type: 'BrownCobblestone', file: 'BrownCobblestone.png' },
     { type: 'BrownGrass', file: 'BrownGrass.png' },
     { type: 'Goldcobblestone', file: 'Goldcobblestone.png' },

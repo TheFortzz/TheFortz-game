@@ -147,13 +147,13 @@ function showJetMapNameInput() {
                 cursor: pointer;
             ">Cancel</button>
             <button id="jetCreateBtn" style="
-                padding: 10px 20px;
-                background: #ff8800;
-                color: black;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-weight: bold;
+              padding: 10px 20px;
+              background: #ff8800;
+              color: #fff;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-weight: bold;
             ">Create Jet Map</button>
         </div>
     `;

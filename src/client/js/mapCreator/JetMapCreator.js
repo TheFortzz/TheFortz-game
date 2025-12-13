@@ -1,18 +1,15 @@
 // Jet Map Creator
 class JetMapCreator {
-    constructor() {
-        this.isActive = false;
-    }
-
-    init() {
-        console.log('✈️ JetMapCreator initialized');
-    }
-
-    start(mapName) {
-        console.log('✈️ Starting jet map creator for:', mapName);
-        alert('Jet Map Creator - Coming Soon!');
-    }
+	constructor() {
+		this.isActive = false;
+	}
 }
 
-// Export
-window.JetMapCreator = JetMapCreator;
+// JetMapCreator neutralized
+// Jet-specific map creator removed — TankMapCreator.js is the consolidated editor.
+console.warn('JetMapCreator.js stub active — use TankMapCreator.js');
+// Neutralized export
+window.JetMapCreator = null;
+
+// Export (re-enable by removing neutralization above)
+// window.JetMapCreator = JetMapCreator;

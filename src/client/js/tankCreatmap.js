@@ -1220,7 +1220,7 @@ function showMapNameInput(vehicleType) {
             <button id="createBtn" style="
                 padding: 10px 20px;
                 background: #00f7ff;
-                color: black;
+                color: #fff;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
@@ -1522,6 +1522,10 @@ function startMapEditor(vehicleType = 'tank') {
                 width: 100% !important;
                 height: 100% !important;
             `;
+            
+            // Create plus cursor overlay
+            createPlusCursorOverlay();
+            
             console.log('✅ Canvas forced visible');
             console.log('   Canvas new display:', window.getComputedStyle(canvas).display);
             console.log('   Canvas dimensions:', canvas.offsetWidth, 'x', canvas.offsetHeight);
@@ -2323,37 +2327,104 @@ function toggleAssetsPanel() {
 function setupTankEditorDrag() {
     const panel = document.getElementById('assetsPanel');
     const header = document.getElementById('tankEditorHeader');
-    if (!panel || !header) return;
+    if (!panel || !header) {
+        console.warn('Assets panel or header not found for dragging setup');
+        return;
+    }
 
+    // Ensure panel is positioned absolutely for dragging
+    panel.style.position = 'fixed';
+    
     let isDragging = false;
     let startX, startY, initialX, initialY;
 
     header.addEventListener('mousedown', (e) => {
+        // Don't drag if clicking the minimize button
         if (e.target.classList.contains('minimize-btn')) return;
+        
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
+        
         const rect = panel.getBoundingClientRect();
         initialX = rect.left;
         initialY = rect.top;
+        
+        // Disable transitions during drag
         panel.style.transition = 'none';
+        header.style.cursor = 'grabbing';
+        
+        // Prevent text selection during drag
+        e.preventDefault();
     });
 
     document.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
+        
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
-        panel.style.left = (initialX + dx) + 'px';
-        panel.style.top = (initialY + dy) + 'px';
+        
+        const newX = initialX + dx;
+        const newY = initialY + dy;
+        
+        // Keep panel within viewport bounds
+        const maxX = window.innerWidth - panel.offsetWidth;
+        const maxY = window.innerHeight - panel.offsetHeight;
+        
+        const clampedX = Math.max(0, Math.min(newX, maxX));
+        const clampedY = Math.max(0, Math.min(newY, maxY));
+        
+        panel.style.left = clampedX + 'px';
+        panel.style.top = clampedY + 'px';
         panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
     });
 
     document.addEventListener('mouseup', () => {
         if (isDragging) {
             isDragging = false;
             panel.style.transition = '';
+            header.style.cursor = 'move';
         }
     });
+    
+    console.log('✅ Tank editor drag setup complete');
+}
+
+// Create plus cursor overlay for map center
+function createPlusCursorOverlay() {
+    // Remove existing overlay if any
+    const existingOverlay = document.getElementById('mapCreatorPlusOverlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+    
+    const canvas = document.getElementById('mapCreatorCanvas');
+    if (!canvas) return;
+    
+    // Create overlay container with FontAwesome plus icon
+    const overlay = document.createElement('div');
+    overlay.id = 'mapCreatorPlusOverlay';
+    overlay.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 1000;
+        font-size: 20px;
+    `;
+    
+    // Create FontAwesome plus icon
+    overlay.innerHTML = '<i class="fa-sharp fa-light fa-plus" style="color: #74C0FC;"></i>';
+    
+    // Add to canvas parent
+    const canvasParent = canvas.parentElement;
+    if (canvasParent) {
+        canvasParent.style.position = 'relative';
+        canvasParent.appendChild(overlay);
+        console.log('✅ Plus cursor overlay created with FontAwesome icon');
+    }
 }
 
 function switchAssetCategory(category) {
@@ -2469,6 +2540,12 @@ const objectFileNameMap = {
 function loadAssets(category) {
     const assetsGrid = document.getElementById('assetsGrid');
     assetsGrid.innerHTML = '';
+    
+    // Apply appropriate grid class based on category
+    assetsGrid.className = 'assets-grid';
+    if (category === 'ground') {
+        assetsGrid.classList.add('ground-assets');
+    }
 
     // If we're viewing a specific object's files, show those
     if (currentObjectFolder) {
@@ -2478,7 +2555,9 @@ function loadAssets(category) {
 
     // Ground PNG textures - all ground tiles with descriptive names
     const groundTextures = [
-        { name: 'Blue Grass', type: 'BlueGrass', file: 'tank/Grounds/BlueGrass.png' },
+        { name: 'Water', type: 'water', file: 'tank/Grounds/water.png' },
+        { name: 'Water Blue', type: 'waterblue', file: 'tank/Grounds/WaterBlue.png' },
+        { name: 'Blue Grass', type: 'bluegrass', file: 'tank/Grounds/BlueGrass.png' },
         { name: 'Brown Cobblestone', type: 'BrownCobblestone', file: 'tank/Grounds/BrownCobblestone.png' },
         { name: 'Brown Grass', type: 'BrownGrass', file: 'tank/Grounds/BrownGrass.png' },
         { name: 'Gold Cobblestone', type: 'Goldcobblestone', file: 'tank/Grounds/Goldcobblestone.png' },
@@ -3249,7 +3328,7 @@ function handleCanvasClick(e) {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Convert to world space (accounting for zoom and pan)
+    // Convert to world space (accounting for zoom and pan) - simple direct conversion
     let worldX = (mouseX - canvasOffsetX) / canvasZoom;
     let worldY = (mouseY - canvasOffsetY) / canvasZoom;
 
@@ -3398,7 +3477,7 @@ function handleCanvasMouseMove(e) {
     lastMouseX = e.clientX - rect.left;
     lastMouseY = e.clientY - rect.top;
 
-    // Calculate world position for hover preview
+    // Calculate world position for hover preview - simple direct conversion
     hoverWorldX = (lastMouseX - canvasOffsetX) / canvasZoom;
     hoverWorldY = (lastMouseY - canvasOffsetY) / canvasZoom;
     
@@ -5042,7 +5121,9 @@ function loadCustomGroundTexture() {
 
         // Load all ground PNG textures with descriptive names
         const groundFiles = [
-            { file: 'tank/Grounds/BlueGrass.png', type: 'BlueGrass' },
+            { file: 'tank/Grounds/water.png', type: 'water' },
+            { file: 'tank/Grounds/WaterBlue.png', type: 'waterblue' },
+            { file: 'tank/Grounds/BlueGrass.png', type: 'bluegrass' },
             { file: 'tank/Grounds/BrownCobblestone.png', type: 'BrownCobblestone' },
             { file: 'tank/Grounds/BrownGrass.png', type: 'BrownGrass' },
             { file: 'tank/Grounds/Goldcobblestone.png', type: 'Goldcobblestone' },
@@ -5658,6 +5739,11 @@ function smoothCameraUpdate() {
         canvasOffsetX = targetCanvasOffsetX; // Snap to target
         canvasOffsetY = targetCanvasOffsetY;
         needsRender = true;
+    }
+
+    // Update hover position when camera changes
+    if (needsRender && isHovering && typeof lastMouseX !== 'undefined' && typeof lastMouseY !== 'undefined') {
+        updateHoverPosition();
     }
 
     // Trigger render only if camera changed

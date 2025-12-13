@@ -6,8 +6,8 @@
 
   // Map ground_X.png to actual file names in /assets/tank/Grounds/
   const GROUND_FILE_MAP = {
-    'ground_0': 'BlueGrass',
-    'ground_1': 'BlueGrass',
+    'ground_0': 'water',
+    'ground_1': 'water',
     'ground_2': 'BrownCobblestone',
     'ground_3': 'BrownGrass',
     'ground_4': 'Sand',
@@ -31,9 +31,9 @@
   function migrateGroundPath(path) {
     if (!path || typeof path !== 'string') return path;
 
-    // Convert _Group_.png -> BlueGrass.png
+    // Convert _Group_.png -> water.png
     if (path.includes('_Group_.png')) {
-      return '/assets/tank/Grounds/BlueGrass.png';
+      return '/assets/tank/Grounds/water.png';
     }
     // Convert _Group_ (X).png -> appropriate ground file
     const groupMatch = path.match(/_Group_\s*\((\d+)\)\.png/);
@@ -170,8 +170,10 @@
     typeToUrl(type) {
       // Map ground types to their image URLs in /assets/tank/Grounds/
       const typeMap = {
-        'water': '/assets/tank/Grounds/BlueGrass.png',
+        'water': '/assets/tank/Grounds/water.png',
+        'waterblue': '/assets/tank/Grounds/WaterBlue.png',
         'BlueGrass': '/assets/tank/Grounds/BlueGrass.png',
+        'bluegrass': '/assets/tank/Grounds/BlueGrass.png',
         'BrownCobblestone': '/assets/tank/Grounds/BrownCobblestone.png',
         'BrownGrass': '/assets/tank/Grounds/BrownGrass.png',
         'Goldcobblestone': '/assets/tank/Grounds/Goldcobblestone.png',
@@ -190,8 +192,10 @@
         'WoodenTile': '/assets/tank/Grounds/WoodenTile.png',
         'YellowGrass': '/assets/tank/Grounds/YellowGrass.png',
         // Legacy mappings for old saved maps (ground1-18 types)
-        'ground0': '/assets/tank/Grounds/BlueGrass.png',
-        'ground1': '/assets/tank/Grounds/BlueGrass.png',
+        'tank/Grounds/water.png': '/assets/tank/Grounds/water.png',
+        'tank/Grounds/Sand.png': '/assets/tank/Grounds/Sand.png',
+        'ground0': '/assets/tank/Grounds/water.png',
+        'ground1': '/assets/tank/Grounds/water.png',
         'ground2': '/assets/tank/Grounds/BrownCobblestone.png',
         'ground3': '/assets/tank/Grounds/BrownGrass.png',
         'ground4': '/assets/tank/Grounds/Sand.png',

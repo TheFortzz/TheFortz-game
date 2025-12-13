@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/styles/index.css?v=10">
+    <link rel="stylesheet" href="/styles/ui-buttons.css">
+    <link rel="stylesheet" href="/styles/edit-button.css">
+    <link rel="stylesheet" href="/styles/map-creator-buttons.css">
 
     <!-- CrazyGames SDK v2 -->
     <script src="https://sdk.crazygames.com/crazygames-sdk-v2.js"></script>
@@ -206,17 +209,21 @@
 
                 <!-- Blank Map Creator -->
                 <div id="blankMapCreator" class="blank-creator hidden">
-                    <button class="back-from-creator-btn" onclick="closeBlankMapCreator()">
-                        BACK
-                    </button>
-
-                    <button class="publish-map-btn" onclick="saveMap()">
-                        PUBLISH
-                    </button>
-
-                    <button class="test-map-btn" onclick="testMap()">
-                        TEST
-                    </button>
+                    <!-- Map Creator Control Buttons - Icons only -->
+                    <div class="map-creator-buttons">
+                        <button class="map-creator-btn map-creator-btn-left" onclick="closeBlankMapCreator()">
+                            <span class="map-creator-btn-text"><i class="fa-sharp fa-solid fa-arrow-right-from-bracket"></i></span>
+                        </button>
+                        <button id="mapCreatorEditButton" class="map-creator-btn map-creator-btn-middle" onclick="toggleEditMode()">
+                            <span class="map-creator-btn-text"><i class="fa-solid fa-pen-to-square"></i></span>
+                        </button>
+                        <button class="map-creator-btn map-creator-btn-publish" onclick="saveMap()">
+                            <span class="map-creator-btn-text"><i class="fa-sharp fa-regular fa-upload"></i></span>
+                        </button>
+                        <button class="map-creator-btn map-creator-btn-right" onclick="testMap()">
+                            <span class="map-creator-btn-text"><i class="fa-solid fa-eye"></i></span>
+                        </button>
+                    </div>
 
                     <!-- Map Creator Canvas -->
                     <canvas id="mapCreatorCanvas" class="map-creator-canvas" style="cursor: grab;"></canvas>
@@ -227,6 +234,13 @@
                             <h3 style="pointer-events: none;">Editor</h3>
                             <button class="minimize-btn" id="minimizeBtn" onclick="toggleAssetsPanel()">+</button>
                         </div>
+                        
+                        <!-- Control section for unselect button -->
+                        <div id="assetControlSection" style="padding: 15px 20px; border-bottom: 1px solid rgba(0,247,255,0.2); display: none;">
+                            <button id="unselectAssetBtn" onclick="unselectCurrentAsset()" style="width:100%; padding:12px; background: linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15)); border: 1px solid rgba(255,80,80,0.4); border-left: 3px solid #ff4444; color:#ff6666; cursor:pointer; font-weight:600; font-size:12px; letter-spacing:0.5px; transition:all 0.2s; text-align:left; border-radius: 0;">
+                                <span style="margin-right: 8px;">✖</span>CLEAR SELECTION
+                            </button>
+                        </div>
 
                         <div class="assets-panel-content">
                             <!-- Asset Category Buttons -->
@@ -234,17 +248,17 @@
                                 style="display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap;">
                                 <button class="asset-category-btn" data-category="ground"
                                     onclick="switchAssetCategory('ground')"
-                                    style="flex: 1; min-width: 80px; padding: 8px 12px; background: rgba(139, 69, 19, 0.3); border: 2px solid rgba(139, 69, 19, 0.6); color: rgba(255, 255, 255, 0.8); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s;">
+                                    style="flex: 1; min-width: 80px; padding: 8px 12px; background: rgba(139, 69, 19, 0.3); border: 2px solid rgba(139, 69, 19, 0.6); color: rgba(255, 255, 255, 0.8); border-radius: 0; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s;">
                                     🌍 Ground
                                 </button>
                                 <button class="asset-category-btn active" data-category="buildings"
                                     onclick="switchAssetCategory('buildings')"
-                                    style="flex: 1; min-width: 80px; padding: 8px 12px; background: rgba(0, 247, 255, 0.2); border: 2px solid rgba(0, 247, 255, 0.6); color: #00f7ff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s;">
+                                    style="flex: 1; min-width: 80px; padding: 8px 12px; background: rgba(0, 247, 255, 0.2); border: 2px solid rgba(0, 247, 255, 0.6); color: #00f7ff; border-radius: 0; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s;">
                                     🏛️ Buildings
                                 </button>
                                 <button class="asset-category-btn" data-category="players"
                                     onclick="switchAssetCategory('players')"
-                                    style="flex: 1; min-width: 80px; padding: 8px 12px; background: rgba(255, 100, 100, 0.3); border: 2px solid rgba(255, 100, 100, 0.6); color: rgba(255, 255, 255, 0.8); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s;">
+                                    style="flex: 1; min-width: 80px; padding: 8px 12px; background: rgba(255, 100, 100, 0.3); border: 2px solid rgba(255, 100, 100, 0.6); color: rgba(255, 255, 255, 0.8); border-radius: 0; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s;">
                                     👥 Players
                                 </button>
                             </div>
@@ -632,26 +646,26 @@
 
                             <!-- Current Item Displays -->
                             <div class="locker-current-items" style="margin: 20px 0;">
-                                <div id="currentColor" style="padding: 10px; background: rgba(0,0,0,0.5); margin: 5px 0; border-radius: 5px; color: white;">Current Color: Default</div>
-                                <div id="currentBody" style="padding: 10px; background: rgba(0,0,0,0.5); margin: 5px 0; border-radius: 5px; color: white;">Current Body: Default</div>
-                                <div id="currentWeapon" style="padding: 10px; background: rgba(0,0,0,0.5); margin: 5px 0; border-radius: 5px; color: white;">Current Weapon: Default</div>
+                                <div id="currentColor" style="padding: 10px; background: rgba(0,0,0,0.5); margin: 5px 0; border-radius: 0; color: white;">Current Color: Default</div>
+                                <div id="currentBody" style="padding: 10px; background: rgba(0,0,0,0.5); margin: 5px 0; border-radius: 0; color: white;">Current Body: Default</div>
+                                <div id="currentWeapon" style="padding: 10px; background: rgba(0,0,0,0.5); margin: 5px 0; border-radius: 0; color: white;">Current Weapon: Default</div>
                             </div>
 
                             <!-- Tank Preview -->
-                            <div id="lockerTankPreview" style="width: 200px; height: 200px; background: rgba(0,0,0,0.8); border-radius: 10px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: white;">
+                            <div id="lockerTankPreview" style="width: 200px; height: 200px; background: rgba(0,0,0,0.8); border-radius: 0; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: white;">
                                 Tank Preview
                             </div>
 
                             <!-- Item Grids (Hidden by default) -->
-                            <div id="colorsItemsGrid" class="locker-items-grid hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 5px; margin: 10px 0;">
+                            <div id="colorsItemsGrid" class="locker-items-grid hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 0; margin: 10px 0;">
                                 <!-- Color items will be populated here -->
                             </div>
                             
-                            <div id="bodiesItemsGrid" class="locker-items-grid hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 5px; margin: 10px 0;">
+                            <div id="bodiesItemsGrid" class="locker-items-grid hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 0; margin: 10px 0;">
                                 <!-- Body items will be populated here -->
                             </div>
                             
-                            <div id="weaponsItemsGrid" class="locker-items-grid hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 5px; margin: 10px 0;">
+                            <div id="weaponsItemsGrid" class="locker-items-grid hidden" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; background: rgba(0,0,0,0.8); border-radius: 0; margin: 10px 0;">
                                 <!-- Weapon items will be populated here -->
                             </div>
 
@@ -989,7 +1003,7 @@
                     <span class="logo-text">TheFortz</span>
                 </div>
                 <div class="top-buttons">
-                    <button class="button-3d button-3d-green" onclick="openFeature('create-map')"
+                    <button class="button-3d button-3d-gold" onclick="openFeature('create-map')"
                         data-testid="button-create-map">
                         <span class="button-3d-top">Create Map</span>
                         <span class="button-3d-bottom"></span>
@@ -1001,24 +1015,24 @@
                         <span class="button-3d-bottom"></span>
                         <span class="button-3d-base"></span>
                     </button>
-                    <button id="shopButton" class="button-3d button-3d-cyan" onclick="openFeature('shop')"
+                    <button id="shopButton" class="button-3d button-3d-gold" onclick="openFeature('shop')"
                         data-testid="button-shop">
                         <span class="button-3d-top">Shop</span>
                         <span class="button-3d-bottom"></span>
                         <span class="button-3d-base"></span>
                     </button>
-                    <button class="button-3d button-3d-orange" onclick="openFeature('pass')" data-testid="button-pass">
+                    <button class="button-3d button-3d-gold" onclick="openFeature('pass')" data-testid="button-pass">
                         <span class="button-3d-top">Pass</span>
                         <span class="button-3d-bottom"></span>
                         <span class="button-3d-base"></span>
                     </button>
-                    <button class="button-3d button-3d-purple" onclick="openFeature('settings')"
+                    <button class="button-3d button-3d-gold" onclick="openFeature('settings')"
                         data-testid="button-settings">
                         <span class="button-3d-top">Settings</span>
                         <span class="button-3d-bottom"></span>
                         <span class="button-3d-base"></span>
                     </button>
-                    <button class="button-3d button-3d-blue" onclick="openFeature('friends')"
+                    <button class="button-3d button-3d-gold" onclick="openFeature('friends')"
                         data-testid="button-friends">
                         <span class="button-3d-top">Friends</span>
                         <span class="button-3d-bottom"></span>
@@ -1225,7 +1239,7 @@
                 <h3 style="color: white; margin-bottom: 20px;">Create Tank Map</h3>
                 <input id="tankMapNameInput" type="text" placeholder="Enter map name..." style="width: 300px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
                 <div style="display: flex; gap: 10px;">
-                    <button id="tankCreateBtn" style="padding: 10px 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Create</button>
+                    <button id="tankCreateBtn" style="padding: 10px 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Create</button>
                     <button id="tankCancelBtn" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
                 </div>
             </div>
@@ -1235,7 +1249,7 @@
                 <h3 style="color: white; margin-bottom: 20px;">Create Race Map</h3>
                 <input id="raceMapNameInput" type="text" placeholder="Enter map name..." style="width: 300px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
                 <div style="display: flex; gap: 10px;">
-                    <button id="raceCreateBtn" style="padding: 10px 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Create</button>
+                    <button id="raceCreateBtn" style="padding: 10px 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Create</button>
                     <button id="raceCancelBtn" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
                 </div>
             </div>
@@ -1245,7 +1259,7 @@
                 <h3 style="color: white; margin-bottom: 20px;">Create Jet Map</h3>
                 <input id="jetMapNameInput" type="text" placeholder="Enter map name..." style="width: 300px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
                 <div style="display: flex; gap: 10px;">
-                    <button id="jetCreateBtn" style="padding: 10px 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Create</button>
+                    <button id="jetCreateBtn" style="padding: 10px 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Create</button>
                     <button id="jetCancelBtn" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
                 </div>
             </div>
@@ -1255,7 +1269,7 @@
                 <h3 style="color: white; margin-bottom: 20px;">Create Map</h3>
                 <input id="mapNameInput" type="text" placeholder="Enter map name..." style="width: 300px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
                 <div style="display: flex; gap: 10px;">
-                    <button id="createBtn" style="padding: 10px 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Create</button>
+                    <button id="createBtn" style="padding: 10px 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Create</button>
                     <button id="backBtn" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Back</button>
                 </div>
             </div>
@@ -1264,9 +1278,9 @@
             <div id="vehicleTypeDialog" class="hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 10px; z-index: 10000;">
                 <h3 style="color: white; margin-bottom: 20px;">Select Vehicle Type</h3>
                 <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                    <button onclick="selectVehicleType('tank')" style="padding: 15px 25px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Tank</button>
-                    <button onclick="selectVehicleType('jet')" style="padding: 15px 25px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Jet</button>
-                    <button onclick="selectVehicleType('race')" style="padding: 15px 25px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Race</button>
+                    <button onclick="selectVehicleType('tank')" style="padding: 15px 25px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Tank</button>
+                    <button onclick="selectVehicleType('jet')" style="padding: 15px 25px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Jet</button>
+                    <button onclick="selectVehicleType('race')" style="padding: 15px 25px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Race</button>
                 </div>
                 <button id="cancelVehicleBtn" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
             </div>
@@ -1276,7 +1290,7 @@
                 <h3 style="color: white; margin-bottom: 20px;">Rename Map</h3>
                 <input id="renameMapInput" type="text" placeholder="Enter new name..." style="width: 300px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;">
                 <div style="display: flex; gap: 10px;">
-                    <button id="confirmRenameBtn" style="padding: 10px 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer;">Rename</button>
+                    <button id="confirmRenameBtn" style="padding: 10px 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Rename</button>
                     <button id="cancelRenameBtn" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
                 </div>
             </div>
@@ -1288,7 +1302,7 @@
 
             <!-- Create New Map Button Container -->
             <div id="createMapButtonContainer" class="hidden" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-                <button id="createNewMapBtn" style="padding: 15px 25px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">+ Create New Map</button>
+                <button id="createNewMapBtn" style="padding: 15px 25px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">+ Create New Map</button>
             </div>
 
             <!-- Game Modes Screen -->
@@ -1296,10 +1310,10 @@
                 <div style="background: rgba(0, 0, 0, 0.8); padding: 40px; border-radius: 10px; max-width: 600px; width: 90%;">
                     <h2 style="color: white; text-align: center; margin-bottom: 30px;">Select Game Mode</h2>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                        <button onclick="selectGameMode('battle-royale')" style="padding: 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Battle Royale</button>
-                        <button onclick="selectGameMode('team-deathmatch')" style="padding: 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Team Deathmatch</button>
-                        <button onclick="selectGameMode('free-for-all')" style="padding: 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Free For All</button>
-                        <button onclick="selectGameMode('capture-flag')" style="padding: 20px; background: #00f7ff; color: black; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Capture The Flag</button>
+                        <button onclick="selectGameMode('battle-royale')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Battle Royale</button>
+                        <button onclick="selectGameMode('team-deathmatch')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Team Deathmatch</button>
+                        <button onclick="selectGameMode('free-for-all')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Free For All</button>
+                        <button onclick="selectGameMode('capture-flag')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Capture The Flag</button>
                     </div>
                     <button onclick="closeGameModesScreen()" style="margin-top: 20px; padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%;">Cancel</button>
                 </div>
@@ -1584,6 +1598,12 @@
         </div>
     </div>
     
+    <!-- Blank Map Creator container required by MapCreator scripts -->
+    <div id="blankMapCreator" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b1020; z-index: 99999;">
+        <canvas id="mapCreatorCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
+        <button id="mapCreatorCloseBtn" onclick="closeBlankMapCreator()" style="position: fixed; top: 18px; right: 18px; z-index: 100000; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 28px; width: 48px; height: 48px; border-radius: 8px; cursor: pointer;">×</button>
+    </div>
+
     <!-- Map Creator Loading Screen -->
     <div id="mapCreatorLoadingScreen" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <div style="color: white; font-size: 24px; margin-bottom: 20px;">Loading Map Creator...</div>
@@ -1620,11 +1640,9 @@
     <script src="/js/locker/locker.js"></script>
     <script src="/js/shop/shop.js?v=3"></script>
     
-    <!-- Map Creator System (New Organized Structure) -->
-    <script src="/js/mapCreator/MapCreatorCore.js"></script>
+    <!-- Map Creator System (Tank-only) -->
     <script src="/js/mapCreator/TankMapCreator.js"></script>
-    <script src="/js/mapCreator/JetMapCreator.js"></script>
-    <script src="/js/mapCreator/RaceMapCreator.js"></script>
+    <script src="/js/mapCreator/MapRadiusPatch.js"></script>
     <script src="/js/settings.js"></script>
     <script src="/js/zoomSlider.js"></script>
     <script src="/js/horizontalScroll.js"></script>

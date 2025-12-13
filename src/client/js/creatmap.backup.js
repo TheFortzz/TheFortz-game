@@ -1,64 +1,8 @@
-// Create Map System - Simplified (View Only)
-let createMapAnimationId = null;
-
-const MAP_BUTTONS = [
-    { id: 'created-map', name: 'Created Maps', color: '#00f7ff', icon: '🗺️' },
-    { id: 'analyze', name: 'Analytics', color: '#FFD700', icon: '📊' }
-];
-
-let selectedButton = 'created-map';
-
-let createdMaps = [];
-let hoveredMapIndex = -1;
-let mapCardAnimations = [];
-
-function captureMapThumbnail() {
-    let sourceCanvas = document.getElementById('mapCreatorMinimapCanvas');
-    if ((!sourceCanvas || !sourceCanvas.width || !sourceCanvas.height) && typeof window !== 'undefined') {
-        sourceCanvas = document.getElementById('mapCreatorCanvas');
-    }
-
-    if (!sourceCanvas || !sourceCanvas.width || !sourceCanvas.height) {
-        console.warn('No canvas available for thumbnail capture');
-        return null;
-    }
-
-    try {
-        const targetWidth = 320;
-        const targetHeight = 180;
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = targetWidth;
-        tempCanvas.height = targetHeight;
-        const ctx = tempCanvas.getContext('2d');
-
-        ctx.fillStyle = '#041020';
-        ctx.fillRect(0, 0, targetWidth, targetHeight);
-
-        const aspectRatio = sourceCanvas.width / sourceCanvas.height;
-        let drawWidth = targetWidth;
-        let drawHeight = drawWidth / aspectRatio;
-
-        if (drawHeight < targetHeight) {
-            drawHeight = targetHeight;
-            drawWidth = drawHeight * aspectRatio;
-        }
-
-        const offsetX = (targetWidth - drawWidth) / 2;
-        const offsetY = (targetHeight - drawHeight) / 2;
-
-        ctx.drawImage(sourceCanvas, offsetX, offsetY, drawWidth, drawHeight);
-
-        try {
-            return tempCanvas.toDataURL('image/webp', 0.85);
-        } catch (err) {
-            console.warn('WebP thumbnail capture failed, falling back to PNG', err);
-            return tempCanvas.toDataURL('image/png');
-        }
-    } catch (error) {
-        console.warn('Failed to capture map thumbnail', error);
-        return null;
-    }
-}
+// creatmap.backup.js neutralized
+// The legacy create-map backup has been consolidated into
+// /src/client/js/mapCreator/TankMapCreator.js. This file is
+// intentionally left as a stub to avoid duplicate implementations.
+console.warn('creatmap.backup.js stub active — use TankMapCreator.js');
 
 let playerStatsData = {
     dailyPlayers: [
@@ -671,11 +615,6 @@ function createInteractiveElements() {
 let currentAssetCategory = 'buildings';
 let selectedAsset = null;
 
-// Edit Mode State
-let isEditMode = false;
-let hoveredObject = null;
-let selectedObject = null;
-
 // Canvas state for zoom/pan
 let canvasZoom = 1;
 let canvasOffsetX = 0;
@@ -705,19 +644,6 @@ let keysPressed = {};
 
 // Placed objects on the map
 let placedObjects = [];
-
-// Duplicate detection
-function isPositionOccupied(x, y, tolerance = 30) {
-    return placedObjects.some(obj => {
-        const distance = Math.sqrt(Math.pow(obj.x - x, 2) + Math.pow(obj.y - y, 2));
-        return distance < tolerance;
-    });
-}
-
-// Red X indicator for occupied positions
-let showRedX = false;
-let redXPosition = { x: 0, y: 0 };
-let redXTimer = null;
 
 // Ground tile customization - store custom ground textures per tile
 let customGroundTiles = new Map(); // key: "x,y", value: texture type
@@ -750,23 +676,6 @@ function switchCreateMapTab(tabName) {
 function openBlankMapCreator() {
     console.log('Opening map name input...');
 
-    // Ensure a visible debug banner exists for environments without devtools
-    let debugBanner = document.getElementById('mapCreatorDebugBanner');
-    if (!debugBanner) {
-        debugBanner = document.createElement('div');
-        debugBanner.id = 'mapCreatorDebugBanner';
-        debugBanner.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ffcc00;color:#fff;padding:6px 10px;z-index:100001;font-weight:bold;text-align:left;';
-        debugBanner.textContent = 'MapCreator: opening name input...';
-        document.body.appendChild(debugBanner);
-        // Auto-hide debug banner after a short period to avoid persistent text
-        setTimeout(() => {
-            try { debugBanner.remove(); } catch (e) { debugBanner.style.display = 'none'; }
-        }, 3000);
-    } else {
-        debugBanner.textContent = 'MapCreator: opening name input...';
-        debugBanner.style.display = 'block';
-    }
-
     // Create modal overlay
     const modal = document.createElement('div');
     modal.style.cssText = `
@@ -795,16 +704,7 @@ function openBlankMapCreator() {
     `;
 
     container.innerHTML = `
-        <h2 style="color: #00f7ff; margin-bottom: 8px;">🗺️ Create New Map</h2>
-
-        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
-            <button id="vehicleTankBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;font-weight:700;cursor:pointer;">Tank</button>
-            <button id="vehicleJetBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;cursor:pointer;">Jet</button>
-            <button id="vehicleRaceBtn" style="padding:8px 14px;border-radius:8px;border:2px solid transparent;background:transparent;color:#002b5c;cursor:pointer;">Race</button>
-        </div>
-
-        <h3 id="vehicleInfo" style="color: rgba(255,255,255,0.85); font-size:14px; margin-bottom:12px;">Selected: Tank — ready to create a Tank map.</h3>
-
+        <h2 style="color: #00f7ff; margin-bottom: 20px;">🗺️ Name Your Map</h2>
         <input 
             type="text" 
             id="mapNameInput" 
@@ -834,7 +734,7 @@ function openBlankMapCreator() {
             <button id="createBtn" style="
                 padding: 10px 20px;
                 background: #00f7ff;
-                color: #fff;
+                color: black;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
@@ -846,108 +746,35 @@ function openBlankMapCreator() {
     modal.appendChild(container);
     document.body.appendChild(modal);
 
-    // Use container-scoped selectors to avoid ID collisions
-    const input = container.querySelector('#mapNameInput');
-    if (input) input.focus();
+    // Focus the input
+    const input = document.getElementById('mapNameInput');
+    input.focus();
 
-    const cancelBtnScoped = container.querySelector('#cancelBtn');
-    const createBtnScoped = container.querySelector('#createBtn');
+    // Handle cancel
+    document.getElementById('cancelBtn').onclick = () => {
+        modal.remove();
+    };
 
-    // Vehicle selection: default to tank
-    let selectedVehicle = 'tank';
-    const tankBtn = container.querySelector('#vehicleTankBtn');
-    const jetBtn = container.querySelector('#vehicleJetBtn');
-    const raceBtn = container.querySelector('#vehicleRaceBtn');
-    const vehicleInfo = container.querySelector('#vehicleInfo');
-
-    function setVehicle(v) {
-        selectedVehicle = v;
-        // Common dark blue text for all states
-        const textColor = '#002b5c';
-        const selectedBg = '#bfeeff'; // light blue background for selection
-        const unselectedBg = 'transparent';
-        const borderColor = '#004080';
-
-        [tankBtn, jetBtn, raceBtn].forEach(btn => {
-            if (!btn) return;
-            btn.style.background = unselectedBg;
-            btn.style.color = textColor;
-            btn.style.border = `2px solid rgba(0,0,0,0)`;
-            btn.style.boxShadow = 'none';
-        });
-
-        // Apply selected style
-        const activeBtn = (v === 'tank') ? tankBtn : (v === 'jet') ? jetBtn : raceBtn;
-        if (activeBtn) {
-            activeBtn.style.background = selectedBg;
-            activeBtn.style.color = textColor;
-            activeBtn.style.border = `2px solid ${borderColor}`;
-            activeBtn.style.boxShadow = '0 4px 10px rgba(0,64,128,0.15)';
+    // Handle create
+    document.getElementById('createBtn').onclick = () => {
+        const mapName = input.value.trim();
+        if (!mapName) {
+            alert('Please enter a map name!');
+            return;
         }
 
-        if (vehicleInfo) {
-            if (v === 'tank') vehicleInfo.textContent = 'Selected: Tank — ready to create a Tank map.';
-            else vehicleInfo.textContent = `Selected: ${v.charAt(0).toUpperCase() + v.slice(1)} — coming soon.`;
-            vehicleInfo.style.color = textColor;
+        // Store map name and open editor
+        window.currentMapName = mapName;
+        modal.remove();
+        startMapEditor();
+    };
+
+    // Handle Enter key
+    input.onkeypress = (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('createBtn').click();
         }
-    }
-
-    if (tankBtn) tankBtn.onclick = () => setVehicle('tank');
-    if (jetBtn) jetBtn.onclick = () => setVehicle('jet');
-    if (raceBtn) raceBtn.onclick = () => setVehicle('race');
-
-    // Apply default visual selection
-    setVehicle('tank');
-
-    if (cancelBtnScoped) {
-        cancelBtnScoped.onclick = () => {
-            debugBanner.textContent = 'MapCreator: cancelled';
-            modal.remove();
-        };
-    }
-
-    if (createBtnScoped) {
-        createBtnScoped.onclick = () => {
-            try {
-                // Only allow Tank for now
-                if (selectedVehicle !== 'tank') {
-                    alert((selectedVehicle.charAt(0).toUpperCase() + selectedVehicle.slice(1)) + ' editor coming soon!');
-                    return;
-                }
-                const mapName = input ? input.value.trim() : '';
-                if (!mapName) {
-                    // visible feedback for users without console
-                    debugBanner.textContent = 'MapCreator: please enter a map name';
-                    alert('Please enter a map name!');
-                    return;
-                }
-
-                // Store map name and open editor
-                window.currentMapName = mapName;
-                debugBanner.textContent = `MapCreator: starting editor for "${mapName}"...`;
-                modal.remove();
-
-                // Attempt to start editor and show visible errors if it fails
-                try {
-                    startMapEditor();
-                    debugBanner.textContent = `MapCreator: editor opened for "${mapName}"`;
-                } catch (err) {
-                    debugBanner.textContent = `MapCreator ERROR: ${err && err.message ? err.message : err}`;
-                    alert('Failed to open map editor: ' + (err && err.message ? err.message : err));
-                }
-            } catch (outerErr) {
-                debugBanner.textContent = 'MapCreator outer error: ' + (outerErr && outerErr.message ? outerErr.message : outerErr);
-                alert('Unexpected error: ' + (outerErr && outerErr.message ? outerErr.message : outerErr));
-            }
-        };
-    }
-
-    // Handle Enter key inside modal
-    if (input) {
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && createBtnScoped) createBtnScoped.click();
-        });
-    }
+    };
 }
 
 function startMapEditor() {
@@ -983,15 +810,6 @@ function startMapEditor() {
 
         // Load initial assets
         loadAssets(currentAssetCategory);
-
-        // Initialize unselect button hover effects
-        initializeUnselectButton();
-
-        // Hide debug banner if present (editor opened)
-        const debugBanner = document.getElementById('mapCreatorDebugBanner');
-        if (debugBanner) {
-            try { debugBanner.remove(); } catch (e) { debugBanner.style.display = 'none'; }
-        }
     }, 100);
 }
 
@@ -1017,9 +835,6 @@ function createZoomSlider() {
         z-index: 99999;
         pointer-events: auto;
     `;
-
-    // Initialize edit mode button
-    initializeEditModeButton();
 
     // Create the track
     const track = document.createElement('div');
@@ -1114,23 +929,6 @@ function createZoomSlider() {
         // Update target zoom for smooth interpolation
         targetCanvasZoom = zoomValue;
 
-        // ALSO update the target camera offset so the zoom centers on the
-        // current screen center (prevents zooming to the original start position)
-        const canvas = document.getElementById('mapCreatorCanvas');
-        if (canvas) {
-            const rect = canvas.getBoundingClientRect();
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            // Calculate world position of the center before zoom
-            const worldX = (centerX - canvasOffsetX) / canvasZoom;
-            const worldY = (centerY - canvasOffsetY) / canvasZoom;
-
-            // Adjust target offsets so the same world point stays at screen center
-            targetCanvasOffsetX = centerX - worldX * zoomValue;
-            targetCanvasOffsetY = centerY - worldY * zoomValue;
-        }
-
         // Update slider visuals
         const min = parseFloat(input.min);
         const max = parseFloat(input.max);
@@ -1151,305 +949,6 @@ function createZoomSlider() {
 
     // Create minimap viewer
     createMinimapViewer();
-}
-
-// Initialize edit mode button (now in HTML)
-function initializeEditModeButton() {
-    const editButton = document.getElementById('mapCreatorEditButton');
-    if (editButton) {
-        console.log('✅ Edit mode button found in HTML');
-        // The button is already in HTML with onclick handler
-        return true;
-    } else {
-        console.warn('⚠️ Edit mode button not found in HTML');
-        return false;
-    }
-}
-
-// Toggle edit mode
-function toggleEditMode() {
-    isEditMode = !isEditMode;
-    selectedObject = null;
-    hoveredObject = null;
-    
-    const editButton = document.getElementById('mapCreatorEditButton');
-    if (editButton) {
-        if (isEditMode) {
-            editButton.classList.add('active');
-            editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> EDITING';
-        } else {
-            editButton.classList.remove('active');
-            editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> EDIT';
-        }
-    }
-    
-    console.log('Edit mode:', isEditMode ? 'ON' : 'OFF');
-    renderMapCreatorCanvas();
-}
-
-// Show object edit controls
-function showObjectEditControls(obj) {
-    // Remove existing controls
-    hideObjectEditControls();
-    
-    // Create controls container
-    const controlsContainer = document.createElement('div');
-    controlsContainer.id = 'objectEditControls';
-    controlsContainer.style.cssText = `
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, rgba(8,18,28,0.95), rgba(12,22,32,0.95));
-        border: 2px solid rgba(0,247,255,0.6);
-        border-left: 4px solid #00f7ff;
-        padding: 15px 20px;
-        z-index: 99998;
-        color: white;
-        backdrop-filter: blur(15px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-        border-radius: 0;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    `;
-    
-    // Object name
-    const objectName = document.createElement('div');
-    objectName.textContent = obj.asset.name;
-    objectName.style.cssText = 'color: #00f7ff; font-weight: bold; margin-right: 15px; font-size: 14px;';
-    controlsContainer.appendChild(objectName);
-    
-    // Delete button
-    const deleteBtn = document.createElement('button');
-    deleteBtn.innerHTML = '🗑️ DELETE';
-    deleteBtn.style.cssText = `
-        padding: 8px 15px;
-        background: linear-gradient(135deg, rgba(255,60,60,0.2), rgba(200,40,40,0.2));
-        border: 1px solid rgba(255,80,80,0.5);
-        border-left: 3px solid #ff4444;
-        color: #ff6666;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 12px;
-        transition: all 0.2s;
-        border-radius: 0;
-    `;
-    deleteBtn.onclick = () => deleteSelectedObject();
-    deleteBtn.onmouseenter = () => {
-        deleteBtn.style.background = 'linear-gradient(135deg, rgba(255,60,60,0.4), rgba(200,40,40,0.4))';
-        deleteBtn.style.borderLeftColor = '#ff6666';
-    };
-    deleteBtn.onmouseleave = () => {
-        deleteBtn.style.background = 'linear-gradient(135deg, rgba(255,60,60,0.2), rgba(200,40,40,0.2))';
-        deleteBtn.style.borderLeftColor = '#ff4444';
-    };
-    controlsContainer.appendChild(deleteBtn);
-    
-    // Position button (only for buildings)
-    if (obj.asset.viewFolder === 'Buildings') {
-        const positionBtn = document.createElement('button');
-        positionBtn.innerHTML = '🔄 POSITION';
-        positionBtn.style.cssText = `
-            padding: 8px 15px;
-            background: linear-gradient(135deg, rgba(0,150,255,0.2), rgba(0,120,200,0.2));
-            border: 1px solid rgba(0,180,255,0.5);
-            border-left: 3px solid #0099ff;
-            color: #00aaff;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-            transition: all 0.2s;
-            border-radius: 0;
-        `;
-        positionBtn.onclick = () => showPositionControls();
-        positionBtn.onmouseenter = () => {
-            positionBtn.style.background = 'linear-gradient(135deg, rgba(0,150,255,0.4), rgba(0,120,200,0.4))';
-            positionBtn.style.borderLeftColor = '#00aaff';
-        };
-        positionBtn.onmouseleave = () => {
-            positionBtn.style.background = 'linear-gradient(135deg, rgba(0,150,255,0.2), rgba(0,120,200,0.2))';
-            positionBtn.style.borderLeftColor = '#0099ff';
-        };
-        controlsContainer.appendChild(positionBtn);
-    }
-    
-    document.body.appendChild(controlsContainer);
-}
-
-// Hide object edit controls
-function hideObjectEditControls() {
-    const controls = document.getElementById('objectEditControls');
-    if (controls) {
-        controls.remove();
-    }
-    
-    const positionControls = document.getElementById('positionControls');
-    if (positionControls) {
-        positionControls.remove();
-    }
-}
-
-// Delete selected object
-function deleteSelectedObject() {
-    if (selectedObject) {
-        const index = placedObjects.indexOf(selectedObject);
-        if (index > -1) {
-            placedObjects.splice(index, 1);
-            selectedObject = null;
-            hideObjectEditControls();
-            renderMapCreatorCanvas();
-            console.log('✓ Object deleted');
-        }
-    }
-}
-
-// Show position controls for buildings
-function showPositionControls() {
-    // Hide main controls
-    hideObjectEditControls();
-    
-    // Create position controls container
-    const controlsContainer = document.createElement('div');
-    controlsContainer.id = 'positionControls';
-    controlsContainer.style.cssText = `
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, rgba(8,18,28,0.95), rgba(12,22,32,0.95));
-        border: 2px solid rgba(0,247,255,0.6);
-        border-left: 4px solid #00f7ff;
-        padding: 15px 20px;
-        z-index: 99998;
-        color: white;
-        backdrop-filter: blur(15px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-        border-radius: 0;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    `;
-    
-    // Title
-    const title = document.createElement('div');
-    title.textContent = 'CHANGE DIRECTION:';
-    title.style.cssText = 'color: #00f7ff; font-weight: bold; margin-right: 15px; font-size: 14px;';
-    controlsContainer.appendChild(title);
-    
-    // Direction buttons
-    const directions = [
-        { name: 'FRONT', dir: 'front', icon: '↑' },
-        { name: 'BACK', dir: 'back', icon: '↓' },
-        { name: 'LEFT', dir: 'left', icon: '←' },
-        { name: 'RIGHT', dir: 'right', icon: '→' }
-    ];
-    
-    directions.forEach(direction => {
-        const btn = document.createElement('button');
-        btn.innerHTML = `${direction.icon} ${direction.name}`;
-        btn.style.cssText = `
-            padding: 8px 12px;
-            background: linear-gradient(135deg, rgba(0,150,255,0.2), rgba(0,120,200,0.2));
-            border: 1px solid rgba(0,180,255,0.5);
-            border-left: 3px solid #0099ff;
-            color: #00aaff;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 11px;
-            transition: all 0.2s;
-            border-radius: 0;
-        `;
-        
-        // Highlight current direction
-        if (selectedObject && selectedObject.asset.direction === direction.dir) {
-            btn.style.background = 'linear-gradient(135deg, rgba(0,200,255,0.4), rgba(0,160,220,0.4))';
-            btn.style.borderLeftColor = '#00ccff';
-        }
-        
-        btn.onclick = () => changeObjectDirection(direction.dir);
-        btn.onmouseenter = () => {
-            btn.style.background = 'linear-gradient(135deg, rgba(0,150,255,0.4), rgba(0,120,200,0.4))';
-            btn.style.borderLeftColor = '#00aaff';
-        };
-        btn.onmouseleave = () => {
-            const isActive = selectedObject && selectedObject.asset.direction === direction.dir;
-            btn.style.background = isActive ? 
-                'linear-gradient(135deg, rgba(0,200,255,0.4), rgba(0,160,220,0.4))' :
-                'linear-gradient(135deg, rgba(0,150,255,0.2), rgba(0,120,200,0.2))';
-            btn.style.borderLeftColor = isActive ? '#00ccff' : '#0099ff';
-        };
-        
-        controlsContainer.appendChild(btn);
-    });
-    
-    // Back button
-    const backBtn = document.createElement('button');
-    backBtn.innerHTML = '← BACK';
-    backBtn.style.cssText = `
-        padding: 8px 15px;
-        background: linear-gradient(135deg, rgba(100,100,100,0.2), rgba(80,80,80,0.2));
-        border: 1px solid rgba(150,150,150,0.5);
-        border-left: 3px solid #999999;
-        color: #cccccc;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 12px;
-        transition: all 0.2s;
-        border-radius: 0;
-        margin-left: 10px;
-    `;
-    backBtn.onclick = () => {
-        hideObjectEditControls();
-        showObjectEditControls(selectedObject);
-    };
-    backBtn.onmouseenter = () => {
-        backBtn.style.background = 'linear-gradient(135deg, rgba(100,100,100,0.4), rgba(80,80,80,0.4))';
-        backBtn.style.borderLeftColor = '#bbbbbb';
-    };
-    backBtn.onmouseleave = () => {
-        backBtn.style.background = 'linear-gradient(135deg, rgba(100,100,100,0.2), rgba(80,80,80,0.2))';
-        backBtn.style.borderLeftColor = '#999999';
-    };
-    controlsContainer.appendChild(backBtn);
-    
-    document.body.appendChild(controlsContainer);
-}
-
-// Change object direction
-function changeObjectDirection(newDirection) {
-    if (selectedObject && selectedObject.asset.viewFolder === 'Buildings') {
-        // Update asset direction
-        selectedObject.asset.direction = newDirection;
-        
-        // Update image path
-        const viewFolderName = 'top_down_view';
-        const fileName = selectedObject.asset.fileName;
-        const folder = selectedObject.asset.folder;
-        const viewFolder = selectedObject.asset.viewFolder;
-        
-        // Handle special cases for direction suffix
-        let directionSuffix = newDirection;
-        if (newDirection === 'right' && fileName === 'farm_field' && viewFolder === 'Buildings') {
-            directionSuffix = 'right_';
-        }
-        
-        const newImagePath = `/assets/tank/${viewFolder}/${folder}/spr_${viewFolderName}_${fileName}_${directionSuffix}.png`;
-        selectedObject.asset.image = newImagePath;
-        
-        // Load new image
-        const newImg = new Image();
-        newImg.src = newImagePath;
-        newImg.onload = () => {
-            selectedObject.image = newImg;
-            renderMapCreatorCanvas();
-        };
-        
-        // Update position controls to show new active direction
-        showPositionControls();
-        
-        console.log('✓ Changed object direction to:', newDirection);
-    }
 }
 
 // Create minimap viewer dynamically
@@ -1663,7 +1162,7 @@ function updateMinimapViewer() {
                         groundType = customTile.type; // Extract the type from the object
                     } else {
                         // Use ground12 as default (same as main canvas)
-                        groundType = 'tank/Grounds/Sand.png';
+                        groundType = 'ground12';
                     }
 
                     const groundImg = groundTextureImages.get(groundType);
@@ -1771,21 +1270,6 @@ function closeBlankMapCreator() {
         helpTooltip.remove();
     }
 
-    // Reset edit button state
-    const editButton = document.getElementById('mapCreatorEditButton');
-    if (editButton) {
-        editButton.classList.remove('active');
-        editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> EDIT';
-    }
-
-    // Remove edit controls
-    hideObjectEditControls();
-
-    // Reset edit mode
-    isEditMode = false;
-    selectedObject = null;
-    hoveredObject = null;
-
     // Show the create new map button again
     createInteractiveElements();
 }
@@ -1822,6 +1306,10 @@ function switchAssetCategory(category) {
                 btn.style.background = 'rgba(139, 69, 19, 0.5)';
                 btn.style.borderColor = 'rgba(139, 69, 19, 0.8)';
                 btn.style.color = '#d2691e';
+            } else if (category === 'asteroids') {
+                btn.style.background = 'rgba(255, 165, 0, 0.4)';
+                btn.style.borderColor = 'rgba(255, 165, 0, 0.8)';
+                btn.style.color = '#ffa500';
             } else {
                 btn.style.background = 'rgba(0, 247, 255, 0.3)';
                 btn.style.borderColor = '#00f7ff';
@@ -1832,6 +1320,10 @@ function switchAssetCategory(category) {
             if (btn.dataset.category === 'ground') {
                 btn.style.background = 'rgba(139, 69, 19, 0.3)';
                 btn.style.borderColor = 'rgba(139, 69, 19, 0.6)';
+                btn.style.color = 'rgba(255, 255, 255, 0.8)';
+            } else if (btn.dataset.category === 'asteroids') {
+                btn.style.background = 'rgba(255, 165, 0, 0.2)';
+                btn.style.borderColor = 'rgba(255, 165, 0, 0.6)';
                 btn.style.color = 'rgba(255, 255, 255, 0.8)';
             } else {
                 btn.style.background = 'rgba(0, 247, 255, 0.2)';
@@ -1901,133 +1393,7 @@ const objectFileNameMap = {
 };
 
 function loadAssets(category) {
-    let assetsGrid = document.getElementById('assetsGrid');
-
-    // If assets grid doesn't exist in the HTML, create it
-    if (!assetsGrid) {
-        // Create assets grid in the existing HTML panel
-        const assetsPanel = document.getElementById('assetsPanel');
-        if (assetsPanel) {
-            assetsGrid = document.createElement('div');
-            assetsGrid.id = 'assetsGrid';
-            assetsGrid.className = 'assets-grid';
-            assetsPanel.appendChild(assetsGrid);
-        }
-    }
-
-    // If still no assets grid and no HTML panel exists, create a floating panel
-    if (!assetsGrid) {
-        const assetsPanel = document.createElement('div');
-        assetsPanel.id = 'assetsPanel';
-        assetsPanel.style.cssText = 'position: fixed; right: 15px; top: 70px; width: 320px; max-height: 85vh; overflow: hidden; background: linear-gradient(180deg, rgba(8,18,28,0.98), rgba(12,22,32,0.98)); border-left: 4px solid #00f7ff; border-top: 2px solid rgba(0,247,255,0.6); border-bottom: 2px solid rgba(0,247,255,0.6); border-right: 1px solid rgba(0,247,255,0.3); padding: 0; z-index: 100000; color: white; box-shadow: -8px 0 30px rgba(0,0,0,0.7), 0 0 20px rgba(0,247,255,0.2); backdrop-filter: blur(20px); border-radius: 0;';
-
-        // Header section
-        const header = document.createElement('div');
-        header.style.cssText = 'padding: 18px 20px; background: linear-gradient(90deg, rgba(0,247,255,0.12), rgba(0,200,220,0.08)); border-bottom: 2px solid rgba(0,247,255,0.3); margin-bottom: 0; border-radius: 0;';
-        header.innerHTML = '<div style="font-size: 16px; font-weight: bold; color: #00f7ff; text-shadow: 0 0 8px rgba(0,247,255,0.4); letter-spacing: 1px;">MAP ASSETS</div><div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 3px;">Select objects to place on map</div>';
-        assetsPanel.appendChild(header);
-
-        // Control section (for unselect button - will be shown/hidden dynamically)
-        const controlSection = document.createElement('div');
-        controlSection.id = 'assetControlSection';
-        controlSection.style.cssText = 'padding: 15px 20px; border-bottom: 1px solid rgba(0,247,255,0.2); display: none;';
-        
-        // Unselect button
-        const unselectBtn = document.createElement('button');
-        unselectBtn.innerHTML = '<span style="margin-right: 8px;">✖</span>CLEAR SELECTION';
-        unselectBtn.style.cssText = 'width:100%; padding:12px; background: linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15)); border: 1px solid rgba(255,80,80,0.4); border-left: 3px solid #ff4444; color:#ff6666; cursor:pointer; font-weight:600; font-size:12px; letter-spacing:0.5px; transition:all 0.2s; text-align:left; border-radius: 0;';
-        unselectBtn.onclick = () => {
-            selectedAsset = null;
-            updateAssetSelection();
-            renderMapCreatorCanvas();
-        };
-        unselectBtn.onmouseenter = () => {
-            unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.25), rgba(220,40,40,0.25))';
-            unselectBtn.style.borderLeftColor = '#ff6666';
-            unselectBtn.style.transform = 'translateX(2px)';
-        };
-        unselectBtn.onmouseleave = () => {
-            unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15))';
-            unselectBtn.style.borderLeftColor = '#ff4444';
-            unselectBtn.style.transform = 'translateX(0)';
-        };
-        controlSection.appendChild(unselectBtn);
-        assetsPanel.appendChild(controlSection);
-
-        // Category section
-        const categorySection = document.createElement('div');
-        categorySection.style.cssText = 'padding: 15px 20px; border-bottom: 1px solid rgba(0,247,255,0.15);';
-        
-        const categoryLabel = document.createElement('div');
-        categoryLabel.textContent = 'CATEGORIES';
-        categoryLabel.style.cssText = 'font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 10px; letter-spacing: 1px;';
-        categorySection.appendChild(categoryLabel);
-        
-        const catGrid = document.createElement('div');
-        catGrid.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 8px;';
-        
-        const categories = [
-            { id: 'ground', name: 'GROUND', icon: '🌱' },
-            { id: 'buildings', name: 'BUILDS', icon: '🏗️' },
-            { id: 'tanks', name: 'TANKS', icon: '🚗' }
-        ];
-        
-        categories.forEach(cat => {
-            const b = document.createElement('button');
-            b.className = 'asset-category-btn';
-            b.dataset.category = cat.id;
-            b.innerHTML = `<div style="font-size: 14px; margin-bottom: 2px;">${cat.icon}</div><div style="font-size: 10px; font-weight: 600; letter-spacing: 0.5px;">${cat.name}</div>`;
-            b.style.cssText = 'padding: 12px 8px; background: linear-gradient(135deg, rgba(0,247,255,0.08), rgba(0,200,220,0.05)); border: 1px solid rgba(0,247,255,0.2); border-left: 2px solid rgba(0,247,255,0.4); color: #00f7ff; cursor: pointer; transition: all 0.2s; text-align: center; border-radius: 0;';
-            b.onclick = () => switchAssetCategory(cat.id);
-            b.onmouseenter = () => {
-                b.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.2), rgba(0,200,220,0.15))';
-                b.style.borderLeftColor = '#00f7ff';
-                b.style.transform = 'translateX(2px)';
-            };
-            b.onmouseleave = () => {
-                b.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.08), rgba(0,200,220,0.05))';
-                b.style.borderLeftColor = 'rgba(0,247,255,0.4)';
-                b.style.transform = 'translateX(0)';
-            };
-            catGrid.appendChild(b);
-        });
-        
-        categorySection.appendChild(catGrid);
-        assetsPanel.appendChild(categorySection);
-
-        // Scrollable content area
-        const contentArea = document.createElement('div');
-        contentArea.style.cssText = 'flex: 1; overflow-y: auto; max-height: calc(85vh - 200px);';
-        
-        // Assets grid container
-        assetsGrid = document.createElement('div');
-        assetsGrid.id = 'assetsGrid';
-        assetsGrid.style.cssText = 'padding: 15px 20px; display: flex; flex-direction: column; gap: 6px;';
-        
-        contentArea.appendChild(assetsGrid);
-        assetsPanel.appendChild(contentArea);
-        
-        // Add custom scrollbar styling
-        const style = document.createElement('style');
-        style.textContent = `
-            #assetsPanel div::-webkit-scrollbar {
-                width: 6px;
-            }
-            #assetsPanel div::-webkit-scrollbar-track {
-                background: rgba(0,0,0,0.2);
-            }
-            #assetsPanel div::-webkit-scrollbar-thumb {
-                background: linear-gradient(180deg, #00f7ff, #0099cc);
-                border-radius: 0;
-            }
-            #assetsPanel div::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(180deg, #33ffff, #00ccff);
-            }
-        `;
-        document.head.appendChild(style);
-
-        document.body.appendChild(assetsPanel);
-    }
+    const assetsGrid = document.getElementById('assetsGrid');
     assetsGrid.innerHTML = '';
 
     // If we're viewing a specific object's files, show those
@@ -2036,26 +1402,26 @@ function loadAssets(category) {
         return;
     }
 
-    // Ground PNG textures (use tank asset folder)
+    // Ground PNG textures - all 18 ground tiles
     const groundTextures = [
-        { name: 'Water', type: 'water', file: 'tank/Grounds/water.png' },
-        { name: 'Blue Grass', type: 'bluegrass', file: 'tank/Grounds/BlueGrass.png' },
-        { name: 'Brown Cobblestone', type: 'browncobble', file: 'tank/Grounds/BrownCobblestone.png' },
-        { name: 'Brown Grass', type: 'browngrass', file: 'tank/Grounds/BrownGrass.png' },
-        { name: 'Gold Cobblestone', type: 'goldcobble', file: 'tank/Grounds/Goldcobblestone.png' },
-        { name: 'Golden Cobblestone', type: 'goldencobble', file: 'tank/Grounds/GoldenCobblestone.png' },
-        { name: 'Gray Ground', type: 'grayground', file: 'tank/Grounds/GrayGround.png' },
-        { name: 'Green Grass', type: 'greengrass', file: 'tank/Grounds/GreenGrass.png' },
-        { name: 'Light Brown Cobblestone', type: 'lightbrowncobble', file: 'tank/Grounds/LightBrownCobblestone.png' },
-        { name: 'Light Grey Cobblestone', type: 'lightgreycobble', file: 'tank/Grounds/LightGreyCobblestone.png' },
-        { name: 'Light Grey Ground', type: 'lightgreyground', file: 'tank/Grounds/LightGreyGround.png' },
-        { name: 'Light Sand', type: 'lightsand', file: 'tank/Grounds/LightSand.png' },
-        { name: 'Purple Cobblestone', type: 'purplecobble', file: 'tank/Grounds/PurpleCobblestone.png' },
-        { name: 'Red Cobblestone', type: 'redcobble', file: 'tank/Grounds/RedCobblestone.png' },
-        { name: 'Sand', type: 'sand', file: 'tank/Grounds/Sand.png' },
-        { name: 'Wooden Planks', type: 'woodenplanks', file: 'tank/Grounds/WoodenPlanks.png' },
-        { name: 'Wooden Tile', type: 'woodentile', file: 'tank/Grounds/WoodenTile.png' },
-        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' }
+        { name: 'Ground 1', type: 'ground1', file: 'Grounds/_Group_.png' },
+        { name: 'Ground 2', type: 'ground2', file: 'Grounds/_Group_ (1).png' },
+        { name: 'Ground 3', type: 'ground3', file: 'Grounds/_Group_ (2).png' },
+        { name: 'Ground 4', type: 'ground4', file: 'Grounds/_Group_ (3).png' },
+        { name: 'Ground 5', type: 'ground5', file: 'Grounds/_Group_ (4).png' },
+        { name: 'Ground 6', type: 'ground6', file: 'Grounds/_Group_ (5).png' },
+        { name: 'Ground 7', type: 'ground7', file: 'Grounds/_Group_ (6).png' },
+        { name: 'Ground 8', type: 'ground8', file: 'Grounds/_Group_ (7).png' },
+        { name: 'Ground 9', type: 'ground9', file: 'Grounds/_Group_ (8).png' },
+        { name: 'Ground 10', type: 'ground10', file: 'Grounds/_Group_ (9).png' },
+        { name: 'Ground 11', type: 'ground11', file: 'Grounds/_Group_ (10).png' },
+        { name: 'Ground 12', type: 'ground12', file: 'Grounds/_Group_ (11).png' },
+        { name: 'Ground 13', type: 'ground13', file: 'Grounds/_Group_ (12).png' },
+        { name: 'Ground 14', type: 'ground14', file: 'Grounds/_Group_ (13).png' },
+        { name: 'Ground 15', type: 'ground15', file: 'Grounds/_Group_ (14).png' },
+        { name: 'Ground 16', type: 'ground16', file: 'Grounds/_Group_ (15).png' },
+        { name: 'Ground 17', type: 'ground17', file: 'Grounds/_Group_ (16).png' },
+        { name: 'Ground 18', type: 'ground18', file: 'Grounds/_Group_ (17).png' }
     ];
 
     // Show only ground textures if ground category is selected
@@ -2072,52 +1438,28 @@ function loadAssets(category) {
                 image: `/assets/${ground.file}`,
                 isFolder: false,
                 isGround: true,
-                // Use the file path as the groundType key so it matches
-                // the keys stored in `groundTextureImages` (they are stored
-                // by filename like 'tank/Grounds/BlueGrass.png').
-                groundType: ground.file,
+                groundType: ground.type,
                 groundFile: ground.file
             };
 
             assetItem.onclick = () => selectAsset(asset, assetItem);
 
             assetItem.innerHTML = `
-                <div style="width: 55px; height: 55px; background: linear-gradient(145deg, rgba(0,247,255,0.1), rgba(0,200,220,0.05)); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(0,247,255,0.3); transition: all 0.2s;">
+                <div style="width: 50px; height: 50px; background: rgba(20, 30, 50, 0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,255,255,0.2);">
                     <img src="/assets/${ground.file}" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; margin-left: 12px;">
-                    <div style="color: #00f7ff; font-size: 14px; font-weight: bold; text-shadow: 0 0 5px rgba(0,247,255,0.3);">${asset.name}</div>
-                    <div style="color: rgba(255, 255, 255, 0.6); font-size: 11px;">Ground Texture</div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                    <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
+                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 11px;">Click to paint</div>
                 </div>
             `;
-            
-            // Modern asset item styling
-            assetItem.style.cssText = 'display: flex; align-items: center; padding: 12px; margin-bottom: 8px; cursor: pointer; background: linear-gradient(90deg, rgba(0,247,255,0.03), rgba(0,200,220,0.01)); border-left: 3px solid rgba(0,247,255,0.2); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(0,0,0,0.2); transition: all 0.2s; position: relative; border-radius: 0;';
-            
-            // Add subtle line accent
-            const lineAccent = document.createElement('div');
-            lineAccent.style.cssText = 'position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, transparent, #00f7ff, transparent); opacity: 0; transition: opacity 0.2s;';
-            assetItem.appendChild(lineAccent);
-            
-            assetItem.onmouseenter = () => {
-                assetItem.style.background = 'linear-gradient(90deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04))';
-                assetItem.style.borderLeftColor = '#00f7ff';
-                assetItem.style.transform = 'translateX(4px)';
-                lineAccent.style.opacity = '1';
-            };
-            assetItem.onmouseleave = () => {
-                assetItem.style.background = 'linear-gradient(90deg, rgba(0,247,255,0.03), rgba(0,200,220,0.01))';
-                assetItem.style.borderLeftColor = 'rgba(0,247,255,0.2)';
-                assetItem.style.transform = 'translateX(0)';
-                lineAccent.style.opacity = '0';
-            };
 
             assetsGrid.appendChild(assetItem);
         });
 
         // Add info message
         const infoMsg = document.createElement('div');
-        infoMsg.style.cssText = 'padding: 15px; margin-top: 10px; background: rgba(0, 247, 255, 0.1); border: 1px solid rgba(0, 247, 255, 0.3); border-left: 3px solid #00f7ff; color: rgba(255, 255, 255, 0.7); font-size: 12px; line-height: 1.5; border-radius: 0;';
+        infoMsg.style.cssText = 'padding: 15px; margin-top: 10px; background: rgba(0, 247, 255, 0.1); border: 1px solid rgba(0, 247, 255, 0.3); border-radius: 8px; color: rgba(255, 255, 255, 0.7); font-size: 12px; line-height: 1.5;';
         infoMsg.innerHTML = `
             <div style="font-weight: 600; color: #00f7ff; margin-bottom: 5px;">🎨 Ground Texture Painting</div>
             Select a ground texture and click on the map to paint tiles!<br>
@@ -2128,7 +1470,57 @@ function loadAssets(category) {
         return;
     }
 
+    // Show asteroids category
+    if (category === 'asteroids') {
+        const asteroidSizes = ['Large 1', 'Large 2', 'Medium 1', 'Medium 2', 'Small 1', 'Small 2'];
+        const asteroidTypes = ['Rock', 'Ice', 'Gold'];
 
+        asteroidSizes.forEach(size => {
+            asteroidTypes.forEach(type => {
+                const assetItem = document.createElement('div');
+                assetItem.className = 'asset-item-list';
+
+                // Use first frame of asteroid animation
+                const imagePath = `/assets/Asteroids/Asteroid ${size}/${type}/spr_asteroids_${size.toLowerCase().replace(' ', '')}_${type.toLowerCase()}_01.png`;
+
+                const asset = {
+                    name: `${size} ${type} Asteroid`,
+                    folder: 'Asteroids',
+                    fileName: `spr_asteroids_${size.toLowerCase().replace(' ', '')}_${type.toLowerCase()}_01.png`,
+                    image: imagePath,
+                    isFolder: false,
+                    asteroidSize: size,
+                    asteroidType: type
+                };
+
+                assetItem.onclick = () => selectAsset(asset, assetItem);
+
+                assetItem.innerHTML = `
+                    <div style="width: 50px; height: 50px; background: rgba(20, 30, 50, 0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,165,0,0.2);">
+                        <img src="${imagePath}" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                        <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
+                        <div style="color: rgba(255, 165, 0, 0.6); font-size: 11px;">Click to place</div>
+                    </div>
+                `;
+
+                assetsGrid.appendChild(assetItem);
+            });
+        });
+
+        // Add info message
+        const infoMsg = document.createElement('div');
+        infoMsg.style.cssText = 'padding: 15px; margin-top: 10px; background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); border-radius: 8px; color: rgba(255, 255, 255, 0.7); font-size: 12px; line-height: 1.5;';
+        infoMsg.innerHTML = `
+            <div style="font-weight: 600; color: #ffa500; margin-bottom: 5px;">🌌 Asteroid Placement</div>
+            Select an asteroid and click on the map to place it!<br>
+            Asteroids add visual interest and obstacles to your battle arena.
+        `;
+        assetsGrid.appendChild(infoMsg);
+
+        return;
+    }
 
     // Show buildings category
     if (category === 'buildings') {
@@ -2153,7 +1545,7 @@ function loadAssets(category) {
                 frontName = 'font'; // Typo in actual file
             }
 
-            const imagePath = `/assets/tank/${viewFolder}/${objName}/spr_${viewFolderName}_${fileName}_${frontName}.png`;
+            const imagePath = `/assets/${viewFolder}/${objName}/spr_${viewFolderName}_${fileName}_${frontName}.png`;
 
             const asset = {
                 name: objName.replace(/_/g, ' '),
@@ -2179,52 +1571,6 @@ function loadAssets(category) {
 
             assetsGrid.appendChild(assetItem);
         });
-        
-        return;
-    }
-
-    // Show tanks/vehicles category
-    if (category === 'tanks' || category === 'vehicles') {
-        const colors = ['blue', 'camo', 'desert', 'purple', 'red'];
-
-        colors.forEach(color => {
-            const assetItem = document.createElement('div');
-            assetItem.className = 'asset-item-list';
-
-            // Prefer the halftrack body PNG, fallback to tracks image
-            let imagePath = `/assets/tank/tanks/${color}/${color}_body_halftrack.png`;
-            // Some folders use different naming - provide fallback
-            const fallback = `/assets/tank/tanks/${color}/${color}_body_tracks.png`;
-
-            const asset = {
-                name: `${color.charAt(0).toUpperCase() + color.slice(1)} Tank`,
-                folder: color,
-                fileName: imagePath.split('/').pop(),
-                image: imagePath,
-                isFolder: false
-            };
-
-            assetItem.onclick = () => selectAsset(asset, assetItem);
-
-            assetItem.innerHTML = `
-                <div style="width: 50px; height: 50px; background: rgba(20, 30, 50, 0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,255,255,0.08);">
-                    <img src="${imagePath}" onerror="this.src='${fallback}'" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: contain;">
-                </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-                    <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
-                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 11px;">Click to place</div>
-                </div>
-            `;
-
-            assetsGrid.appendChild(assetItem);
-        });
-
-        const infoMsg = document.createElement('div');
-        infoMsg.style.cssText = 'padding: 12px; margin-top: 10px; background: rgba(0, 247, 255, 0.04); border: 1px solid rgba(0, 247, 255, 0.06); border-radius: 8px; color: rgba(255,255,255,0.7); font-size: 12px;';
-        infoMsg.innerHTML = '<strong>Vehicles:</strong> Select a tank to place a vehicle prefab. Use the palette to select colors.';
-        assetsGrid.appendChild(infoMsg);
-
-        return;
     }
 }
 
@@ -2285,7 +1631,7 @@ function loadObjectFiles(asset) {
             directionSuffix = 'right_';
         }
 
-        const imagePath = `/assets/tank/${asset.viewFolder}/${asset.folder}/spr_${viewFolderName}_${fileName}_${directionSuffix}.png`;
+        const imagePath = `/assets/${asset.viewFolder}/${asset.folder}/spr_${viewFolderName}_${fileName}_${directionSuffix}.png`;
 
         const fileAsset = {
             name: `${asset.name} ${direction}`,
@@ -2318,62 +1664,13 @@ function selectAsset(asset, element) {
 
     // Update visual selection
     document.querySelectorAll('.asset-item-list').forEach(item => {
-        item.style.background = 'linear-gradient(90deg, rgba(0,247,255,0.03), rgba(0,200,220,0.01))';
-        item.style.borderLeftColor = 'rgba(0,247,255,0.2)';
+        item.style.background = 'transparent';
+        item.style.borderColor = 'transparent';
     });
-    element.style.background = 'linear-gradient(90deg, rgba(100,150,255,0.15), rgba(80,120,200,0.1))';
-    element.style.borderLeftColor = 'rgba(100,150,255,0.6)';
-
-    // Update asset selection UI
-    updateAssetSelection();
+    element.style.background = 'rgba(100, 150, 255, 0.15)';
+    element.style.borderColor = 'rgba(100, 150, 255, 0.4)';
 
     console.log('Selected asset:', asset.name);
-    // Force a render so hover/preview updates immediately after selection
-    renderMapCreatorCanvas();
-}
-
-// Function to show/hide unselect button based on selection
-function updateAssetSelection() {
-    const controlSection = document.getElementById('assetControlSection');
-    if (controlSection) {
-        if (selectedAsset) {
-            controlSection.style.display = 'block';
-        } else {
-            controlSection.style.display = 'none';
-        }
-    }
-}
-
-// Function to unselect current asset (called from HTML button)
-function unselectCurrentAsset() {
-    selectedAsset = null;
-    updateAssetSelection();
-    
-    // Clear visual selection from all asset items
-    document.querySelectorAll('.asset-item-list').forEach(item => {
-        item.style.background = 'linear-gradient(90deg, rgba(0,247,255,0.03), rgba(0,200,220,0.01))';
-        item.style.borderLeftColor = 'rgba(0,247,255,0.2)';
-    });
-    
-    renderMapCreatorCanvas();
-    console.log('Asset unselected');
-}
-
-// Initialize unselect button hover effects
-function initializeUnselectButton() {
-    const unselectBtn = document.getElementById('unselectAssetBtn');
-    if (unselectBtn) {
-        unselectBtn.onmouseenter = () => {
-            unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.25), rgba(220,40,40,0.25))';
-            unselectBtn.style.borderLeftColor = '#ff6666';
-            unselectBtn.style.transform = 'translateX(2px)';
-        };
-        unselectBtn.onmouseleave = () => {
-            unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15))';
-            unselectBtn.style.borderLeftColor = '#ff4444';
-            unselectBtn.style.transform = 'translateX(0)';
-        };
-    }
 }
 
 
@@ -2446,12 +1743,12 @@ function saveMap() {
             } else {
                 // Use same logic as drawGroundSamples: water at edges, grass in center
                 let groundType, groundImage;
-                if (distFromMapCenter > MAP_RADIUS * 0.60) {
-                    groundType = 'tank/Grounds/water.png';  // Water at outer edges (even bigger area)
-                    groundImage = '/assets/tank/Grounds/water.png';
+                if (distFromMapCenter > MAP_RADIUS * 0.85) {
+                    groundType = 'ground1';  // Water at outer edges
+                    groundImage = '/assets/Grounds/_Group_.png';
                 } else {
-                    groundType = 'tank/Grounds/Sand.png'; // Default ground in center
-                    groundImage = '/assets/tank/Grounds/Sand.png';
+                    groundType = 'ground13'; // Default ground in center
+                    groundImage = '/assets/Grounds/_Group_ (12).png';
                 }
                 
                 tileData = {
@@ -2583,13 +1880,17 @@ function initMapCreatorCanvas() {
         return;
     }
 
-    // Canvas initialized successfully
+    // Test render to make sure canvas is working
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(0, 0, 100, 100);
+    console.log('✅ Test render completed');
 
     // Load custom ground texture
     loadCustomGroundTexture();
 
-    // Add event listeners for interaction (wheel handled by setupSmoothWheelZoom)
+    // Add event listeners for interaction
     canvas.addEventListener('click', handleCanvasClick);
+    canvas.addEventListener('wheel', handleCanvasWheel);
     canvas.addEventListener('mousedown', handleCanvasMouseDown);
     canvas.addEventListener('mousemove', handleCanvasMouseMove);
     canvas.addEventListener('mouseup', handleCanvasMouseUp);
@@ -2652,7 +1953,13 @@ function actualRenderMapCreatorCanvas() {
     ctx.fillStyle = '#0a1a2a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Canvas test pattern removed
+    // Add a test pattern to make sure canvas is working
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(50, 50, 100, 100);
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(200, 50, 100, 100);
+    ctx.fillStyle = '#0000ff';
+    ctx.fillRect(350, 50, 100, 100);
     
     console.log('✅ Test pattern drawn at canvas top');
 
@@ -2671,7 +1978,7 @@ function actualRenderMapCreatorCanvas() {
 
     // Draw isometric water tiles as background
     try {
-        // Water rendering removed
+        drawIsometricWater(ctx, camera, canvas.width / canvasZoom, canvas.height / canvasZoom);
     } catch (error) {
         console.error('❌ Error drawing water:', error);
         // Fallback: draw simple blue background
@@ -2710,38 +2017,6 @@ function actualRenderMapCreatorCanvas() {
         }
     });
 
-    // Draw red X for occupied positions
-    if (showRedX) {
-        ctx.save();
-        
-        // Draw glowing red X
-        const xSize = 40;
-        const xThickness = 6;
-        
-        ctx.strokeStyle = '#ff3333';
-        ctx.lineWidth = xThickness;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#ff3333';
-        ctx.lineCap = 'round';
-        
-        // Draw X lines
-        ctx.beginPath();
-        ctx.moveTo(redXPosition.x - xSize/2, redXPosition.y - xSize/2);
-        ctx.lineTo(redXPosition.x + xSize/2, redXPosition.y + xSize/2);
-        ctx.moveTo(redXPosition.x + xSize/2, redXPosition.y - xSize/2);
-        ctx.lineTo(redXPosition.x - xSize/2, redXPosition.y + xSize/2);
-        ctx.stroke();
-        
-        // Draw red circle background
-        ctx.fillStyle = 'rgba(255, 51, 51, 0.2)';
-        ctx.shadowBlur = 20;
-        ctx.beginPath();
-        ctx.arc(redXPosition.x, redXPosition.y, xSize/2 + 5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.restore();
-    }
-
     // Draw preview of selected asset at mouse position
     if (isHovering && selectedAsset && !isDragging) {
         if (selectedAsset.isGround) {
@@ -2771,45 +2046,6 @@ function actualRenderMapCreatorCanvas() {
             ctx.strokeRect(isoX, isoY, tileWidth, drawHeight);
             ctx.restore();
         } else if (selectedAsset.image) {
-            // Draw glowing grid lines for building snapping
-            if (!selectedAsset.isGround) {
-                ctx.save();
-                const gridSize = 60;
-                const gridColor = '#00f7ff';
-                
-                // Draw glowing grid around cursor
-                ctx.strokeStyle = gridColor;
-                ctx.lineWidth = 1;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = gridColor;
-                ctx.globalAlpha = 0.5;
-                
-                // Draw grid lines in a small area around cursor
-                const gridRange = 300; // How far to draw grid lines
-                const startX = Math.floor((hoverWorldX - gridRange) / gridSize) * gridSize;
-                const endX = Math.ceil((hoverWorldX + gridRange) / gridSize) * gridSize;
-                const startY = Math.floor((hoverWorldY - gridRange) / gridSize) * gridSize;
-                const endY = Math.ceil((hoverWorldY + gridRange) / gridSize) * gridSize;
-                
-                // Vertical lines
-                for (let x = startX; x <= endX; x += gridSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, startY);
-                    ctx.lineTo(x, endY);
-                    ctx.stroke();
-                }
-                
-                // Horizontal lines
-                for (let y = startY; y <= endY; y += gridSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(startX, y);
-                    ctx.lineTo(endX, y);
-                    ctx.stroke();
-                }
-                
-                ctx.restore();
-            }
-            
             // Preview building/object - use cached image from asset
             // Load image if not already loaded
             if (!selectedAsset.previewImage) {
@@ -2831,31 +2067,11 @@ function actualRenderMapCreatorCanvas() {
                 ctx.globalAlpha = 0.6;
                 ctx.drawImage(previewImg, posX, posY, width, height);
 
-                // Draw outline - red if position occupied, cyan if free
+                // Draw outline
                 ctx.globalAlpha = 1.0;
-                const isOccupied = isPositionOccupied(hoverWorldX, hoverWorldY);
-                ctx.strokeStyle = isOccupied ? '#ff3333' : '#00f7ff';
-                ctx.lineWidth = isOccupied ? 3 : 2;
-                if (isOccupied) {
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#ff3333';
-                }
+                ctx.strokeStyle = '#00f7ff';
+                ctx.lineWidth = 2;
                 ctx.strokeRect(posX, posY, width, height);
-                
-                // Draw small red X if occupied
-                if (isOccupied) {
-                    const xSize = 20;
-                    ctx.strokeStyle = '#ff3333';
-                    ctx.lineWidth = 4;
-                    ctx.lineCap = 'round';
-                    ctx.beginPath();
-                    ctx.moveTo(hoverWorldX - xSize/2, hoverWorldY - xSize/2);
-                    ctx.lineTo(hoverWorldX + xSize/2, hoverWorldY + xSize/2);
-                    ctx.moveTo(hoverWorldX + xSize/2, hoverWorldY - xSize/2);
-                    ctx.lineTo(hoverWorldX - xSize/2, hoverWorldY + xSize/2);
-                    ctx.stroke();
-                }
-                
                 ctx.restore();
             }
         }
@@ -2899,7 +2115,7 @@ function actualRenderMapCreatorCanvas() {
 
 function handleCanvasClick(e) {
     console.log('=== CANVAS CLICK EVENT ===');
-    console.log('Button:', e.button, 'isDragging:', isDragging, 'isEditMode:', isEditMode);
+    console.log('Button:', e.button, 'isDragging:', isDragging);
 
     // Only handle left clicks (button 0)
     if (e.button !== 0) {
@@ -2921,20 +2137,6 @@ function handleCanvasClick(e) {
         return;
     }
 
-    // Handle edit mode object selection
-    if (isEditMode) {
-        if (hoveredObject) {
-            selectedObject = hoveredObject;
-            console.log('✓ Selected object for editing:', selectedObject.asset.name);
-            showObjectEditControls(selectedObject);
-        } else {
-            selectedObject = null;
-            hideObjectEditControls();
-        }
-        renderMapCreatorCanvas();
-        return;
-    }
-
     if (!selectedAsset) {
         console.log('❌ No asset selected');
         return;
@@ -2949,16 +2151,9 @@ function handleCanvasClick(e) {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Convert to world space (accounting for zoom and pan) - simple direct conversion
-    let worldX = (mouseX - canvasOffsetX) / canvasZoom;
-    let worldY = (mouseY - canvasOffsetY) / canvasZoom;
-    
-    // Apply the same grid snapping as hover preview for buildings and objects (not ground)
-    if (selectedAsset && !selectedAsset.isGround) {
-        const gridSize = 32; // Same as TANK_GRID_SIZE - matches hover preview exactly
-        worldX = Math.round(worldX / gridSize) * gridSize;
-        worldY = Math.round(worldY / gridSize) * gridSize;
-    }
+    // Convert to world space (accounting for zoom and pan)
+    const worldX = (mouseX - canvasOffsetX) / canvasZoom;
+    const worldY = (mouseY - canvasOffsetY) / canvasZoom;
 
     console.log('✓ Click at world position:', worldX, worldY);
 
@@ -2999,24 +2194,6 @@ function handleCanvasClick(e) {
     img.onload = () => {
         // Only place if image loaded successfully
         if (img.naturalWidth > 0) {
-            // Check for duplicates at this position
-            if (isPositionOccupied(worldX, worldY)) {
-                // Show red X indicator
-                showRedX = true;
-                redXPosition = { x: worldX, y: worldY };
-                
-                // Clear red X after 1 second
-                if (redXTimer) clearTimeout(redXTimer);
-                redXTimer = setTimeout(() => {
-                    showRedX = false;
-                    renderMapCreatorCanvas();
-                }, 1000);
-                
-                renderMapCreatorCanvas();
-                console.log('❌ Cannot place object - position occupied!');
-                return;
-            }
-            
             placedObjects.push({
                 asset: selectedAsset,
                 x: worldX,
@@ -3121,49 +2298,10 @@ function handleCanvasMouseMove(e) {
     lastMouseX = e.clientX - rect.left;
     lastMouseY = e.clientY - rect.top;
 
-    // Calculate world position for hover preview - simple direct conversion
-    let worldX = (lastMouseX - canvasOffsetX) / canvasZoom;
-    let worldY = (lastMouseY - canvasOffsetY) / canvasZoom;
-    
-    // Grid snapping for buildings and objects (not ground) - match tankCreatmap.js
-    if (selectedAsset && !selectedAsset.isGround) {
-        const gridSize = 32; // Same as TANK_GRID_SIZE in tankCreatmap.js
-        worldX = Math.round(worldX / gridSize) * gridSize;
-        worldY = Math.round(worldY / gridSize) * gridSize;
-    }
-    
-    hoverWorldX = worldX;
-    hoverWorldY = worldY;
+    // Calculate world position for hover preview
+    hoverWorldX = (lastMouseX - canvasOffsetX) / canvasZoom;
+    hoverWorldY = (lastMouseY - canvasOffsetY) / canvasZoom;
     isHovering = true;
-
-    // Check for object hovering in edit mode
-    if (isEditMode && !isDragging) {
-        hoveredObject = null;
-        
-        // Check if mouse is over any placed object
-        for (let i = placedObjects.length - 1; i >= 0; i--) {
-            const obj = placedObjects[i];
-            if (obj.image && obj.image.complete && obj.image.naturalWidth > 0) {
-                const width = obj.image.naturalWidth;
-                const height = obj.image.naturalHeight;
-                
-                // Check if mouse is within object bounds
-                if (worldX >= obj.x - width / 2 && worldX <= obj.x + width / 2 &&
-                    worldY >= obj.y - height / 2 && worldY <= obj.y + height / 2) {
-                    hoveredObject = obj;
-                    obj.isHovered = true;
-                    break;
-                }
-            }
-        }
-        
-        // Clear hover state for all other objects
-        placedObjects.forEach(obj => {
-            if (obj !== hoveredObject) {
-                obj.isHovered = false;
-            }
-        });
-    }
 
     if (isDragging) {
         const newOffsetX = e.clientX - dragStartX;
@@ -3281,51 +2419,46 @@ function startPanningLoop() {
 
 // Draw isometric water tiles as background
 function drawIsometricWater(ctx, camera, viewWidth, viewHeight) {
-    // Draw a base water background for the visible area so water is always
-    // visible even when no individual water tiles fall inside the limited draw window.
-    const mapRadiusPixels = 2500;
-    const baseFillPadding = Math.max(viewWidth, viewHeight) * 1.5;
-    ctx.save();
-    ctx.fillStyle = '#2a7ab8';
-    // Fill a generous area around the viewport (in world coordinates)
-    ctx.fillRect(camera.x - baseFillPadding, camera.y - baseFillPadding, viewWidth + baseFillPadding * 2, viewHeight + baseFillPadding * 2);
-    ctx.restore();
+    console.log('🌊 Drawing water tiles...', { camera, viewWidth, viewHeight });
+    
+    const tileWidth = 120;
+    const tileHeight = 30;
+    const drawHeight = 70;
 
-    // Limit water tile iteration to a relatively small window around the viewport center
-    const waterScale = 1.0; // normal tile size
-    const tileWidth = 120 * waterScale;
-    const tileHeight = 30 * waterScale;
-    const drawHeight = 70 * waterScale;
+    // OPTIMIZATION: Calculate visible viewport bounds in world coordinates
+    const viewLeft = camera.x;
+    const viewTop = camera.y;
+    const viewRight = camera.x + viewWidth;
+    const viewBottom = camera.y + viewHeight;
 
-    const centerWorldX = camera.x + viewWidth / 2;
-    const centerWorldY = camera.y + viewHeight / 2;
-    const centerCol = Math.floor(centerWorldX / tileWidth);
-    const centerRow = Math.floor(centerWorldY / tileHeight);
+    // Add generous padding to ensure full screen coverage
+    // Use drawHeight for Y padding since tiles are taller than their spacing
+    const paddingX = tileWidth * 4;
+    const paddingY = drawHeight * 6; // Extra padding for tile overlap
 
-    // Increase coverage ~2x so water appears noticeably larger (more tiles
-    // drawn around the viewport) while keeping each tile the same size.
-    const radiusCols = Math.ceil((viewWidth / tileWidth) * 3.2) + 8;
-    const radiusRows = Math.ceil((viewHeight / tileHeight) * 3.2) + 8;
+    // Calculate tile range - only visible tiles
+    const startCol = Math.floor((viewLeft - paddingX) / tileWidth);
+    const endCol = Math.ceil((viewRight + paddingX) / tileWidth);
+    const startRow = Math.floor((viewTop - paddingY) / tileHeight);
+    const endRow = Math.ceil((viewBottom + paddingY) / tileHeight);
 
-    const maxGridRange = Math.ceil(mapRadiusPixels / tileHeight);
-    const startCol = Math.max(-maxGridRange, centerCol - radiusCols);
-    const endCol = Math.min(maxGridRange, centerCol + radiusCols);
-    const startRow = Math.max(-maxGridRange, centerRow - radiusRows);
-    const endRow = Math.min(maxGridRange, centerRow + radiusRows);
+    console.log('🌊 Water tile range:', { startCol, endCol, startRow, endRow });
 
     let tilesDrawn = 0;
+    // Draw water tiles
     for (let row = startRow; row <= endRow; row++) {
         for (let col = startCol; col <= endCol; col++) {
+            // Calculate isometric position
             const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
             const isoY = row * tileHeight;
 
-            const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
-            if (distFromMapCenter > mapRadiusPixels) continue;
-
+            // Draw water tile with isometric shape
             drawWaterTile(ctx, isoX, isoY, tileWidth, drawHeight);
             tilesDrawn++;
         }
     }
+    
+    console.log('🌊 Drew', tilesDrawn, 'water tiles');
 }
 
 // Draw a single isometric water tile
@@ -3344,7 +2477,7 @@ function drawWaterTile(ctx, x, y, width, height) {
         gradient.addColorStop(0.7, '#2a7ab8');  // Darker blue
         gradient.addColorStop(1, '#1a6aa8');    // Deep blue (bottom-right, shadow)
 
-        // Draw the water diamond (scaled size passed from caller)
+        // Draw the water diamond
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.moveTo(top.x, top.y);
@@ -3455,18 +2588,15 @@ function drawGroundSamples(ctx, camera, viewWidth, viewHeight) {
             const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
             if (distFromMapCenter > mapRadiusPixels) continue;
 
-            // Use water (ground1) at edges, ground12 in center
+            // Use water (ground1) at edges, ground13 in center
             let groundType;
-            if (distFromMapCenter > mapRadiusPixels * 0.60) {
-                groundType = 'tank/Grounds/water.png'; // Water at outer edges (even bigger area)
+            if (distFromMapCenter > mapRadiusPixels * 0.85) {
+                groundType = 'ground1'; // Water at outer edges
             } else {
-                groundType = 'tank/Grounds/Sand.png'; // Default ground in center
+                groundType = 'ground13'; // Default ground in center
             }
 
-            if (!groundTextureImages.has(groundType)) {
-                console.warn('Ground texture not found:', groundType);
-                continue;
-            }
+            if (!groundTextureImages.has(groundType)) continue;
 
             const groundImg = groundTextureImages.get(groundType);
 
@@ -3637,30 +2767,6 @@ if (typeof window !== 'undefined') {
     window.publishMap = publishMap;
     window.getPublishedMaps = getPublishedMaps;
     window.getMostPlayedMap = getMostPlayedMap;
-    window.unselectCurrentAsset = unselectCurrentAsset;
-    window.updateAssetSelection = updateAssetSelection;
-    window.initializeUnselectButton = initializeUnselectButton;
-    window.toggleEditMode = toggleEditMode;
-    window.initializeEditModeButton = initializeEditModeButton;
-    window.loadSavedMaps = loadSavedMaps;
-    
-    console.log('✅ TankMapCreator functions exported to window');
-    
-    // Dispatch event to notify other modules that TankMapCreator is ready
-    if (typeof window.dispatchEvent === 'function') {
-        window.dispatchEvent(new CustomEvent('tankMapCreatorReady'));
-    }
-    
-    // Add fallback functions for safety
-    window.ensureMapCreatorReady = function(callback) {
-        if (typeof window.startCreateMapRendering === 'function' && 
-            typeof window.loadSavedMaps === 'function') {
-            callback();
-        } else {
-            console.warn('Map creator functions not ready, retrying...');
-            setTimeout(() => window.ensureMapCreatorReady(callback), 100);
-        }
-    };
 }
 
 // ========== MAP PUBLISHING SYSTEM ==========
@@ -4028,24 +3134,24 @@ let groundTexturesLoaded = false;
 function loadCustomGroundTexture() {
     // Load all 18 ground PNG textures
     const groundFiles = [
-        'tank/Grounds/water.png',
-        'tank/Grounds/BlueGrass.png',
-        'tank/Grounds/BrownCobblestone.png',
-        'tank/Grounds/BrownGrass.png',
-        'tank/Grounds/Goldcobblestone.png',
-        'tank/Grounds/GoldenCobblestone.png',
-        'tank/Grounds/GrayGround.png',
-        'tank/Grounds/GreenGrass.png',
-        'tank/Grounds/LightBrownCobblestone.png',
-        'tank/Grounds/LightGreyCobblestone.png',
-        'tank/Grounds/LightGreyGround.png',
-        'tank/Grounds/LightSand.png',
-        'tank/Grounds/PurpleCobblestone.png',
-        'tank/Grounds/RedCobblestone.png',
-        'tank/Grounds/Sand.png',
-        'tank/Grounds/WoodenPlanks.png',
-        'tank/Grounds/WoodenTile.png',
-        'tank/Grounds/YellowGrass.png'
+        'Grounds/_Group_.png',
+        'Grounds/_Group_ (1).png',
+        'Grounds/_Group_ (2).png',
+        'Grounds/_Group_ (3).png',
+        'Grounds/_Group_ (4).png',
+        'Grounds/_Group_ (5).png',
+        'Grounds/_Group_ (6).png',
+        'Grounds/_Group_ (7).png',
+        'Grounds/_Group_ (8).png',
+        'Grounds/_Group_ (9).png',
+        'Grounds/_Group_ (10).png',
+        'Grounds/_Group_ (11).png',
+        'Grounds/_Group_ (12).png',
+        'Grounds/_Group_ (13).png',
+        'Grounds/_Group_ (14).png',
+        'Grounds/_Group_ (15).png',
+        'Grounds/_Group_ (16).png',
+        'Grounds/_Group_ (17).png'
     ];
 
     let loadedCount = 0;
@@ -4493,7 +3599,6 @@ function easeOutCubic(t) {
 function smoothCameraUpdate() {
     // Smoothly interpolate zoom with ease-out
     const zoomDiff = targetCanvasZoom - canvasZoom;
-    let didChange = false;
     if (Math.abs(zoomDiff) > 0.001) {
         // Calculate easing factor based on distance (closer = slower)
         const distance = Math.abs(zoomDiff);
@@ -4502,7 +3607,6 @@ function smoothCameraUpdate() {
 
         canvasZoom += zoomDiff * easedFactor;
         window.canvasZoom = canvasZoom;
-        didChange = true;
     }
 
     // Smoothly interpolate position with ease-out
@@ -4517,11 +3621,7 @@ function smoothCameraUpdate() {
 
         canvasOffsetX += offsetXDiff * easedFactor;
         canvasOffsetY += offsetYDiff * easedFactor;
-        didChange = true;
     }
-
-    // If camera changed, request a render so the user sees updated zoom/pan immediately
-    if (didChange) renderMapCreatorCanvas();
 
     requestAnimationFrame(smoothCameraUpdate);
 }
@@ -4755,46 +3855,11 @@ function editMap(mapId) {
     window.currentMapName = map.name;
     window.currentMapId = mapId;
 
-    console.log("Loading map for editing:", map.name);
+    // Load the map data (you'll need to implement loadMap function)
+    console.log('Loading map for editing:', map.name);
 
-    // Open the editor first
+    // Open the editor
     startMapEditor();
-
-    // Wait for the editor to initialize, then load the map data
-    setTimeout(() => {
-        // Ensure ground textures are loaded before loading map
-        if (!groundTexturesLoaded) {
-            console.log("⏳ Waiting for ground textures to load...");
-            const checkTextures = setInterval(() => {
-                if (groundTexturesLoaded) {
-                    clearInterval(checkTextures);
-                    loadMap(map);
-                    console.log("✅ Map loaded for editing:", map.name, "with", map.objects?.length || 0, "objects and", map.groundTiles?.length || 0, "ground tiles");
-                }
-            }, 100);
-        } else {
-            loadMap(map);
-            console.log("✅ Map loaded for editing:", map.name, "with", map.objects?.length || 0, "objects and", map.groundTiles?.length || 0, "ground tiles");
-        }
-    }, 500);
-
-    // Wait for the editor to initialize, then load the map data
-    setTimeout(() => {
-        // Ensure ground textures are loaded before loading map
-        if (!groundTexturesLoaded) {
-            console.log("⏳ Waiting for ground textures to load...");
-            const checkTextures = setInterval(() => {
-                if (groundTexturesLoaded) {
-                    clearInterval(checkTextures);
-                    loadMap(map);
-                    console.log("✅ Map loaded for editing:", map.name, "with", map.objects?.length || 0, "objects and", map.groundTiles?.length || 0, "ground tiles");
-                }
-            }, 100);
-        } else {
-            loadMap(map);
-            console.log("✅ Map loaded for editing:", map.name, "with", map.objects?.length || 0, "objects and", map.groundTiles?.length || 0, "ground tiles");
-        }
-    }, 500);
 }
 
 // Analyze map function
@@ -4839,21 +3904,10 @@ function deleteMap(mapId) {
 // Load saved maps when the page loads
 document.addEventListener('DOMContentLoaded', loadSavedMaps);
 
-// Additional exports (these are already exported in the main block above)
-if (typeof window !== 'undefined') {
-    window.editMap = editMap;
-    window.analyzeMap = analyzeMap;
-    window.deleteMap = deleteMap;
-}
-
-// Editor starters / compatibility exports
-window.startMapEditor = typeof startMapEditor === 'function' ? startMapEditor : function() { console.warn('startMapEditor not defined'); };
-window.startTankEditor = window.startMapEditor;
-window.startJetEditor = function() { alert('Jet editor is not available in this build.'); };
-window.startRaceEditor = function() { alert('Race editor is not available in this build.'); };
-
-// Editor starters / compatibility exports
-window.startMapEditor = typeof startMapEditor === 'function' ? startMapEditor : function() { console.warn('startMapEditor not defined'); };
-window.startTankEditor = window.startMapEditor;
-window.startJetEditor = function() { alert('Jet editor is not available in this build.'); };
-window.startRaceEditor = function() { alert('Race editor is not available in this build.'); };
+// Export functions
+window.loadSavedMaps = loadSavedMaps;
+window.editMap = editMap;
+window.analyzeMap = analyzeMap;
+window.deleteMap = deleteMap; window.de
+leteMap = deleteMap;
+window.openBlankMapCreator = openBlankMapCreator;
