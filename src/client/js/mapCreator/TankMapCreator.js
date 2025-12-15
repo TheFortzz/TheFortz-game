@@ -78,6 +78,7 @@ let playerStatsData = {
 
 // Map creator state
 let isInMapCreator = false;
+let isEditingExistingMap = false;
 
 function startCreateMapRendering() {
     if (createMapAnimationId) return;
@@ -748,7 +749,10 @@ function switchCreateMapTab(tabName) {
 }
 
 function openBlankMapCreator() {
-    console.log('Opening map name input...');
+    console.log('🆕 Opening CREATE NEW MAP flow...');
+    
+    // Reset edit mode flag for new map creation
+    isEditingExistingMap = false;
 
     // Ensure a visible debug banner exists for environments without devtools
     let debugBanner = document.getElementById('mapCreatorDebugBanner');
@@ -950,8 +954,22 @@ function openBlankMapCreator() {
     }
 }
 
-function startMapEditor() {
-    console.log('Starting map editor for:', window.currentMapName);
+function startMapEditor(isEditMode = false) {
+    console.log('Starting map editor for:', window.currentMapName, isEditMode ? '(Edit Mode)' : '(New Map)');
+
+    // Set edit mode flag
+    isEditingExistingMap = isEditMode;
+
+    // Reset all map data for new map (not for edit mode)
+    if (!isEditMode) {
+        spawnPoints = [];
+        placedObjects = [];
+        customGroundTiles.clear();
+        selectedAsset = null;
+        selectedObject = null;
+        hoveredObject = null;
+        console.log('✅ Map data cleared for new map creation');
+    }
 
     // Show blank creator
     const blankCreator = document.getElementById('blankMapCreator');
@@ -986,6 +1004,14 @@ function startMapEditor() {
 
         // Initialize unselect button hover effects
         initializeUnselectButton();
+        
+        // Initialize spawn points counter
+        updateSpawnPointsCounter();
+        
+        // Load saved script if exists
+        loadMapScript();
+        
+        console.log('✅ Map editor initialized successfully');
 
         // Hide debug banner if present (editor opened)
         const debugBanner = document.getElementById('mapCreatorDebugBanner');
@@ -995,162 +1021,30 @@ function startMapEditor() {
     }, 100);
 }
 
-// Create zoom slider dynamically
+// Create zoom slider dynamically (HTML creation removed, keeping function structure)
 function createZoomSlider() {
-    // Check if slider already exists
-    if (document.getElementById('mapCreatorZoomSlider')) {
-        console.log('Zoom slider already exists');
-        return;
-    }
-
-    console.log('Creating zoom slider...');
-
-    // Create the slider container
-    const sliderContainer = document.createElement('div');
-    sliderContainer.id = 'mapCreatorZoomSlider';
-    sliderContainer.className = 'map-creator-zoom-slider';
-    sliderContainer.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 99999;
-        pointer-events: auto;
-    `;
+    console.log('Initializing zoom slider functionality...');
 
     // Initialize edit mode button
     initializeEditModeButton();
-
-    // Create the track
-    const track = document.createElement('div');
-    track.className = 'map-zoom-slider-track';
-    track.style.cssText = `
-        position: relative;
-        width: 250px;
-        height: 10px;
-        background: rgba(0, 0, 0, 0.8);
-        border-radius: 0;
-        border: 3px solid rgba(100, 150, 255, 0.8);
-    `;
-
-    // Create the fill
-    const fill = document.createElement('div');
-    fill.id = 'mapZoomSliderFill';
-    fill.className = 'map-zoom-slider-fill';
-    fill.style.cssText = `
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 0%;
-        background: linear-gradient(90deg, #6496ff, #5080dc);
-        border-radius: 0;
-        pointer-events: none;
-        z-index: 2;
-    `;
-
-    // Create the input
-    const input = document.createElement('input');
-    input.type = 'range';
-    input.id = 'mapZoomSlider';
-    input.className = 'map-zoom-slider';
-    input.min = '0.5';
-    input.max = '3';
-    input.step = '0.1';
-    input.value = '0.5';
-    input.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 0;
-        transform: translateY(-50%);
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-        z-index: 2;
-    `;
-
-    // Create the thumb
-    const thumb = document.createElement('div');
-    thumb.id = 'mapZoomSliderThumb';
-    thumb.className = 'map-zoom-slider-thumb';
-    thumb.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 0%;
-        transform: translate(-50%, -50%);
-        width: 28px;
-        height: 28px;
-        background: linear-gradient(135deg, #6496ff, #5080dc);
-        border: 4px solid #ffffff;
-        border-radius: 50%;
-        box-shadow: 0 0 25px rgba(100, 150, 255, 1), 0 4px 10px rgba(0, 0, 0, 0.7);
-        pointer-events: none;
-        z-index: 3;
-        transition: left 0.1s ease;
-    `;
-
-    // Assemble the slider
-    track.appendChild(fill);
-    track.appendChild(input);
-    track.appendChild(thumb);
-    sliderContainer.appendChild(track);
-
-    // Add to body (not to blankMapCreator to avoid z-index issues)
-    document.body.appendChild(sliderContainer);
-
-    console.log('✅ Zoom slider created and added to body!');
-
-    // Set initial zoom display to 50%
-    const zoomDisplay = document.getElementById('zoomDisplay');
-    if (zoomDisplay) {
-        zoomDisplay.textContent = '50%';
-    }
-
-    // Add event listener for slider input
-    input.addEventListener('input', function (e) {
-        const zoomValue = parseFloat(e.target.value);
-
-        // Update target zoom for smooth interpolation
-        targetCanvasZoom = zoomValue;
-
-        // ALSO update the target camera offset so the zoom centers on the
-        // current screen center (prevents zooming to the original start position)
-        const canvas = document.getElementById('mapCreatorCanvas');
-        if (canvas) {
-            const rect = canvas.getBoundingClientRect();
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            // Calculate world position of the center before zoom
-            const worldX = (centerX - canvasOffsetX) / canvasZoom;
-            const worldY = (centerY - canvasOffsetY) / canvasZoom;
-
-            // Adjust target offsets so the same world point stays at screen center
-            targetCanvasOffsetX = centerX - worldX * zoomValue;
-            targetCanvasOffsetY = centerY - worldY * zoomValue;
+    
+    // Initialize new editor
+    setTimeout(() => {
+        initializeNewEditor();
+        
+        // Ensure assets panel is visible
+        const assetsPanel = document.getElementById('assetsPanel');
+        if (assetsPanel) {
+            assetsPanel.style.display = 'flex';
+            assetsPanel.classList.remove('hidden');
+            console.log('✅ Assets panel made visible');
         }
+    }, 500); // Small delay to ensure DOM is ready
 
-        // Update slider visuals
-        const min = parseFloat(input.min);
-        const max = parseFloat(input.max);
-        const percentage = ((zoomValue - min) / (max - min)) * 100;
+    console.log('✅ Zoom slider functionality initialized (no HTML elements created)');
 
-        fill.style.width = percentage + '%';
-        thumb.style.left = percentage + '%';
-
-        // Update zoom display
-        if (zoomDisplay) {
-            zoomDisplay.textContent = Math.round(zoomValue * 100) + '%';
-        }
-
-        console.log('Zoom target changed to:', zoomValue);
-    });
-
-    console.log('✅ Zoom slider event listener attached!');
-
-    // Create minimap viewer
-    createMinimapViewer();
+    // Initialize spawn points system
+    initializeSpawnPointsSystem();
 }
 
 // Initialize edit mode button (now in HTML)
@@ -1176,10 +1070,10 @@ function toggleEditMode() {
     if (editButton) {
         if (isEditMode) {
             editButton.classList.add('active');
-            editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> EDITING';
+            editButton.innerHTML = '<span class="map-creator-btn-text"><i class="fa-solid fa-pen-to-square"></i></span>';
         } else {
             editButton.classList.remove('active');
-            editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> EDIT';
+            editButton.innerHTML = '<span class="map-creator-btn-text"><i class="fa-solid fa-pen-to-square"></i></span>';
         }
     }
     
@@ -1452,60 +1346,12 @@ function changeObjectDirection(newDirection) {
     }
 }
 
-// Create minimap viewer dynamically
-function createMinimapViewer() {
-    // Check if minimap already exists
-    if (document.getElementById('mapCreatorMinimap')) {
-        console.log('Minimap already exists');
-        return;
-    }
-
-    console.log('Creating minimap viewer...');
-
-    // Create the minimap container
-    const minimapContainer = document.createElement('div');
-    minimapContainer.id = 'mapCreatorMinimap';
-    minimapContainer.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: 180px;
-        height: 180px;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(15px);
-        border-radius: 50%;
-        border: 4px solid rgba(100, 150, 255, 0.6);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 30px rgba(100, 150, 255, 0.3);
-        z-index: 99999;
-        pointer-events: auto;
-        overflow: hidden;
-    `;
-
-    // Create minimap canvas
-    const minimapCanvas = document.createElement('canvas');
-    minimapCanvas.id = 'mapCreatorMinimapCanvas';
-    minimapCanvas.width = 180;
-    minimapCanvas.height = 180;
-    minimapCanvas.style.cssText = `
-        width: 100%;
-        height: 100%;
-        display: block;
-        border-radius: 50%;
-    `;
-
-    // Assemble minimap
-    minimapContainer.appendChild(minimapCanvas);
-
-    // Add to body
-    document.body.appendChild(minimapContainer);
-
-    console.log('✅ Minimap viewer created!');
-
-    // Start updating minimap
-    updateMinimapViewer();
-
+// Initialize spawn points system
+function initializeSpawnPointsSystem() {
     // Create help button
     createHelpButton();
+    
+    console.log('✅ Spawn points system initialized!');
 }
 
 // Create help button with tooltip
@@ -1587,147 +1433,299 @@ function createHelpButton() {
     console.log('✅ Help button created!');
 }
 
-// Update minimap viewer
-function updateMinimapViewer() {
-    const canvas = document.getElementById('mapCreatorMinimapCanvas');
+// Spawn Points System
+let spawnPoints = [];
+let isSpawnPointMode = false;
+
+function showSpawnPointMinimap() {
+    // Create large centered minimap overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'spawnPointOverlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 200000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    `;
+
+    // Create header with spawn point counter
+    const header = document.createElement('div');
+    header.style.cssText = `
+        color: #00f7ff;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px rgba(0, 247, 255, 0.5);
+        text-align: center;
+    `;
+    header.innerHTML = `<span id="spawnPointCounter">${spawnPoints.length}/20</span> Spawn Points`;
+    
+    // Create instructions
+    const instructions = document.createElement('div');
+    instructions.style.cssText = `
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        margin-bottom: 20px;
+        text-align: center;
+        line-height: 1.4;
+    `;
+    instructions.innerHTML = `Left click to place spawn points • Right click to remove spawn points`;
+
+    // Create large minimap container
+    const minimapContainer = document.createElement('div');
+    minimapContainer.style.cssText = `
+        width: 600px;
+        height: 600px;
+        background: rgba(0, 0, 0, 0.9);
+        border: 4px solid #00f7ff;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(0, 247, 255, 0.3);
+    `;
+
+    // Create minimap canvas
+    const minimapCanvas = document.createElement('canvas');
+    minimapCanvas.id = 'spawnPointMinimapCanvas';
+    minimapCanvas.width = 600;
+    minimapCanvas.height = 600;
+    minimapCanvas.style.cssText = `
+        width: 100%;
+        height: 100%;
+        cursor: crosshair;
+    `;
+
+    // Add click handler for placing spawn points
+    minimapCanvas.addEventListener('click', handleSpawnPointClick);
+    
+    // Add right-click handler for removing spawn points
+    minimapCanvas.addEventListener('contextmenu', handleSpawnPointRightClick);
+
+    minimapContainer.appendChild(minimapCanvas);
+
+    // Create close button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕ Close';
+    closeBtn.style.cssText = `
+        margin-top: 20px;
+        padding: 12px 24px;
+        background: rgba(255, 60, 60, 0.2);
+        border: 2px solid #ff4444;
+        color: #ff6666;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.3s;
+    `;
+    closeBtn.onclick = closeSpawnPointMinimap;
+
+    overlay.appendChild(header);
+    overlay.appendChild(instructions);
+    overlay.appendChild(minimapContainer);
+    overlay.appendChild(closeBtn);
+    document.body.appendChild(overlay);
+
+    // Start rendering the minimap
+    renderSpawnPointMinimap();
+}
+
+function handleSpawnPointClick(e) {
+    const canvas = e.target;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Convert canvas coordinates to world coordinates
+    const mapRadius = 2500;
+    const canvasSize = 600;
+    const scale = canvasSize / (mapRadius * 2);
+    
+    const worldX = (x - canvasSize / 2) / scale;
+    const worldY = (y - canvasSize / 2) / scale;
+
+    // Check if within map bounds
+    const distFromCenter = Math.sqrt(worldX * worldX + worldY * worldY);
+    if (distFromCenter > mapRadius) return;
+
+    // Check if we already have 20 spawn points
+    if (spawnPoints.length >= 20) {
+        alert('Maximum 20 spawn points allowed!');
+        return;
+    }
+
+    // Add spawn point
+    spawnPoints.push({ x: worldX, y: worldY });
+    
+    // Update counter in overlay
+    const counter = document.getElementById('spawnPointCounter');
+    if (counter) {
+        counter.textContent = `${spawnPoints.length}/20`;
+    }
+    
+    // Update counter in HTML panel
+    updateSpawnPointsCounter();
+
+    // Re-render minimap
+    renderSpawnPointMinimap();
+}
+
+function handleSpawnPointRightClick(e) {
+    e.preventDefault();
+    
+    const canvas = e.target;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Convert canvas coordinates to world coordinates
+    const mapRadius = 2500;
+    const canvasSize = 600;
+    const scale = canvasSize / (mapRadius * 2);
+    
+    const worldX = (x - canvasSize / 2) / scale;
+    const worldY = (y - canvasSize / 2) / scale;
+
+    // Find closest spawn point within 50 pixels
+    let closestIndex = -1;
+    let closestDistance = Infinity;
+    
+    spawnPoints.forEach((point, index) => {
+        const pointX = canvasSize / 2 + point.x * scale;
+        const pointY = canvasSize / 2 + point.y * scale;
+        const distance = Math.sqrt((x - pointX) ** 2 + (y - pointY) ** 2);
+        
+        if (distance < 20 && distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = index;
+        }
+    });
+
+    // Remove the closest spawn point if found
+    if (closestIndex !== -1) {
+        spawnPoints.splice(closestIndex, 1);
+        
+        // Update counter
+        const counter = document.getElementById('spawnPointCounter');
+        if (counter) {
+            counter.textContent = `${spawnPoints.length}/20`;
+        }
+        
+        // Update HTML counter
+        updateSpawnPointsCounter();
+        
+        // Re-render minimap
+        renderSpawnPointMinimap();
+    }
+}
+
+function renderSpawnPointMinimap() {
+    const canvas = document.getElementById('spawnPointMinimapCanvas');
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = width / 2;
+    const size = 600;
+    const mapRadius = 2500;
+    const scale = size / (mapRadius * 2);
 
     // Clear canvas
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, size, size);
 
-    // Clip to circle
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.clip();
-
-    // Draw ground tiles background - matching main canvas with circular boundary
-    const mapRadiusPixels = 2500; // Same as main canvas map boundary
-    const scale = width / (mapRadiusPixels * 2);
-    const worldTileWidth = 120;
-    const worldTileHeight = 30;
-    const minimapTileWidth = worldTileWidth * scale;
-    const minimapTileHeight = worldTileHeight * scale;
-
-    // Calculate where screen center points to in world coordinates
-    const mainCanvas = document.getElementById('mapCreatorCanvas');
-    const screenCenterWorldX = mainCanvas ? (mainCanvas.width / 2 - canvasOffsetX) / canvasZoom : 0;
-    const screenCenterWorldY = mainCanvas ? (mainCanvas.height / 2 - canvasOffsetY) / canvasZoom : 0;
-
-    // Draw water background first with enhanced color
+    // Draw map background
     ctx.fillStyle = '#2a7ab8';
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, size, size);
 
-    // Draw ground PNG textures if available
-    if (typeof groundTextureImages !== 'undefined' && groundTextureImages.size > 0) {
-        const groundTypes = Array.from(groundTextureImages.keys());
+    // Draw map boundary circle
+    ctx.strokeStyle = '#00f7ff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, mapRadius * scale, 0, Math.PI * 2);
+    ctx.stroke();
 
-        // Calculate visible tile range around screen center
-        const maxGridRange = Math.ceil(mapRadiusPixels / worldTileHeight);
-        const startRow = Math.max(-maxGridRange, Math.floor((screenCenterWorldY - radius / scale) / worldTileHeight));
-        const endRow = Math.min(maxGridRange, Math.ceil((screenCenterWorldY + radius / scale) / worldTileHeight));
-        const startCol = Math.max(-maxGridRange, Math.floor((screenCenterWorldX - radius / scale) / worldTileWidth));
-        const endCol = Math.min(maxGridRange, Math.ceil((screenCenterWorldX + radius / scale) / worldTileWidth));
-
-        for (let row = startRow; row <= endRow; row++) {
-            for (let col = startCol; col <= endCol; col++) {
-                // Calculate isometric position (same as main canvas)
-                const isoX = col * worldTileWidth + (row % 2) * (worldTileWidth / 2);
-                const isoY = row * worldTileHeight;
-
-                // Check if within circular map boundary (world coordinates)
-                const distFromMapCenter = Math.sqrt(isoX * isoX + isoY * isoY);
-                if (distFromMapCenter > mapRadiusPixels) continue;
-
-                // Convert world position to minimap position - tiles move relative to fixed center
-                const minimapX = centerX + (isoX - screenCenterWorldX) * scale;
-                const minimapY = centerY + (isoY - screenCenterWorldY) * scale;
-
-                // Check if tile is within minimap circle
-                const dist = Math.sqrt((minimapX - centerX) ** 2 + (minimapY - centerY) ** 2);
-                if (dist < radius) {
-                    // Check if user placed custom ground tile
-                    const tileKey = `${col},${row}`;
-                    let groundType;
-
-                    if (typeof customGroundTiles !== 'undefined' && customGroundTiles.has(tileKey)) {
-                        // Use custom ground tile placed by user
-                        const customTile = customGroundTiles.get(tileKey);
-                        groundType = customTile.type; // Extract the type from the object
-                    } else {
-                        // Use ground12 as default (same as main canvas)
-                        groundType = 'tank/Grounds/Sand.png';
-                    }
-
-                    const groundImg = groundTextureImages.get(groundType);
-                    if (groundImg && groundImg.complete) {
-                        ctx.drawImage(groundImg, minimapX, minimapY, minimapTileWidth, minimapTileWidth * 0.6);
-                    }
-                }
-            }
-        }
-    }
-
-    // Draw placed objects on minimap - relative to screen center
+    // Draw placed objects
     if (typeof placedObjects !== 'undefined') {
         placedObjects.forEach(obj => {
-            if (obj.image && obj.image.complete && obj.image.naturalWidth > 0) {
-                const objX = centerX + (obj.x - screenCenterWorldX) * scale;
-                const objY = centerY + (obj.y - screenCenterWorldY) * scale;
+            if (obj.image && obj.image.complete) {
+                const objX = size / 2 + obj.x * scale;
+                const objY = size / 2 + obj.y * scale;
+                const objSize = 8;
 
-                // Calculate scaled size for minimap (small version of building)
-                const imgWidth = obj.image.naturalWidth * scale * 0.5; // 50% of actual scale
-                const imgHeight = obj.image.naturalHeight * scale * 0.5;
-
-                // Draw the building image on minimap
-                ctx.save();
-                ctx.globalAlpha = 0.8;
-                ctx.drawImage(
-                    obj.image,
-                    objX - imgWidth / 2,
-                    objY - imgHeight / 2,
-                    imgWidth,
-                    imgHeight
-                );
-                ctx.restore();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fillRect(objX - objSize / 2, objY - objSize / 2, objSize, objSize);
             }
         });
     }
 
-    // Draw FIXED cyan crosshair in center of minimap (matches screen center)
-    // Crosshair stays fixed, ground tiles move around it
-    ctx.strokeStyle = 'rgba(0, 247, 255, 0.9)';
-    ctx.lineWidth = 2;
-    ctx.shadowBlur = 5;
-    ctx.shadowColor = 'rgba(0, 247, 255, 0.5)';
-    ctx.beginPath();
-    // Horizontal line
-    ctx.moveTo(centerX - 10, centerY);
-    ctx.lineTo(centerX + 10, centerY);
-    // Vertical line
-    ctx.moveTo(centerX, centerY - 10);
-    ctx.lineTo(centerX, centerY + 10);
-    ctx.stroke();
+    // Draw spawn points as green circles
+    spawnPoints.forEach((point, index) => {
+        const pointX = size / 2 + point.x * scale;
+        const pointY = size / 2 + point.y * scale;
 
-    // Draw cyan center dot
-    ctx.fillStyle = 'rgba(0, 247, 255, 1)';
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
+        // Green circle
+        ctx.fillStyle = '#00ff00';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(pointX, pointY, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
 
-    ctx.restore();
+        // Number label
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText((index + 1).toString(), pointX, pointY + 4);
+    });
+}
 
-    // Request next frame
-    requestAnimationFrame(updateMinimapViewer);
+function closeSpawnPointMinimap() {
+    const overlay = document.getElementById('spawnPointOverlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+function updateSpawnPointsCounter() {
+    const htmlCounter = document.getElementById('spawnPointsCounter');
+    if (htmlCounter) {
+        htmlCounter.textContent = `${spawnPoints.length}/20`;
+        
+        // Change color based on completion
+        if (spawnPoints.length === 20) {
+            htmlCounter.style.color = '#00ff00'; // Green when complete
+        } else if (spawnPoints.length > 0) {
+            htmlCounter.style.color = '#ffaa00'; // Orange when in progress
+        } else {
+            htmlCounter.style.color = '#00f7ff'; // Cyan when empty
+        }
+    }
+}
+
+// Placeholder function for AI Bot functionality
+function addAIBot() {
+    alert('AI Bot functionality coming soon!');
+}
+
+// Test map functionality
+function testMap() {
+    if (spawnPoints.length !== 20) {
+        alert(`Cannot test map: You need exactly 20 spawn points!\nCurrent spawn points: ${spawnPoints.length}/20`);
+        return;
+    }
+    
+    if (placedObjects.length === 0) {
+        alert('Cannot test map: Add some buildings or objects to your map first!');
+        return;
+    }
+    
+    alert('🎮 Map test functionality coming soon!\n\nYour map has:\n• ' + placedObjects.length + ' objects\n• ' + spawnPoints.length + ' spawn points\n• Ready for testing!');
 }
 
 function closeBlankMapCreator() {
@@ -1742,8 +1740,11 @@ function closeBlankMapCreator() {
         createMapScreen.classList.remove('hidden');
     }
 
-    // Refresh the saved maps display
-    loadSavedMaps();
+    // Only refresh saved maps display if we were editing an existing map
+    // Don't show created maps when closing from "Create New Map" flow
+    if (isEditingExistingMap) {
+        loadSavedMaps();
+    }
 
     // Remove zoom slider
     const slider = document.getElementById('mapCreatorZoomSlider');
@@ -1752,11 +1753,11 @@ function closeBlankMapCreator() {
         console.log('Zoom slider removed');
     }
 
-    // Remove minimap
-    const minimap = document.getElementById('mapCreatorMinimap');
-    if (minimap) {
-        minimap.remove();
-        console.log('Minimap removed');
+    // Remove spawn point overlay if open
+    const spawnOverlay = document.getElementById('spawnPointOverlay');
+    if (spawnOverlay) {
+        spawnOverlay.remove();
+        console.log('Spawn point overlay removed');
     }
 
     // Remove help button
@@ -1775,7 +1776,7 @@ function closeBlankMapCreator() {
     const editButton = document.getElementById('mapCreatorEditButton');
     if (editButton) {
         editButton.classList.remove('active');
-        editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> EDIT';
+        editButton.innerHTML = '<span class="map-creator-btn-text"><i class="fa-solid fa-pen-to-square"></i></span>';
     }
 
     // Remove edit controls
@@ -1783,11 +1784,13 @@ function closeBlankMapCreator() {
 
     // Reset edit mode
     isEditMode = false;
+    isEditingExistingMap = false;
     selectedObject = null;
     hoveredObject = null;
 
-    // Show the create new map button again
-    createInteractiveElements();
+    // Remove any existing create new map button (don't recreate it)
+    const existingBtn = document.getElementById('createNewMapBtn');
+    if (existingBtn) existingBtn.remove();
 }
 
 function toggleAssetsPanel() {
@@ -1812,37 +1815,41 @@ function toggleAssetsPanel() {
 function switchAssetCategory(category) {
     currentAssetCategory = category;
 
-    // Update button states
-    document.querySelectorAll('.asset-category-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.category === category) {
-            btn.classList.add('active');
-            // Update button styling
-            if (category === 'ground') {
-                btn.style.background = 'rgba(139, 69, 19, 0.5)';
-                btn.style.borderColor = 'rgba(139, 69, 19, 0.8)';
-                btn.style.color = '#d2691e';
-            } else {
-                btn.style.background = 'rgba(0, 247, 255, 0.3)';
-                btn.style.borderColor = '#00f7ff';
-                btn.style.color = '#00f7ff';
-            }
-        } else {
-            // Reset inactive button styling
-            if (btn.dataset.category === 'ground') {
-                btn.style.background = 'rgba(139, 69, 19, 0.3)';
-                btn.style.borderColor = 'rgba(139, 69, 19, 0.6)';
-                btn.style.color = 'rgba(255, 255, 255, 0.8)';
-            } else {
-                btn.style.background = 'rgba(0, 247, 255, 0.2)';
-                btn.style.borderColor = 'rgba(0, 247, 255, 0.6)';
-                btn.style.color = 'rgba(255, 255, 255, 0.8)';
-            }
+    // Update tab states
+    document.querySelectorAll('.editor-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.category === category) {
+            tab.classList.add('active');
         }
     });
 
-    // Load assets for this category
-    loadAssets(category);
+    // Show/hide appropriate panels
+    const assetsGrid = document.getElementById('assetsGrid');
+    const playersPanel = document.getElementById('playersPanel');
+    const textEditorContainer = document.getElementById('textEditorContainer');
+    
+    if (category === 'players') {
+        if (assetsGrid) assetsGrid.style.display = 'none';
+        if (playersPanel) playersPanel.style.display = 'block';
+        if (textEditorContainer) textEditorContainer.style.display = 'none';
+    } else if (category === 'script') {
+        if (assetsGrid) assetsGrid.style.display = 'none';
+        if (playersPanel) playersPanel.style.display = 'none';
+        if (textEditorContainer) textEditorContainer.style.display = 'block';
+        
+        // Focus the textarea
+        const textarea = document.getElementById('mapScriptEditor');
+        if (textarea) {
+            setTimeout(() => textarea.focus(), 100);
+        }
+    } else {
+        if (assetsGrid) assetsGrid.style.display = 'grid';
+        if (playersPanel) playersPanel.style.display = 'none';
+        if (textEditorContainer) textEditorContainer.style.display = 'none';
+        
+        // Load assets for this category
+        loadAssets(category);
+    }
 }
 
 // Track if we're viewing object details
@@ -1901,40 +1908,257 @@ const objectFileNameMap = {
 };
 
 function loadAssets(category) {
-    let assetsGrid = document.getElementById('assetsGrid');
-
-    // If assets grid doesn't exist in the HTML, create it
+    const assetsGrid = document.getElementById('assetsGrid');
     if (!assetsGrid) {
-        // Create assets grid in the existing HTML panel
-        const assetsPanel = document.getElementById('assetsPanel');
-        if (assetsPanel) {
-            assetsGrid = document.createElement('div');
-            assetsGrid.id = 'assetsGrid';
-            assetsGrid.className = 'assets-grid';
-            assetsPanel.appendChild(assetsGrid);
-        }
+        console.error('Assets grid not found');
+        return;
     }
 
-    // If still no assets grid and no HTML panel exists, create a floating panel
-    if (!assetsGrid) {
-        const assetsPanel = document.createElement('div');
-        assetsPanel.id = 'assetsPanel';
-        assetsPanel.style.cssText = 'position: fixed; right: 15px; top: 70px; width: 320px; max-height: 85vh; overflow: hidden; background: linear-gradient(180deg, rgba(8,18,28,0.98), rgba(12,22,32,0.98)); border-left: 4px solid #00f7ff; border-top: 2px solid rgba(0,247,255,0.6); border-bottom: 2px solid rgba(0,247,255,0.6); border-right: 1px solid rgba(0,247,255,0.3); padding: 0; z-index: 100000; color: white; box-shadow: -8px 0 30px rgba(0,0,0,0.7), 0 0 20px rgba(0,247,255,0.2); backdrop-filter: blur(20px); border-radius: 0;';
+    console.log('🎨 Loading assets for category:', category);
 
-        // Header section
-        const header = document.createElement('div');
-        header.style.cssText = 'padding: 18px 20px; background: linear-gradient(90deg, rgba(0,247,255,0.12), rgba(0,200,220,0.08)); border-bottom: 2px solid rgba(0,247,255,0.3); margin-bottom: 0; border-radius: 0;';
-        header.innerHTML = '<div style="font-size: 16px; font-weight: bold; color: #00f7ff; text-shadow: 0 0 8px rgba(0,247,255,0.4); letter-spacing: 1px;">MAP ASSETS</div><div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 3px;">Select objects to place on map</div>';
-        assetsPanel.appendChild(header);
+    // Clear existing content
+    assetsGrid.innerHTML = '';
+    assetsGrid.className = 'editor-grid';
 
-        // Control section (for unselect button - will be shown/hidden dynamically)
-        const controlSection = document.createElement('div');
-        controlSection.id = 'assetControlSection';
-        controlSection.style.cssText = 'padding: 15px 20px; border-bottom: 1px solid rgba(0,247,255,0.2); display: none;';
+    // Load assets based on category
+    if (category === 'ground') {
+        loadGroundAssets(assetsGrid);
+        console.log('✅ Ground assets loaded');
+    } else if (category === 'buildings') {
+        loadBuildingAssets(assetsGrid);
+        console.log('✅ Building assets loaded');
+    } else if (category === 'players') {
+        loadPlayersPanel();
+        console.log('✅ Players panel loaded');
+    }
+}
+
+// Ground assets loader with real textures
+function loadGroundAssets(container) {
+    const groundTextures = [
+        { name: 'Blue Grass', type: 'bluegrass', file: 'tank/Grounds/BlueGrass.png' },
+        { name: 'Brown Cobblestone', type: 'browncobble', file: 'tank/Grounds/BrownCobblestone.png' },
+        { name: 'Brown Grass', type: 'browngrass', file: 'tank/Grounds/BrownGrass.png' },
+        { name: 'Gold Cobblestone', type: 'goldcobble', file: 'tank/Grounds/Goldcobblestone.png' },
+        { name: 'Golden Cobblestone', type: 'goldencobble', file: 'tank/Grounds/GoldenCobblestone.png' },
+        { name: 'Gray Ground', type: 'grayground', file: 'tank/Grounds/GrayGround.png' },
+        { name: 'Green Grass', type: 'greengrass', file: 'tank/Grounds/GreenGrass.png' },
+        { name: 'Light Brown Cobblestone', type: 'lightbrowncobble', file: 'tank/Grounds/LightBrownCobblestone.png' },
+        { name: 'Light Grey Cobblestone', type: 'lightgreycobble', file: 'tank/Grounds/LightGreyCobblestone.png' },
+        { name: 'Light Grey Ground', type: 'lightgreyground', file: 'tank/Grounds/LightGreyGround.png' },
+        { name: 'Light Sand', type: 'lightsand', file: 'tank/Grounds/LightSand.png' },
+        { name: 'Purple Cobblestone', type: 'purplecobble', file: 'tank/Grounds/PurpleCobblestone.png' },
+        { name: 'Red Cobblestone', type: 'redcobble', file: 'tank/Grounds/RedCobblestone.png' },
+        { name: 'Sand', type: 'sand', file: 'tank/Grounds/Sand.png' },
+        { name: 'Wooden Planks', type: 'woodenplanks', file: 'tank/Grounds/WoodenPlanks.png' },
+        { name: 'Wooden Tile', type: 'woodentile', file: 'tank/Grounds/WoodenTile.png' },
+        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' }
+    ];
+
+    groundTextures.forEach(ground => {
+        const item = createGroundAssetItem(ground);
+        item.onclick = () => selectGroundAsset(ground);
+        container.appendChild(item);
+    });
+}
+
+// Building assets loader with real assets
+function loadBuildingAssets(container) {
+    // Object file name mapping from backup
+    const objectFileNameMap = {
+        'Buildings': {
+            'Cart': 'cart',
+            'Farm_House_01': 'farm_house_01',
+            'Farm_House_02': 'farm_house_02',
+            'Farm_House_With_CropFiled': 'farm_field',
+            'Guard_Tower': 'guard_tower',
+            'House_01': 'house_01',
+            'House_02': 'house_02',
+            'Inn': 'inn',
+            'Shop_01': 'shop_01',
+            'Shop_02': 'shop_02',
+            'Stall_01': 'stall_01',
+            'Stall_02': 'stall_02',
+            'Tree': 'trees',
+            'Wind_Mill': 'windmill'
+        }
+    };
+
+    const viewFolder = 'Buildings';
+    const objects = Object.keys(objectFileNameMap[viewFolder]);
+
+    objects.forEach(objName => {
+        const fileName = objectFileNameMap[viewFolder][objName];
+        const viewFolderName = 'top_down_view';
+        const imagePath = `/assets/tank/${viewFolder}/${objName}/spr_${viewFolderName}_${fileName}_front.png`;
+
+        const asset = {
+            name: objName.replace(/_/g, ' '),
+            folder: objName,
+            fileName: fileName,
+            viewFolder: viewFolder,
+            image: imagePath,
+            isFolder: true
+        };
+
+        const item = createBuildingAssetItem(asset);
+        item.onclick = () => openObjectFolder(asset);
+        container.appendChild(item);
+    });
+}
+
+// Create ground asset item with real texture
+function createGroundAssetItem(ground) {
+    const item = document.createElement('div');
+    item.className = 'editor-asset-item ground';
+    
+    item.innerHTML = `
+        <div class="asset-preview">
+            <img src="/assets/${ground.file}" alt="${ground.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">
+        </div>
+        <div class="asset-name">${ground.name}</div>
+    `;
+    
+    return item;
+}
+
+// Create building asset item with real image
+function createBuildingAssetItem(asset) {
+    const item = document.createElement('div');
+    item.className = 'editor-asset-item building';
+    
+    item.innerHTML = `
+        <div class="asset-preview">
+            <img src="${asset.image}" alt="${asset.name}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.style.display='none'">
+        </div>
+        <div class="asset-name">${asset.name}</div>
+        <div style="color: rgba(255, 255, 255, 0.4); font-size: 10px; text-align: center;">Click to expand</div>
+    `;
+    
+    return item;
+}
+
+// Asset selection functions
+function selectGroundAsset(ground) {
+    selectedAsset = {
+        name: ground.name,
+        folder: null,
+        fileName: ground.file,
+        viewFolder: null,
+        image: `/assets/${ground.file}`,
+        isFolder: false,
+        isGround: true,
+        groundType: ground.file, // Use file path as groundType to match texture loading
+        groundFile: ground.file
+    };
+    updateAssetSelection();
+    updateSelectedAssetVisual();
+    console.log('✅ Ground asset selected:', ground.name, 'File:', ground.file);
+}
+
+// Open object folder to show different directions
+function openObjectFolder(asset) {
+    const assetsGrid = document.getElementById('assetsGrid');
+    assetsGrid.innerHTML = '';
+
+    // Add back button
+    const backBtn = document.createElement('div');
+    backBtn.className = 'editor-asset-item back-button';
+    backBtn.innerHTML = `
+        <div class="asset-preview">
+            <span style="font-size: 24px;">←</span>
+        </div>
+        <div class="asset-name">Back to Buildings</div>
+    `;
+    backBtn.onclick = () => {
+        selectedAsset = null;
+        updateAssetSelection();
+        loadAssets('buildings');
+    };
+    assetsGrid.appendChild(backBtn);
+
+    // Show different directions for this building
+    const directions = ['front', 'back', 'left', 'right'];
+    const viewFolderName = 'top_down_view';
+
+    directions.forEach(direction => {
+        let directionSuffix = direction;
+        // Handle special cases
+        if (direction === 'right' && asset.fileName === 'farm_field') {
+            directionSuffix = 'right_';
+        }
+
+        const imagePath = `/assets/tank/${asset.viewFolder}/${asset.folder}/spr_${viewFolderName}_${asset.fileName}_${directionSuffix}.png`;
+
+        const directionAsset = {
+            ...asset,
+            name: `${asset.name} (${direction})`,
+            image: imagePath,
+            direction: direction,
+            isFolder: false
+        };
+
+        const item = document.createElement('div');
+        item.className = 'editor-asset-item building-direction';
         
-        // Unselect button
-        const unselectBtn = document.createElement('button');
-        unselectBtn.innerHTML = '<span style="margin-right: 8px;">✖</span>CLEAR SELECTION';
+        item.innerHTML = `
+            <div class="asset-preview">
+                <img src="${imagePath}" alt="${directionAsset.name}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.style.display='none'">
+            </div>
+            <div class="asset-name">${directionAsset.name}</div>
+            <div style="color: rgba(255, 255, 255, 0.4); font-size: 10px; text-align: center;">Click to select</div>
+        `;
+
+        item.onclick = () => selectBuildingAsset(directionAsset);
+        assetsGrid.appendChild(item);
+    });
+}
+
+function selectBuildingAsset(asset) {
+    selectedAsset = asset;
+    updateAssetSelection();
+    updateSelectedAssetVisual();
+    console.log('✅ Building asset selected:', asset.name, 'Direction:', asset.direction);
+}
+
+// Update visual selection
+function updateSelectedAssetVisual() {
+    // Remove previous selection
+    document.querySelectorAll('.editor-asset-item.selected').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Add selection to current item if any
+    if (selectedAsset) {
+        const items = document.querySelectorAll('.editor-asset-item');
+        items.forEach(item => {
+            const name = item.querySelector('.asset-name').textContent;
+            if (name === selectedAsset.name) {
+                item.classList.add('selected');
+            }
+        });
+    }
+}
+
+// Load players panel
+function loadPlayersPanel() {
+    const assetsGrid = document.getElementById('assetsGrid');
+    const playersPanel = document.getElementById('playersPanel');
+    
+    if (assetsGrid) assetsGrid.style.display = 'none';
+    if (playersPanel) playersPanel.style.display = 'block';
+}
+
+
+// Updated selectAsset function for new editor
+function selectAsset(asset, element) {
+    selectedAsset = asset;
+    updateAssetSelection();
+    updateSelectedAssetVisual();
+    console.log('Selected asset:', asset.name);
+    renderMapCreatorCanvas();
+
+function openObjectFolder(asset) {
         unselectBtn.style.cssText = 'width:100%; padding:12px; background: linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15)); border: 1px solid rgba(255,80,80,0.4); border-left: 3px solid #ff4444; color:#ff6666; cursor:pointer; font-weight:600; font-size:12px; letter-spacing:0.5px; transition:all 0.2s; text-align:left; border-radius: 0;';
         unselectBtn.onclick = () => {
             selectedAsset = null;
@@ -2060,9 +2284,22 @@ function loadAssets(category) {
 
     // Show only ground textures if ground category is selected
     if (category === 'ground') {
+        // Create perfect grid container for 2 grounds per row - 3x bigger
+        const groundsGridContainer = document.createElement('div');
+        groundsGridContainer.style.cssText = `
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 25px; 
+            margin: 25px auto;
+            padding: 25px;
+            justify-content: center;
+            align-items: start;
+            max-width: 100%;
+        `;
+        
         groundTextures.forEach(ground => {
             const assetItem = document.createElement('div');
-            assetItem.className = 'asset-item-list';
+            assetItem.className = 'asset-item-grid ground-item';
 
             const asset = {
                 name: ground.name,
@@ -2072,9 +2309,6 @@ function loadAssets(category) {
                 image: `/assets/${ground.file}`,
                 isFolder: false,
                 isGround: true,
-                // Use the file path as the groundType key so it matches
-                // the keys stored in `groundTextureImages` (they are stored
-                // by filename like 'tank/Grounds/BlueGrass.png').
                 groundType: ground.file,
                 groundFile: ground.file
             };
@@ -2082,48 +2316,89 @@ function loadAssets(category) {
             assetItem.onclick = () => selectAsset(asset, assetItem);
 
             assetItem.innerHTML = `
-                <div style="width: 55px; height: 55px; background: linear-gradient(145deg, rgba(0,247,255,0.1), rgba(0,200,220,0.05)); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(0,247,255,0.3); transition: all 0.2s;">
-                    <img src="/assets/${ground.file}" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="asset-preview" style="
+                    width: 100%; 
+                    height: 200px; 
+                    background: linear-gradient(145deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04)); 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    overflow: hidden; 
+                    border: 3px solid rgba(0,247,255,0.25); 
+                    transition: all 0.3s ease;
+                    margin-bottom: 15px;
+                    border-radius: 12px;
+                ">
+                    <img src="/assets/${ground.file}" alt="${asset.name}" style="
+                        width: 160%; 
+                        height: 160%; 
+                        object-fit: cover;
+                        transition: transform 0.3s ease;
+                        transform-origin: center center;
+                    ">
                 </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; margin-left: 12px;">
-                    <div style="color: #00f7ff; font-size: 14px; font-weight: bold; text-shadow: 0 0 5px rgba(0,247,255,0.3);">${asset.name}</div>
-                    <div style="color: rgba(255, 255, 255, 0.6); font-size: 11px;">Ground Texture</div>
+                <div class="asset-info" style="text-align: center; padding: 0 8px;">
+                    <div style="
+                        color: #00f7ff; 
+                        font-size: 14px; 
+                        font-weight: 700; 
+                        text-shadow: 0 0 8px rgba(0,247,255,0.4);
+                        margin-bottom: 4px;
+                        line-height: 1.3;
+                    ">${asset.name}</div>
+                    <div style="
+                        color: rgba(255, 255, 255, 0.6); 
+                        font-size: 11px;
+                        font-weight: 500;
+                    ">Ground Texture</div>
                 </div>
             `;
             
-            // Modern asset item styling
-            assetItem.style.cssText = 'display: flex; align-items: center; padding: 12px; margin-bottom: 8px; cursor: pointer; background: linear-gradient(90deg, rgba(0,247,255,0.03), rgba(0,200,220,0.01)); border-left: 3px solid rgba(0,247,255,0.2); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(0,0,0,0.2); transition: all 0.2s; position: relative; border-radius: 0;';
-            
-            // Add subtle line accent
-            const lineAccent = document.createElement('div');
-            lineAccent.style.cssText = 'position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, transparent, #00f7ff, transparent); opacity: 0; transition: opacity 0.2s;';
-            assetItem.appendChild(lineAccent);
+            // Perfect square asset item styling - equal width and height
+            assetItem.style.cssText = `
+                width: 80px;
+                height: 80px;
+                padding: 8px; 
+                cursor: pointer; 
+                background: rgba(139, 69, 19, 0.1); 
+                border: 2px solid rgba(139, 69, 19, 0.6); 
+                transition: all 0.3s ease; 
+                position: relative; 
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            `;
             
             assetItem.onmouseenter = () => {
-                assetItem.style.background = 'linear-gradient(90deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04))';
+                assetItem.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04))';
+                assetItem.style.borderColor = 'rgba(0,247,255,0.5)';
                 assetItem.style.borderLeftColor = '#00f7ff';
-                assetItem.style.transform = 'translateX(4px)';
-                lineAccent.style.opacity = '1';
+                assetItem.style.transform = 'translateY(-6px) scale(1.02)';
+                assetItem.style.boxShadow = '0 12px 35px rgba(0,247,255,0.2)';
+                
+                const img = assetItem.querySelector('img');
+                if (img) img.style.transform = 'scale(1.08)';
             };
+            
             assetItem.onmouseleave = () => {
-                assetItem.style.background = 'linear-gradient(90deg, rgba(0,247,255,0.03), rgba(0,200,220,0.01))';
-                assetItem.style.borderLeftColor = 'rgba(0,247,255,0.2)';
-                assetItem.style.transform = 'translateX(0)';
-                lineAccent.style.opacity = '0';
+                assetItem.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.02), rgba(0,200,220,0.01))';
+                assetItem.style.borderColor = 'rgba(0,247,255,0.15)';
+                assetItem.style.borderLeftColor = 'rgba(0,247,255,0.3)';
+                assetItem.style.transform = 'translateY(0) scale(1)';
+                assetItem.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                
+                const img = assetItem.querySelector('img');
+                if (img) img.style.transform = 'scale(1)';
             };
 
-            assetsGrid.appendChild(assetItem);
+            groundsGridContainer.appendChild(assetItem);
         });
-
-        // Add info message
-        const infoMsg = document.createElement('div');
-        infoMsg.style.cssText = 'padding: 15px; margin-top: 10px; background: rgba(0, 247, 255, 0.1); border: 1px solid rgba(0, 247, 255, 0.3); border-left: 3px solid #00f7ff; color: rgba(255, 255, 255, 0.7); font-size: 12px; line-height: 1.5; border-radius: 0;';
-        infoMsg.innerHTML = `
-            <div style="font-weight: 600; color: #00f7ff; margin-bottom: 5px;">🎨 Ground Texture Painting</div>
-            Select a ground texture and click on the map to paint tiles!<br>
-            Use these textures to create varied and realistic terrain.
-        `;
-        assetsGrid.appendChild(infoMsg);
+        
+        assetsGrid.appendChild(groundsGridContainer);
 
         return;
     }
@@ -2138,10 +2413,23 @@ function loadAssets(category) {
         // List of all objects in the view folders
         const objects = Object.keys(objectFileNameMap[viewFolder]);
 
-        // Create asset items for each object (list style)
+        // Create perfect grid container for 2 buildings per row - 3x bigger
+        const buildingsGridContainer = document.createElement('div');
+        buildingsGridContainer.style.cssText = `
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 20px; 
+            margin: 20px auto;
+            padding: 20px;
+            justify-content: center;
+            align-items: start;
+            max-width: 100%;
+        `;
+
+        // Create asset items for each object (perfect grid style)
         objects.forEach(objName => {
             const assetItem = document.createElement('div');
-            assetItem.className = 'asset-item-list';
+            assetItem.className = 'asset-item-grid building-item';
 
             // Get the correct file name pattern for this view
             const fileName = objectFileNameMap[viewFolder][objName];
@@ -2167,18 +2455,101 @@ function loadAssets(category) {
             assetItem.onclick = () => openObjectFolder(asset);
 
             assetItem.innerHTML = `
-                <div style="width: 50px; height: 50px; background: rgba(255, 255, 255, 0.05); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img src="${imagePath}" alt="${asset.name}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.style.display='none'">
+                <div class="asset-preview" style="
+                    width: 100%; 
+                    height: 200px; 
+                    background: linear-gradient(145deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04)); 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    overflow: hidden; 
+                    border: 3px solid rgba(0,247,255,0.25); 
+                    transition: all 0.3s ease;
+                    margin-bottom: 15px;
+                    border-radius: 12px;
+                    position: relative;
+                ">
+                    <img src="${imagePath}" alt="${asset.name}" style="
+                        max-width: 180%; 
+                        max-height: 180%; 
+                        object-fit: contain;
+                        transition: transform 0.3s ease;
+                        transform-origin: center center;
+                    " onerror="this.style.display='none'">
+                    <div style="
+                        position: absolute; 
+                        top: 8px; 
+                        right: 10px; 
+                        color: rgba(255, 255, 255, 0.6); 
+                        font-size: 14px;
+                        background: rgba(0,0,0,0.4);
+                        padding: 4px 6px;
+                        border-radius: 4px;
+                        font-weight: bold;
+                    ">›</div>
                 </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-                    <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
-                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 11px;">Click to expand</div>
+                <div class="asset-info" style="text-align: center; padding: 0 8px;">
+                    <div style="
+                        color: #00f7ff; 
+                        font-size: 14px; 
+                        font-weight: 700; 
+                        text-shadow: 0 0 8px rgba(0,247,255,0.4);
+                        margin-bottom: 4px;
+                        line-height: 1.3;
+                    ">${asset.name}</div>
+                    <div style="
+                        color: rgba(255, 255, 255, 0.6); 
+                        font-size: 11px;
+                        font-weight: 500;
+                    ">Click to expand</div>
                 </div>
-                <div style="color: rgba(255, 255, 255, 0.3); font-size: 16px;">›</div>
             `;
 
-            assetsGrid.appendChild(assetItem);
+            // Perfect square asset item styling - equal width and height
+            assetItem.style.cssText = `
+                width: 80px;
+                height: 80px;
+                padding: 8px; 
+                cursor: pointer; 
+                background: rgba(0, 247, 255, 0.1); 
+                border: 2px solid rgba(0, 247, 255, 0.6); 
+                transition: all 0.3s ease; 
+                position: relative; 
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            `;
+            
+            assetItem.onmouseenter = () => {
+                assetItem.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04))';
+                assetItem.style.borderColor = 'rgba(0,247,255,0.5)';
+                assetItem.style.borderLeftColor = '#00f7ff';
+                assetItem.style.transform = 'translateY(-6px) scale(1.02)';
+                assetItem.style.boxShadow = '0 12px 35px rgba(0,247,255,0.2)';
+                
+                const img = assetItem.querySelector('img');
+                if (img) img.style.transform = 'scale(1.08)';
+            };
+            
+            assetItem.onmouseleave = () => {
+                assetItem.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.02), rgba(0,200,220,0.01))';
+                assetItem.style.borderColor = 'rgba(0,247,255,0.15)';
+                assetItem.style.borderLeftColor = 'rgba(0,247,255,0.3)';
+                assetItem.style.transform = 'translateY(0) scale(1)';
+                assetItem.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+                
+                const img = assetItem.querySelector('img');
+                if (img) img.style.transform = 'scale(1)';
+            };
+
+            buildingsGridContainer.appendChild(assetItem);
         });
+        
+        assetsGrid.appendChild(buildingsGridContainer);
         
         return;
     }
@@ -2224,6 +2595,66 @@ function loadAssets(category) {
         infoMsg.innerHTML = '<strong>Vehicles:</strong> Select a tank to place a vehicle prefab. Use the palette to select colors.';
         assetsGrid.appendChild(infoMsg);
 
+        return;
+    }
+
+    // Show players category
+    if (category === 'players') {
+        // Create players content directly in assetsGrid
+        const playersContainer = document.createElement('div');
+        playersContainer.style.cssText = `
+            padding: 20px;
+            color: white;
+        `;
+
+        // Spawn Points Section
+        const spawnSection = document.createElement('div');
+        spawnSection.style.cssText = `
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0,247,255,0.05), rgba(0,200,220,0.02));
+            border: 1px solid rgba(0,247,255,0.2);
+            border-left: 3px solid rgba(0,247,255,0.4);
+            border-radius: 8px;
+        `;
+
+        spawnSection.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center;">
+                    <span style="font-size: 16px; margin-right: 8px;">📍</span>
+                    <h4 style="color: #00f7ff; font-size: 16px; font-weight: bold; margin: 0;">Spawn Points</h4>
+                </div>
+                <span id="spawnPointsCounter" style="color: #00f7ff; font-weight: bold; font-size: 14px;">${spawnPoints.length}/20</span>
+            </div>
+            <button onclick="showSpawnPointMinimap()" style="
+                width: 100%;
+                padding: 15px;
+                background: linear-gradient(135deg, rgba(0,247,255,0.2), rgba(0,200,220,0.1));
+                border: 2px solid rgba(0,247,255,0.6);
+                color: #00f7ff;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: all 0.3s;
+                margin-bottom: 10px;
+            " onmouseenter="this.style.background='linear-gradient(135deg, rgba(0,247,255,0.3), rgba(0,200,220,0.2))'" 
+               onmouseleave="this.style.background='linear-gradient(135deg, rgba(0,247,255,0.2), rgba(0,200,220,0.1))'">
+                🎯 Place Spawn Points
+            </button>
+            <div style="
+                font-size: 12px;
+                color: rgba(255,255,255,0.6);
+                text-align: center;
+                line-height: 1.4;
+            ">
+                Click the button above to open the spawn point placement tool. You need exactly 20 spawn points to publish your map.
+            </div>
+        `;
+
+        playersContainer.appendChild(spawnSection);
+        assetsGrid.appendChild(playersContainer);
+        
         return;
     }
 }
@@ -2348,12 +2779,7 @@ function updateAssetSelection() {
 function unselectCurrentAsset() {
     selectedAsset = null;
     updateAssetSelection();
-    
-    // Clear visual selection from all asset items
-    document.querySelectorAll('.asset-item-list').forEach(item => {
-        item.style.background = 'linear-gradient(90deg, rgba(0,247,255,0.03), rgba(0,200,220,0.01))';
-        item.style.borderLeftColor = 'rgba(0,247,255,0.2)';
-    });
+    updateSelectedAssetVisual();
     
     renderMapCreatorCanvas();
     console.log('Asset unselected');
@@ -2394,6 +2820,12 @@ function clearAllObjects() {
 }
 
 function saveMap() {
+    // Check if we have exactly 20 spawn points
+    if (spawnPoints.length !== 20) {
+        alert(`You need exactly 20 spawn points to publish your map!\nCurrent spawn points: ${spawnPoints.length}/20\n\nClick the "Place Spawn Points" button in the Players section to add spawn points.`);
+        return;
+    }
+
     // Use the stored map name from when they created it
     const mapName = window.currentMapName || 'Untitled Map';
 
@@ -2475,6 +2907,7 @@ function saveMap() {
         created: new Date().toISOString(),
         objects: serializedObjects,
         groundTiles: serializedGroundTiles,
+        spawnPoints: spawnPoints,
         version: '1.0',
         isUserCreated: true,
         settings: {
@@ -2502,14 +2935,18 @@ function saveMap() {
     console.log('✓ Map saved:', mapName, 'with', placedObjects.length, 'objects and', serializedGroundTiles.length, 'total ground tiles');
     alert(`Map "${mapName}" saved successfully!\n\nObjects: ${placedObjects.length}\nGround tiles: ${serializedGroundTiles.length}`);
 
-    // Refresh the map display
-    loadSavedMaps();
+    // Only refresh the map display if we were editing an existing map
+    // Don't show created maps when saving from "Create New Map" flow
+    if (isEditingExistingMap) {
+        loadSavedMaps();
+    }
 }
 
 function loadMap(mapData) {
     // Clear existing map
     placedObjects = [];
     customGroundTiles.clear();
+    spawnPoints = [];
 
     // Load ground tiles
     if (mapData.groundTiles) {
@@ -2545,6 +2982,12 @@ function loadMap(mapData) {
                 renderMapCreatorCanvas();
             };
         });
+    }
+
+    // Load spawn points
+    if (mapData.spawnPoints) {
+        spawnPoints = mapData.spawnPoints;
+        updateSpawnPointsCounter();
     }
 
     renderMapCreatorCanvas();
@@ -2588,6 +3031,13 @@ function initMapCreatorCanvas() {
     // Load custom ground texture
     loadCustomGroundTexture();
 
+    // Remove any existing event listeners first
+    canvas.removeEventListener('click', handleCanvasClick);
+    canvas.removeEventListener('mousedown', handleCanvasMouseDown);
+    canvas.removeEventListener('mousemove', handleCanvasMouseMove);
+    canvas.removeEventListener('mouseup', handleCanvasMouseUp);
+    canvas.removeEventListener('mouseleave', handleCanvasMouseUp);
+    
     // Add event listeners for interaction (wheel handled by setupSmoothWheelZoom)
     canvas.addEventListener('click', handleCanvasClick);
     canvas.addEventListener('mousedown', handleCanvasMouseDown);
@@ -2598,9 +3048,12 @@ function initMapCreatorCanvas() {
     // Add keyboard controls for panning
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    
+    // Setup wheel zoom
+    setupSmoothWheelZoom();
 
     console.log('✅ Map creator canvas initialized');
-    console.log('Controls: Mouse wheel to zoom, Right-click/Middle-click to pan, Arrow keys or WASD to scroll');
+    console.log('Controls: Mouse wheel to zoom, Left-click to drag, Arrow keys or WASD to scroll');
 
     // Start animation loop for smooth keyboard panning
     startPanningLoop();
@@ -2679,11 +3132,16 @@ function actualRenderMapCreatorCanvas() {
         ctx.fillRect(-5000, -5000, 10000, 10000);
     }
 
-    // Draw ground texture samples on the map
-    try {
-        drawGroundSamples(ctx, camera, canvas.width / canvasZoom, canvas.height / canvasZoom);
-    } catch (error) {
-        console.error('❌ Error drawing ground samples:', error);
+    // Draw ground texture samples on the map (only for new maps, not when editing existing maps)
+    if (!isEditingExistingMap) {
+        try {
+            drawGroundSamples(ctx, camera, canvas.width / canvasZoom, canvas.height / canvasZoom);
+        } catch (error) {
+            console.error('❌ Error drawing ground samples:', error);
+        }
+    } else {
+        // When editing, only show the custom ground tiles from the saved map
+        console.log('🎨 Edit mode: Skipping default ground samples, showing only saved map ground tiles');
     }
 
     // Render custom painted ground tiles on top
@@ -2705,6 +3163,39 @@ function actualRenderMapCreatorCanvas() {
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = '#00f7ff';
                 ctx.strokeRect(obj.x - width / 2 - 5, obj.y - height / 2 - 5, width + 10, height + 10);
+                ctx.shadowBlur = 0;
+            }
+        } else if (obj.useIcon && obj.asset && obj.asset.icon) {
+            // Draw icon fallback
+            const iconSize = 48;
+            
+            // Draw background circle
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.beginPath();
+            ctx.arc(obj.x, obj.y, iconSize / 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw border
+            ctx.strokeStyle = '#00f7ff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw icon
+            ctx.font = `${iconSize * 0.6}px Arial`;
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(obj.asset.icon, obj.x, obj.y);
+
+            // Draw selection highlight if hovering
+            if (obj.isHovered) {
+                ctx.strokeStyle = '#00f7ff';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#00f7ff';
+                ctx.beginPath();
+                ctx.arc(obj.x, obj.y, iconSize / 2 + 5, 0, Math.PI * 2);
+                ctx.stroke();
                 ctx.shadowBlur = 0;
             }
         }
@@ -2980,8 +3471,7 @@ function handleCanvasClick(e) {
 
         // Store the ground type for this tile
         customGroundTiles.set(tileKey, {
-            type: selectedAsset.groundType,
-            image: selectedAsset.image
+            type: selectedAsset.groundType // This should match the key in groundTextureImages
         });
 
         console.log('✓ Painted ground tile at:', tileCol, tileRow, 'with type:', selectedAsset.groundType, 'at world pos:', worldX, worldY);
@@ -3033,8 +3523,37 @@ function handleCanvasClick(e) {
     };
 
     img.onerror = () => {
-        console.error('❌ Failed to load image:', selectedAsset.image);
-        alert('Failed to load asset image. Please check the file path.');
+        console.warn('⚠️ Failed to load image, using icon fallback:', selectedAsset.image);
+        
+        // Check for duplicates at this position
+        if (isPositionOccupied(worldX, worldY)) {
+            // Show red X indicator
+            showRedX = true;
+            redXPosition = { x: worldX, y: worldY };
+            
+            // Clear red X after 1 second
+            if (redXTimer) clearTimeout(redXTimer);
+            redXTimer = setTimeout(() => {
+                showRedX = false;
+                renderMapCreatorCanvas();
+            }, 1000);
+            
+            renderMapCreatorCanvas();
+            console.log('❌ Cannot place object - position occupied!');
+            return;
+        }
+        
+        // Place object with icon fallback
+        placedObjects.push({
+            asset: selectedAsset,
+            x: worldX,
+            y: worldY,
+            image: null, // No image, will use icon
+            useIcon: true
+        });
+
+        console.log('✓ Successfully placed object with icon fallback at:', worldX, worldY);
+        renderMapCreatorCanvas();
     };
 }
 
@@ -3143,17 +3662,26 @@ function handleCanvasMouseMove(e) {
         // Check if mouse is over any placed object
         for (let i = placedObjects.length - 1; i >= 0; i--) {
             const obj = placedObjects[i];
+            let isWithinBounds = false;
+            
             if (obj.image && obj.image.complete && obj.image.naturalWidth > 0) {
                 const width = obj.image.naturalWidth;
                 const height = obj.image.naturalHeight;
                 
                 // Check if mouse is within object bounds
-                if (worldX >= obj.x - width / 2 && worldX <= obj.x + width / 2 &&
-                    worldY >= obj.y - height / 2 && worldY <= obj.y + height / 2) {
-                    hoveredObject = obj;
-                    obj.isHovered = true;
-                    break;
-                }
+                isWithinBounds = worldX >= obj.x - width / 2 && worldX <= obj.x + width / 2 &&
+                                worldY >= obj.y - height / 2 && worldY <= obj.y + height / 2;
+            } else if (obj.useIcon) {
+                // Check hover for icon-based objects (circular area)
+                const iconSize = 48;
+                const distance = Math.sqrt(Math.pow(worldX - obj.x, 2) + Math.pow(worldY - obj.y, 2));
+                isWithinBounds = distance <= iconSize / 2;
+            }
+            
+            if (isWithinBounds) {
+                hoveredObject = obj;
+                obj.isHovered = true;
+                break;
             }
         }
         
@@ -3632,6 +4160,7 @@ if (typeof window !== 'undefined') {
     window.toggleAssetsPanel = toggleAssetsPanel;
     window.switchAssetCategory = switchAssetCategory;
     window.backToObjects = backToObjects;
+    window.openObjectFolder = openObjectFolder;
     window.clearAllObjects = clearAllObjects;
     window.saveMap = saveMap;
     window.publishMap = publishMap;
@@ -3910,18 +4439,23 @@ function renderCustomGroundTiles(ctx, camera, viewWidth, viewHeight) {
             const tileKey = `${col},${row}`;
             const customTile = customGroundTiles.get(tileKey);
 
-            if (customTile && groundTexturesLoaded && groundTextureImages.has(customTile.type)) {
+            if (customTile) {
                 // Calculate isometric position
                 // Offset every other row by half tile width for diamond pattern
                 const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
                 const isoY = row * tileHeight;
 
-                const groundImg = groundTextureImages.get(customTile.type);
-
-                // OPTIMIZATION: Only draw if image is loaded
-                if (groundImg && groundImg.complete && groundImg.naturalWidth > 0) {
-                    // Draw directly instead of using helper function
-                    ctx.drawImage(groundImg, isoX, isoY, tileWidth, drawHeight);
+                // Draw ground texture if available
+                if (groundTexturesLoaded && groundTextureImages.has(customTile.type)) {
+                    const groundImg = groundTextureImages.get(customTile.type);
+                    if (groundImg && groundImg.complete && groundImg.naturalWidth > 0) {
+                        ctx.drawImage(groundImg, isoX, isoY, tileWidth, drawHeight);
+                        customTilesRendered++;
+                    }
+                } else if (customTile.color) {
+                    // Fallback to color if texture not available
+                    ctx.fillStyle = customTile.color;
+                    ctx.fillRect(isoX, isoY, tileWidth, drawHeight);
                     customTilesRendered++;
                 }
             }
@@ -4573,13 +5107,17 @@ function setupSmoothWheelZoom() {
 // Setup wheel zoom when map creator opens
 setupSmoothWheelZoom();
 
-// Update zoom slider visuals
+// Update zoom slider visuals (HTML elements removed, function kept for compatibility)
 function updateZoomSlider(zoomValue) {
     const slider = document.getElementById('mapZoomSlider');
     const fill = document.getElementById('mapZoomSliderFill');
     const thumb = document.getElementById('mapZoomSliderThumb');
 
-    if (!slider || !fill || !thumb) return;
+    // HTML elements no longer exist, but keep function for compatibility
+    if (!slider || !fill || !thumb) {
+        console.log('Zoom slider HTML elements not found (removed by design)');
+        return;
+    }
 
     slider.value = zoomValue;
 
@@ -4658,10 +5196,7 @@ function zoomOut() {
 
 // Make functions globally accessible
 window.zoomIn = zoomIn;
-window.zoomOut = zoomOut;// 
-
-// Export function to global scope
-window.openBlankMapCreator = openBlankMapCreator;
+window.zoomOut = zoomOut;
 
 // Load and display saved maps
 function loadSavedMaps() {
@@ -4755,10 +5290,10 @@ function editMap(mapId) {
     window.currentMapName = map.name;
     window.currentMapId = mapId;
 
-    console.log("Loading map for editing:", map.name);
+    console.log("✏️ Opening EDIT EXISTING MAP flow for:", map.name);
 
-    // Open the editor first
-    startMapEditor();
+    // Open the editor first in edit mode
+    startMapEditor(true);
 
     // Wait for the editor to initialize, then load the map data
     setTimeout(() => {
@@ -4852,8 +5387,238 @@ window.startTankEditor = window.startMapEditor;
 window.startJetEditor = function() { alert('Jet editor is not available in this build.'); };
 window.startRaceEditor = function() { alert('Race editor is not available in this build.'); };
 
-// Editor starters / compatibility exports
-window.startMapEditor = typeof startMapEditor === 'function' ? startMapEditor : function() { console.warn('startMapEditor not defined'); };
-window.startTankEditor = window.startMapEditor;
-window.startJetEditor = function() { alert('Jet editor is not available in this build.'); };
-window.startRaceEditor = function() { alert('Race editor is not available in this build.'); };
+// Initialize the new editor
+function initializeNewEditor() {
+    console.log('🎨 Initializing new editor...');
+    
+    // Make sure the panel is visible
+    const assetsPanel = document.getElementById('assetsPanel');
+    if (assetsPanel) {
+        assetsPanel.classList.remove('minimized');
+        console.log('✅ Assets panel found and expanded');
+        
+        // Initialize drag functionality
+        initializeDragFunctionality(assetsPanel);
+    } else {
+        console.error('❌ Assets panel not found!');
+        return;
+    }
+    
+    // Load default category (buildings)
+    switchAssetCategory('buildings');
+    
+    // Initialize unselect button
+    initializeUnselectButton();
+    
+    console.log('✅ New editor initialized!');
+}
+
+// Drag functionality for editor panel
+function initializeDragFunctionality(panel) {
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let panelStartX = 0;
+    let panelStartY = 0;
+    
+    const header = panel.querySelector('.editor-header');
+    if (!header) return;
+    
+    // Restore saved position or use default
+    const savedPosition = localStorage.getItem('editorPanelPosition');
+    if (savedPosition) {
+        try {
+            const position = JSON.parse(savedPosition);
+            // Validate position is still within screen bounds
+            const maxX = window.innerWidth - 320; // panel width
+            const maxY = window.innerHeight - 200; // minimum panel height
+            
+            if (position.left >= 0 && position.left <= maxX && 
+                position.top >= 0 && position.top <= maxY) {
+                panel.style.left = position.left + 'px';
+                panel.style.top = position.top + 'px';
+                panel.style.right = 'auto';
+                console.log('✅ Restored editor panel position:', position);
+            }
+        } catch (e) {
+            console.warn('Failed to restore panel position:', e);
+        }
+    }
+    
+    // Get initial position
+    const rect = panel.getBoundingClientRect();
+    panelStartX = rect.left;
+    panelStartY = rect.top;
+    
+    // Double-click to reset position
+    header.addEventListener('dblclick', (e) => {
+        if (e.target.classList.contains('editor-toggle-btn')) return;
+        
+        panel.style.left = '';
+        panel.style.top = '20px';
+        panel.style.right = '20px';
+        
+        // Add a brief highlight effect
+        panel.style.boxShadow = '0 12px 35px rgba(0,247,255,0.6)';
+        setTimeout(() => {
+            panel.style.boxShadow = '';
+        }, 300);
+        
+        console.log('🔄 Reset editor panel position');
+    });
+    
+    header.addEventListener('mousedown', (e) => {
+        // Only drag on left click and not on buttons
+        if (e.button !== 0 || e.target.classList.contains('editor-toggle-btn')) return;
+        
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        
+        const rect = panel.getBoundingClientRect();
+        panelStartX = rect.left;
+        panelStartY = rect.top;
+        
+        panel.classList.add('dragging');
+        document.body.style.cursor = 'move';
+        
+        // Prevent text selection
+        e.preventDefault();
+        
+        console.log('🖱️ Started dragging editor panel');
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const deltaX = e.clientX - dragStartX;
+        const deltaY = e.clientY - dragStartY;
+        
+        let newX = panelStartX + deltaX;
+        let newY = panelStartY + deltaY;
+        
+        // Keep panel within screen bounds
+        const panelRect = panel.getBoundingClientRect();
+        const maxX = window.innerWidth - panelRect.width;
+        const maxY = window.innerHeight - panelRect.height;
+        
+        newX = Math.max(0, Math.min(newX, maxX));
+        newY = Math.max(0, Math.min(newY, maxY));
+        
+        // Snap to edges (within 20px)
+        const snapDistance = 20;
+        if (newX < snapDistance) newX = 0;
+        if (newY < snapDistance) newY = 0;
+        if (newX > maxX - snapDistance) newX = maxX;
+        if (newY > maxY - snapDistance) newY = maxY;
+        
+        panel.style.left = newX + 'px';
+        panel.style.top = newY + 'px';
+        panel.style.right = 'auto'; // Remove right positioning
+    });
+    
+    document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        panel.classList.remove('dragging');
+        document.body.style.cursor = '';
+        
+        // Save position to localStorage
+        const rect = panel.getBoundingClientRect();
+        const position = {
+            left: rect.left,
+            top: rect.top
+        };
+        localStorage.setItem('editorPanelPosition', JSON.stringify(position));
+        
+        console.log('✅ Finished dragging editor panel, position saved');
+    });
+    
+    // Handle window resize to keep panel in bounds
+    window.addEventListener('resize', () => {
+        const rect = panel.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width;
+        const maxY = window.innerHeight - rect.height;
+        
+        if (rect.left > maxX) {
+            panel.style.left = maxX + 'px';
+        }
+        if (rect.top > maxY) {
+            panel.style.top = maxY + 'px';
+        }
+    });
+    
+    console.log('✅ Drag functionality initialized for editor panel');
+}
+
+// Toggle text editor visibility
+function toggleTextEditor() {
+    const textEditorContainer = document.getElementById('textEditorContainer');
+    if (textEditorContainer) {
+        const isVisible = textEditorContainer.style.display !== 'none';
+        textEditorContainer.style.display = isVisible ? 'none' : 'block';
+        
+        if (!isVisible) {
+            // Focus the textarea when showing
+            const textarea = document.getElementById('mapScriptEditor');
+            if (textarea) {
+                setTimeout(() => textarea.focus(), 100);
+            }
+        }
+    }
+}
+
+// Save map script
+function saveMapScript() {
+    const textarea = document.getElementById('mapScriptEditor');
+    if (textarea) {
+        const script = textarea.value;
+        // Store in map data or localStorage
+        if (window.currentMapName) {
+            localStorage.setItem(`mapScript_${window.currentMapName}`, script);
+            console.log('✅ Map script saved for:', window.currentMapName);
+            
+            // Show feedback
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Saved!';
+            btn.style.background = 'linear-gradient(135deg, #44ff44, #22cc22)';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = 'linear-gradient(135deg, #00f7ff, #0099cc)';
+            }, 2000);
+        }
+    }
+}
+
+// Clear map script
+function clearMapScript() {
+    const textarea = document.getElementById('mapScriptEditor');
+    if (textarea && confirm('Are you sure you want to clear the script?')) {
+        textarea.value = '';
+        console.log('✅ Map script cleared');
+    }
+}
+
+// Load map script when opening editor
+function loadMapScript() {
+    if (window.currentMapName) {
+        const savedScript = localStorage.getItem(`mapScript_${window.currentMapName}`);
+        const textarea = document.getElementById('mapScriptEditor');
+        if (textarea && savedScript) {
+            textarea.value = savedScript;
+            console.log('✅ Map script loaded for:', window.currentMapName);
+        }
+    }
+}
+
+// Make functions globally available
+window.toggleTextEditor = toggleTextEditor;
+window.saveMapScript = saveMapScript;
+window.clearMapScript = clearMapScript;
+
+// Call initialization when editor starts
+if (typeof window !== 'undefined') {
+    window.initializeNewEditor = initializeNewEditor;
+}
