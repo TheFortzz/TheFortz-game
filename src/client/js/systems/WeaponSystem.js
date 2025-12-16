@@ -701,7 +701,10 @@ export default class WeaponSystem {
         
         // Re-render tank
         if (typeof window.renderTankOnCanvas === 'function') {
-            window.renderTankOnCanvas('playerTankCanvas', this.gameState.selectedTank);
+            window.renderTankOnCanvas('playerTankCanvas', this.gameState.selectedTank, { 
+              isLobby: true, 
+              scale: 1.8 
+            });
         }
     }
 

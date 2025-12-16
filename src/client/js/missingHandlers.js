@@ -1623,30 +1623,65 @@ window.debugShopItems = function() {
     console.log('=== END DEBUG ===');
 };
 
-// Force open shop and create items
-// Main shop opening function
+// Coming Soon functionality
+window.showComingSoon = function(feature) {
+    console.log(`🚧 ${feature} coming soon...`);
+    
+    // Create coming soon notification
+    const notification = document.createElement('div');
+    notification.className = 'coming-soon-notification';
+    notification.innerHTML = `
+        <h2>COMING SOON</h2>
+        <p>Enjoy the game!</p>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds with improved animation
+    setTimeout(() => {
+        notification.style.animation = 'notificationFadeOut 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 500);
+    }, 3000);
+};
+
+// Hover tooltip functionality
+window.showHoverTooltip = function(element, text) {
+    // Remove any existing tooltip
+    hideHoverTooltip();
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'hover-tooltip';
+    tooltip.textContent = text;
+    tooltip.id = 'hoverTooltip';
+    
+    document.body.appendChild(tooltip);
+    
+    // Position tooltip above the element
+    const rect = element.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    
+    tooltip.style.left = (rect.left + rect.width / 2 - tooltipRect.width / 2) + 'px';
+    tooltip.style.top = (rect.top - tooltipRect.height - 10) + 'px';
+};
+
+window.hideHoverTooltip = function() {
+    const tooltip = document.getElementById('hoverTooltip');
+    if (tooltip) {
+        tooltip.remove();
+    }
+};
+
+// Replace old shop functions
 window.openShop = function() {
-    console.log('🛒 Opening shop...');
-    openFeature('shop');
+    showComingSoon('shop');
 };
 
 window.forceOpenShop = function() {
-    console.log('🔧 Force opening shop...');
-    
-    const shopScreen = document.getElementById('shopScreen');
-    if (shopScreen) {
-        shopScreen.classList.remove('hidden');
-        shopScreen.style.display = 'flex';
-    }
-    
-    // Create items
-    setTimeout(() => {
-        if (typeof window.setupSimpleShop === 'function') {
-            window.setupSimpleShop();
-        } else if (typeof window.switchShopCategory === 'function') {
-            window.switchShopCategory('tanks');
-        }
-    }, 100);
+    showComingSoon('shop');
     
     console.log('✅ Shop forced open');
 };

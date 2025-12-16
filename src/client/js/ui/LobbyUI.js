@@ -44,6 +44,24 @@ class LobbyUI {
   }
 
   /**
+   * Show vehicle selection notification
+   */
+  showVehicleNotification(message) {
+    const notification = document.getElementById('vehicleNotification');
+    const notificationText = document.getElementById('vehicleNotificationText');
+    
+    if (notification && notificationText) {
+      notificationText.textContent = message;
+      notification.classList.remove('hidden');
+      
+      // Hide notification after 5 seconds
+      setTimeout(() => {
+        notification.classList.add('hidden');
+      }, 5000);
+    }
+  }
+
+  /**
    * Get the correct lobby canvas based on vehicle type
    */
   getCurrentLobbyCanvas() {
@@ -419,7 +437,10 @@ class LobbyUI {
             weapon: gameState.selectedTank?.weapon || 'turret_01_mk1'
           };
         
-        imageLoader.renderTankOnCanvas('playerTankCanvas', tankConfig);
+        imageLoader.renderTankOnCanvas('playerTankCanvas', tankConfig, { 
+          isLobby: true, 
+          scale: 1.8 
+        });
       }
 
       // Continue animation
@@ -621,7 +642,10 @@ class LobbyUI {
     const vehicleType = gameState.selectedVehicleType || 'tank';
 
     if (vehicleType === 'tank') {
-      imageLoader.renderTankOnCanvas('playerTankCanvas', gameState.selectedTank);
+      imageLoader.renderTankOnCanvas('playerTankCanvas', gameState.selectedTank, { 
+        isLobby: true, 
+        scale: 1.8 
+      });
     } else if (vehicleType === 'jet') {
       imageLoader.renderJetOnCanvas('playerTankCanvas', gameState.selectedJet);
     } else if (vehicleType === 'race') {
@@ -717,6 +741,13 @@ if (typeof window !== 'undefined') {
     document.querySelectorAll('.vehicle-btn').forEach((btn) => btn.classList.remove('active'));
     document.getElementById(`${type}Btn`)?.classList.add('active');
 
+    // Show notification messages for jet and race vehicles
+    if (type === 'jet') {
+      lobbyUI.showVehicleNotification('🚁 JET MODE - Coming Soon! High-speed aerial combat awaits!');
+    } else if (type === 'race') {
+      lobbyUI.showVehicleNotification('🏎️ RACE MODE - Coming Soon! Fast-paced racing action!');
+    }
+
     // Update lobby background
     lobbyUI.updateLobbyVehiclePreview();
   };
@@ -770,20 +801,53 @@ if (typeof window !== 'undefined') {
         if (feature === 'create-map' || feature === 'createMap') {
           console.log('🗺️ Initializing map creator...');
           
-          // Initialize map creator
-          if (typeof window.startCreateMapRendering === 'function') {
-            console.log('✅ Calling startCreateMapRendering()');
-            window.startCreateMapRendering();
-          } else {
-            console.warn('⚠️ startCreateMapRendering function not found');
-          }
+          // Function to initialize map creator when ready
+          const initMapCreator = () => {
+            // Initialize map creator
+            if (typeof window.startCreateMapRendering === 'function') {
+              console.log('✅ Calling startCreateMapRendering()');
+              window.startCreateMapRendering();
+            } else {
+              console.warn('⚠️ startCreateMapRendering function not found');
+            }
+            
+            // Load saved maps
+            if (typeof window.loadSavedMaps === 'function') {
+              console.log('✅ Calling loadSavedMaps()');
+              window.loadSavedMaps();
+            } else {
+              console.warn('⚠️ loadSavedMaps function not found');
+            }
+          };
           
-          // Load saved maps
-          if (typeof window.loadSavedMaps === 'function') {
-            console.log('✅ Calling loadSavedMaps()');
-            window.loadSavedMaps();
+          // Check if map creator is ready
+          if (typeof window.startCreateMapRendering === 'function' && 
+              typeof window.loadSavedMaps === 'function') {
+            // Functions are available, initialize immediately
+            initMapCreator();
           } else {
-            console.warn('⚠️ loadSavedMaps function not found');
+            // Wait for map creator to be ready
+            console.log('⏳ Waiting for map creator to be ready...');
+            
+            const waitForMapCreator = () => {
+              if (typeof window.startCreateMapRendering === 'function' && 
+                  typeof window.loadSavedMaps === 'function') {
+                console.log('✅ Map creator is now ready!');
+                initMapCreator();
+              } else {
+                // Try again after a short delay
+                setTimeout(waitForMapCreator, 100);
+              }
+            };
+            
+            // Listen for map creator ready event
+            window.addEventListener('mapCreatorReady', (event) => {
+              console.log('📡 Map creator ready event received:', event.detail);
+              initMapCreator();
+            }, { once: true });
+            
+            // Also try with timeout as fallback
+            setTimeout(waitForMapCreator, 50);
           }
         }
 

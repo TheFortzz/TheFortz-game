@@ -34,12 +34,54 @@ const Game = {
 
         GameState.isInLobby = false;
 
+        // Stop lobby animation
+        if (window.imageLoader && typeof window.imageLoader.stopLobbyAnimation === 'function') {
+            window.imageLoader.stopLobbyAnimation();
+        }
+
+        // Initialize player in game
+        this.initializePlayer();
+
+        // Input system is already initialized by the main game.js
+
         // Connect to server
         Network.connect('ffa');
 
         // Start game loop
         this.lastTime = performance.now();
         this.loop();
+    },
+
+    initializePlayer() {
+        // Create player with selected tank configuration
+        const gameState = window.gameStateManager ? window.gameStateManager.getGameState() : window.gameState;
+        if (!gameState) return;
+
+        const playerId = 'player_' + Date.now();
+        GameState.playerId = playerId;
+
+        // Add player to game state
+        GameState.players[playerId] = {
+            id: playerId,
+            x: GameState.gameWidth / 2, // Start at center
+            y: GameState.gameHeight / 2,
+            vx: 0,
+            vy: 0,
+            angle: 0,
+            health: 100,
+            score: 0,
+            kills: 0,
+            name: 'Player',
+            animFrame: 0,
+            lastAnimUpdate: Date.now(),
+            tankConfig: gameState.selectedTank || {
+                color: 'blue',
+                body: 'body_halftrack',
+                weapon: 'turret_01_mk1'
+            }
+        };
+
+        console.log('🎮 Player initialized:', GameState.players[playerId]);
     },
 
     loop(currentTime = 0) {
@@ -56,23 +98,8 @@ const Game = {
     },
 
     update(deltaTime) {
-        // Update input
-        // InputHandler.update(); // Disabled - using original game.js input system
-
-        // Update camera
-        GameState.updateCamera();
-
-        // Update bullets
-        GameState.bullets.forEach(bullet => {
-            bullet.x += bullet.vx;
-            bullet.y += bullet.vy;
-        });
-
-        // Remove out of bounds bullets
-        GameState.bullets = GameState.bullets.filter(bullet => {
-            return bullet.x >= 0 && bullet.x <= GameState.gameWidth &&
-                   bullet.y >= 0 && bullet.y <= GameState.gameHeight;
-        });
+        // System updates are handled by GameLoop in game.js
+        // This is just a placeholder for any additional main.js specific updates
     },
 
     stop() {
@@ -91,11 +118,16 @@ const Game = {
 
         GameState.isInLobby = true;
         GameState.reset();
+
+        // Start lobby animation
+        if (window.imageLoader && typeof window.imageLoader.startLobbyAnimation === 'function') {
+            window.imageLoader.startLobbyAnimation();
+        }
     }
 };
 
-// Global function for joining game
-window.joinGame = function() {
+// Game start function (called by game.js joinGame)
+window.startGameSystems = function() {
     Game.start();
 };
 

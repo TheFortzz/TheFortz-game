@@ -355,6 +355,9 @@ export default class PhysicsSystem {
      * @param {number} deltaTime - Time since last update in milliseconds
      */
     update(deltaTime) {
+        // Update local player movement
+        this.updateLocalPlayerMovement();
+        
         // Update sprint system
         this.updateSprintSystem();
         
@@ -363,6 +366,131 @@ export default class PhysicsSystem {
         
         // Interpolate other players' positions
         this.interpolatePlayerPositions();
+    }
+
+    /**
+     * Update local player movement based on input
+     */
+    updateLocalPlayerMovement() {
+        if (!this.gameState.players) {
+            this.gameState.players = {};
+        }
+        
+        const player = this.gameState.players[this.gameState.playerId];
+        if (!player) {
+            console.warn('❌ No player found for movement update');
+            return;
+        }
+
+        if (!this.gameState.keys) {
+            this.gameState.keys = {};
+        }
+
+        // Get input - check both lowercase and KeyCode formats
+        let inputX = 0;
+        let inputY = 0;
+
+        if (this.gameState.keys['w'] || this.gameState.keys['ArrowUp'] || this.gameState.keys['KeyW']) inputY -= 1;
+        if (this.gameState.keys['s'] || this.gameState.keys['ArrowDown'] || this.gameState.keys['KeyS']) inputY += 1;
+        if (this.gameState.keys['a'] || this.gameState.keys['ArrowLeft'] || this.gameState.keys['KeyA']) inputX -= 1;
+        if (this.gameState.keys['d'] || this.gameState.keys['ArrowRight'] || this.gameState.keys['KeyD']) inputX += 1;
+
+        // Debug movement input
+        if (inputX !== 0 || inputY !== 0) {
+            console.log('🎮 Movement input:', { inputX, inputY, keys: Object.keys(this.gameState.keys).filter(k => this.gameState.keys[k]) });
+        }
+
+        // Normalize diagonal movement
+        if (inputX !== 0 && inputY !== 0) {
+            inputX *= 0.707;
+            inputY *= 0.707;
+        }
+
+        // Update tank physics
+        this.updateTankPhysics(inputX, inputY);
+
+        // Apply velocity to player position with safety checks
+        if (isFinite(this.tankVelocity.x) && isFinite(this.tankVelocity.y)) {
+            const oldX = player.x;
+            const oldY = player.y;
+            
+            player.x = (player.x || 0) + this.tankVelocity.x;
+            player.y = (player.y || 0) + this.tankVelocity.y;
+            
+            // Debug position changes
+            if (Math.abs(this.tankVelocity.x) > 0.1 || Math.abs(this.tankVelocity.y) > 0.1) {
+                console.log('🚀 Player moved:', { 
+                    from: { x: Math.round(oldX), y: Math.round(oldY) }, 
+                    to: { x: Math.round(player.x), y: Math.round(player.y) },
+                    velocity: { x: Math.round(this.tankVelocity.x * 10) / 10, y: Math.round(this.tankVelocity.y * 10) / 10 }
+                });
+            }
+        }
+
+        // Ensure player position is always finite
+        player.x = isFinite(player.x) ? player.x : this.gameState.gameWidth / 2;
+        player.y = isFinite(player.y) ? player.y : this.gameState.gameHeight / 2;
+
+        // Store velocity for animation
+        player.vx = this.tankVelocity.x;
+        player.vy = this.tankVelocity.y;
+
+        // Update smooth positions for rendering
+        player.smoothX = player.x;
+        player.smoothY = player.y;
+
+        // Update player angle based on movement direction
+        if (inputX !== 0 || inputY !== 0) {
+            const targetAngle = Math.atan2(inputY, inputX);
+            player.angle = targetAngle;
+            player.currentRotation = targetAngle;
+        }
+
+        // Update mouse angle for turret
+        // DISABLED: Let game.js handle weapon angle directly
+        // if (this.gameState.mouse && this.gameState.mouse.angle !== undefined) {
+        //     // Mouse angle is already calculated by InputSystem
+        //     player.turretAngle = this.gameState.mouse.angle;
+        //     player.smoothGunAngle = this.gameState.mouse.angle;
+        // }
+
+        // Keep player in bounds (expanded bounds for testing)
+        const bounds = 2000;
+        player.x = Math.max(-bounds, Math.min(bounds, player.x));
+        player.y = Math.max(-bounds, Math.min(bounds, player.y));
+
+        // Update camera to follow player
+        this.updateCamera(player);
+    }
+
+    /**
+     * Update camera to follow player
+     */
+    updateCamera(player) {
+        if (!this.gameState.camera) {
+            this.gameState.camera = { x: 0, y: 0, zoom: 1 };
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        if (!canvas) return;
+
+        // Safety checks for player position
+        const playerX = isFinite(player.x) ? player.x : this.gameState.gameWidth / 2;
+        const playerY = isFinite(player.y) ? player.y : this.gameState.gameHeight / 2;
+
+        // Smooth camera following
+        const targetX = playerX - canvas.width / 2;
+        const targetY = playerY - canvas.height / 2;
+
+        // Safety checks for camera position
+        if (isFinite(targetX) && isFinite(targetY)) {
+            this.gameState.camera.x += (targetX - this.gameState.camera.x) * this.CAMERA_SMOOTHING;
+            this.gameState.camera.y += (targetY - this.gameState.camera.y) * this.CAMERA_SMOOTHING;
+        }
+
+        // Ensure camera position is always finite
+        this.gameState.camera.x = isFinite(this.gameState.camera.x) ? this.gameState.camera.x : 0;
+        this.gameState.camera.y = isFinite(this.gameState.camera.y) ? this.gameState.camera.y : 0;
     }
 
     /**

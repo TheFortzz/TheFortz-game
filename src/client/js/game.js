@@ -48,7 +48,6 @@ const physicsSystem = new PhysicsSystem(gameStateManager.getGameState());
 let particleSystem = null;
 let weaponSystem = null;
 let renderSystem = null;
-let gameLoop = null;
 
 // Canvas references
 let canvas, ctx, minimapCanvas, minimapCtx;
@@ -79,27 +78,53 @@ if (typeof window !== 'undefined') {
     window.renderRaceOnCanvas = (canvasId, raceConfig, options) => {
         return imageLoader.renderRaceOnCanvas(canvasId, raceConfig, options);
     };
+    
+    // Early function exports for HTML handlers
+    window.joinGame = function() {
+        console.log('🎮 joinGame called (early export)');
+        if (typeof joinGame === 'function') {
+            joinGame();
+        } else {
+            console.warn('⚠️ joinGame function not yet defined, will retry...');
+            setTimeout(() => {
+                if (typeof joinGame === 'function') {
+                    joinGame();
+                } else {
+                    console.error('❌ joinGame function still not available');
+                }
+            }, 100);
+        }
+    };
 }
 
 /**
  * Initialize the game
  */
 function initializeGame() {
+    console.log('🎮 Initializing game...');
+    
     // Get canvas elements
     canvas = document.getElementById('gameCanvas');
     minimapCanvas = document.getElementById('minimapCanvas');
     
-    if (canvas) {
-        ctx = canvas.getContext('2d');
-        
-        // Initialize canvas-dependent systems
-        particleSystem = new ParticleSystem(gameState, canvas, ctx);
-        weaponSystem = new WeaponSystem(gameState, networkSystem, particleSystem, imageLoader);
-        
-        // Expose to window for backward compatibility
-        window.particleSystem = particleSystem;
-        window.weaponSystem = weaponSystem;
+    if (!canvas) {
+        console.error('❌ Game canvas not found!');
+        return;
     }
+    
+    ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('❌ Could not get canvas context!');
+        return;
+    }
+    
+    // Initialize canvas-dependent systems
+    particleSystem = new ParticleSystem(gameState, canvas, ctx);
+    weaponSystem = new WeaponSystem(gameState, networkSystem, particleSystem, imageLoader);
+    
+    // Expose to window for backward compatibility
+    window.particleSystem = particleSystem;
+    window.weaponSystem = weaponSystem;
     
     if (minimapCanvas) {
         minimapCtx = minimapCanvas.getContext('2d');
@@ -107,13 +132,96 @@ function initializeGame() {
     
     // Initialize render system
     renderSystem = new RenderSystem(gameState, canvas, ctx, minimapCanvas, minimapCtx);
+    
+    // Force image loading and set dependencies
+    console.log('🖼️ ImageLoader status:', {
+        exists: !!imageLoader,
+        imagesLoaded: imageLoader?.imagesLoaded,
+        tankImages: Object.keys(imageLoader?.tankImages || {}),
+        weaponImages: Object.keys(imageLoader?.weaponImages || {})
+    });
+    
+    // Try to initialize images if not loaded
+    if (imageLoader && !imageLoader.imagesLoaded) {
+        console.log('🔄 Forcing image initialization...');
+        imageLoader.initializeTankImages();
+    }
+    
+    // Set dependencies for render system
+    renderSystem.setDependencies(
+        particleSystem, 
+        imageLoader, 
+        imageLoader?.tankImages || {}, 
+        imageLoader?.weaponImages || {}, 
+        imageLoader?.imagesLoaded || false,
+        { tanks: {}, weapons: {} }
+    );
+    
     window.renderSystem = renderSystem;
     
     // Resize canvas
-    if (renderSystem) {
-        renderSystem.resizeCanvas();
+    resizeCanvas();
+    
+    // Initialize camera
+    if (!gameState.camera) {
+        gameState.camera = { x: 0, y: 0, zoom: 1 };
     }
     
+    // Initialize mouse state for weapon tracking
+    if (!gameState.mouse) {
+        gameState.mouse = { 
+            x: canvas ? canvas.width / 2 : 0, 
+            y: canvas ? canvas.height / 2 : 0, 
+            angle: 0, 
+            targetAngle: 0 
+        };
+    }
+    
+    // Initialize DIRECT weapon angle - completely isolated
+    if (window.WEAPON_ANGLE === undefined) {
+        window.WEAPON_ANGLE = 0; // Start pointing right
+        console.log('🎯 DIRECT weapon angle initialized to 0°');
+    }
+    
+    // Create local player for testing if no server connection
+    if (!gameState.playerId) {
+        const playerId = 'local_player_' + Date.now();
+        gameStateManager.updateGameState({ playerId: playerId });
+        
+        // Create local player with proper initialization
+        const localPlayer = {
+            id: playerId,
+            x: gameState.gameWidth / 2,
+            y: gameState.gameHeight / 2,
+            vx: 0,
+            vy: 0,
+            angle: 0,
+            turretAngle: 0,
+            currentRotation: 0,
+            smoothX: gameState.gameWidth / 2,
+            smoothY: gameState.gameHeight / 2,
+            smoothGunAngle: 0,
+            health: 100,
+            maxHealth: 100,
+            score: 0,
+            kills: 0,
+            name: 'Player',
+            selectedTank: gameState.selectedTank || {
+                color: 'blue',
+                body: 'body_halftrack',
+                weapon: 'turret_01_mk1'
+            }
+        };
+        
+        // Initialize players object if it doesn't exist
+        if (!gameState.players) {
+            gameState.players = {};
+        }
+        
+        gameState.players[playerId] = localPlayer;
+        console.log('🎮 Local player created:', localPlayer);
+    }
+
     // Connect to server
     if (!gameState.isConnected) {
         const gameMode = gameState.selectedGameMode || 'ffa';
@@ -123,15 +231,10 @@ function initializeGame() {
     // Initialize input system
     inputSystem.initialize();
     
-    // Create and start game loop
-    gameLoop = new GameLoop(gameState, {
-        inputSystem,
-        physicsSystem,
-        particleSystem,
-        weaponSystem,
-        renderSystem
-    });
-    gameLoop.start();
+    // Start the classic game loop (like in backup)
+    gameLoop();
+    
+    console.log('✅ Game initialized successfully');
     
     // Trigger CrazyGames gameplay start event
     if (window.CrazyGamesIntegration) {
@@ -140,9 +243,136 @@ function initializeGame() {
 }
 
 /**
+ * Resize canvas to window dimensions
+ */
+function resizeCanvas() {
+    if (renderSystem) {
+        renderSystem.resizeCanvas();
+    } else if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+}
+
+/**
+ * Classic game loop (like in backup)
+ */
+let animationId;
+
+function gameLoop() {
+    if (!gameState.isInLobby) {
+        update();
+        render();
+        animationId = requestAnimationFrame(gameLoop);
+    }
+}
+
+/**
+ * Update game systems
+ */
+function update() {
+    // Update input system
+    inputSystem.update(16.67, gameState); // ~60 FPS delta time
+    
+    // Update particle system
+    if (particleSystem) {
+        particleSystem.update();
+    }
+
+    // Update physics system
+    if (physicsSystem) {
+        physicsSystem.update(16.67); // ~60 FPS delta time
+    }
+
+    // Update weapon system
+    if (weaponSystem) {
+        weaponSystem.update(0.0167, []); // ~60 FPS delta time
+    }
+    
+    // Update tank animations (like backup)
+    updateTankAnimations();
+}
+
+/**
+ * Render the game
+ */
+function render() {
+    if (renderSystem) {
+        renderSystem.render();
+    }
+}
+
+// Smooth rotation helper functions
+function normalizeAngle(angle) {
+    while (angle > Math.PI) angle -= 2 * Math.PI;
+    while (angle < -Math.PI) angle += 2 * Math.PI;
+    return angle;
+}
+
+function lerpAngle(current, target, speed) {
+    const diff = normalizeAngle(target - current);
+    return current + diff * speed;
+}
+
+/**
+ * Update tank animations - SMOOTH BODY ROTATION!
+ */
+function updateTankAnimations() {
+    if (!gameState.players || !gameState.playerId) return;
+    
+    const player = gameState.players[gameState.playerId];
+    if (!player) return;
+    
+    // BODY: Smooth rotation toward WASD movement direction
+    const inputDirection = window.physicsSystem ? window.physicsSystem.getLastInputDirection() : { x: 0, y: 0 };
+    
+    // Initialize body angle if not set
+    if (player.bodyAngle === undefined) {
+        player.bodyAngle = -Math.PI / 2; // Start facing up
+    }
+    
+    // Initialize last movement direction if not set
+    if (player.lastMovementAngle === undefined) {
+        player.lastMovementAngle = -Math.PI / 2; // Start facing up
+    }
+    
+    if (Math.abs(inputDirection.x) > 0.01 || Math.abs(inputDirection.y) > 0.01) {
+        // Moving - smoothly rotate toward movement direction
+        const targetBodyAngle = Math.atan2(inputDirection.y, inputDirection.x);
+        
+        // Store the last movement direction
+        player.lastMovementAngle = targetBodyAngle;
+        
+        // Smooth interpolation toward movement direction
+        const rotationSpeed = 0.15; // Adjust for smoothness (0.1 = slower, 0.3 = faster)
+        player.bodyAngle = lerpAngle(player.bodyAngle, targetBodyAngle, rotationSpeed);
+        
+        console.log('🚗 Body smoothly rotating to:', (targetBodyAngle * 180 / Math.PI).toFixed(1), '° (current:', (player.bodyAngle * 180 / Math.PI).toFixed(1), '°)');
+    } else {
+        // Not moving - KEEP the last movement direction instead of returning to up
+        // This fixes the issue where the body would always return to facing up when stopping
+        // Now the body stays in the direction it was facing when movement stopped
+        console.log('🚗 Body staying in last direction:', (player.lastMovementAngle * 180 / Math.PI).toFixed(1), '° (current:', (player.bodyAngle * 180 / Math.PI).toFixed(1), '°)');
+    }
+    
+    // WEAPON: Use DIRECT window variable - NO gameState interference!
+    if (window.WEAPON_ANGLE !== undefined) {
+        const oldWeaponAngle = player.weaponAngle;
+        player.weaponAngle = window.WEAPON_ANGLE; // DIRECT from mouse, no processing
+        
+        // PROTECTION: Make sure weapon angle ONLY changes when mouse moves
+        if (oldWeaponAngle !== undefined && Math.abs(oldWeaponAngle - player.weaponAngle) > 0.1) {
+            console.log('⚠️ WEAPON ANGLE CHANGED! From', (oldWeaponAngle * 180 / Math.PI).toFixed(1), '° to', (player.weaponAngle * 180 / Math.PI).toFixed(1), '° - Should only happen on mouse move!');
+        }
+    }
+}
+
+/**
  * Join game - transition from lobby to game
  */
 function joinGame() {
+    console.log('🎮 Joining game...');
+    
     // Show loading overlay
     const loadingOverlay = document.getElementById('loadingOverlay');
     if (loadingOverlay) {
@@ -155,29 +385,65 @@ function joinGame() {
     }
     
     // Animate lobby screen out
-    document.getElementById('lobbyScreen').style.animation = 'fadeOut 0.5s ease-out';
+    const lobbyScreen = document.getElementById('lobbyScreen');
+    if (lobbyScreen) {
+        lobbyScreen.style.animation = 'fadeOut 0.5s ease-out';
+    }
     
     setTimeout(() => {
         // Hide lobby elements
-        const lobbyScreen = document.getElementById('lobbyScreen');
         if (lobbyScreen) {
             lobbyScreen.classList.add('hidden');
             lobbyScreen.style.display = 'none';
         }
         
+        // Hide all lobby background canvases
+        const tankCanvas = document.getElementById('tankLobbyBackground');
+        const jetCanvas = document.getElementById('jetLobbyBackground');
+        const raceCanvas = document.getElementById('raceLobbyBackground');
+        if (tankCanvas) tankCanvas.style.display = 'none';
+        if (jetCanvas) jetCanvas.style.display = 'none';
+        if (raceCanvas) raceCanvas.style.display = 'none';
+        
         // Show game elements
-        document.getElementById('gameMapArea').classList.remove('hidden');
-        document.getElementById('ui').classList.remove('hidden');
-        document.getElementById('scoreProgressContainer').classList.remove('hidden');
-        document.getElementById('centerBottomBoxes').classList.remove('hidden');
+        const gameMapArea = document.getElementById('gameMapArea');
+        const ui = document.getElementById('ui');
+        const scoreContainer = document.getElementById('scoreProgressContainer');
+        const centerBoxes = document.getElementById('centerBottomBoxes');
+        
+        if (gameMapArea) gameMapArea.classList.remove('hidden');
+        if (ui) ui.classList.remove('hidden');
+        if (scoreContainer) scoreContainer.classList.remove('hidden');
+        if (centerBoxes) centerBoxes.classList.remove('hidden');
         
         gameStateManager.updateGameState({ isInLobby: false });
         
-        // Load selected map
+        // Clear DOM map renderer's game container to prevent duplicate rendering
+        if (window.DOMMapRenderer && typeof window.DOMMapRenderer.clearGameMap === 'function') {
+            window.DOMMapRenderer.clearGameMap();
+        }
+        
+        // Load selected map (like in backup)
         if (window.selectedCreatedMapId && window.MapRenderer) {
+            console.log('🗺️ Loading selected map into game:', window.selectedCreatedMapId);
             window.MapRenderer.loadById(window.selectedCreatedMapId);
         } else if (window.DOMMapRenderer?.currentMap && window.MapRenderer) {
+            console.log('🗺️ Loading current map from DOM renderer into game');
             window.MapRenderer.loadMap(window.DOMMapRenderer.currentMap);
+        } else {
+            // Try to load the first available player-created map
+            try {
+                const maps = JSON.parse(localStorage.getItem(STORAGE_KEYS.TANK_MAPS) || '[]');
+                const createdMaps = maps.filter(m => m.isUserCreated !== false);
+                if (createdMaps.length > 0 && window.MapRenderer) {
+                    console.log('🗺️ Loading first available created map:', createdMaps[0].name);
+                    window.MapRenderer.loadMap(createdMaps[0]);
+                } else {
+                    console.warn('⚠️ No created maps available - create a map first!');
+                }
+            } catch (e) {
+                console.warn('⚠️ Error loading maps:', e);
+            }
         }
         
         // Show game canvas
@@ -189,10 +455,12 @@ function joinGame() {
         }, 100);
         
         initializeGame();
+        
+        console.log('✅ Game joined successfully');
     }, 500);
 }
 
-// Expose joinGame globally
+// Expose joinGame globally (early exposure for HTML handlers)
 window.joinGame = joinGame;
 
 // Initialize image loading
@@ -205,12 +473,20 @@ if (typeof window !== 'undefined') {
         
         // Render tank in lobby
         if (typeof renderTankOnCanvas === 'function' && gameState.selectedTank) {
-            renderTankOnCanvas('playerTankCanvas', gameState.selectedTank);
+            renderTankOnCanvas('playerTankCanvas', gameState.selectedTank, { 
+              isLobby: true, 
+              scale: 1.8 
+            });
         }
         
         // Start lobby animations
         if (typeof animateLobbyTanks === 'function') {
             animateLobbyTanks();
+        }
+
+        // Start GIF lobby animation
+        if (window.imageLoader && typeof window.imageLoader.startLobbyAnimation === 'function') {
+            window.imageLoader.startLobbyAnimation();
         }
         
         // Initialize lobby background
@@ -275,6 +551,304 @@ window.addEventListener('resize', () => {
 })();
 
 console.log('🚀 Game coordinator initialized');
+
+/**
+ * Force start game for testing (bypasses lobby)
+ * Call this function in console to test tank rendering and movement
+ */
+function forceStartGame() {
+    console.log('🚀 Force starting game for testing...');
+    
+    // Set game state to not in lobby FIRST
+    gameStateManager.updateGameState({ isInLobby: false });
+    
+    // Show game elements
+    const gameMapArea = document.getElementById('gameMapArea');
+    if (gameMapArea) {
+        gameMapArea.classList.remove('hidden');
+        gameMapArea.style.display = 'block';
+        console.log('✅ Game map area shown');
+    } else {
+        console.error('❌ Game map area not found');
+    }
+    
+    const gameCanvas = document.getElementById('gameCanvas');
+    if (gameCanvas) {
+        gameCanvas.style.display = 'block';
+        gameCanvas.style.position = 'absolute';
+        gameCanvas.style.top = '0';
+        gameCanvas.style.left = '0';
+        gameCanvas.style.width = '100%';
+        gameCanvas.style.height = '100%';
+        gameCanvas.style.zIndex = '1';
+        console.log('✅ Game canvas shown and styled');
+    } else {
+        console.error('❌ Game canvas not found');
+    }
+    
+    // Hide lobby
+    const lobbyScreen = document.getElementById('lobbyScreen');
+    if (lobbyScreen) {
+        lobbyScreen.style.display = 'none';
+        console.log('✅ Lobby screen hidden');
+    }
+    
+    // Check and create test map if needed, then load it
+    const loadedMap = checkAndCreateTestMap();
+    if (!loadedMap) {
+        console.warn('⚠️ No maps available - will show fallback rendering');
+    }
+    
+    // Initialize game if not already done
+    if (!animationId) {
+        console.log('🎮 Initializing game for the first time...');
+        initializeGame();
+    } else {
+        console.log('🎮 Restarting existing game loop...');
+        // Cancel existing animation frame and restart
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        gameLoop();
+    }
+    
+    // Force a render immediately
+    setTimeout(() => {
+        if (renderSystem) {
+            console.log('🎨 Forcing immediate render...');
+            renderSystem.render();
+        }
+    }, 100);
+    
+    console.log('✅ Game force started - you should see tank and be able to move with WASD');
+    console.log('📊 Current game state:', {
+        isInLobby: gameState.isInLobby,
+        playerId: gameState.playerId,
+        hasPlayer: !!gameState.players?.[gameState.playerId],
+        canvasVisible: !!document.getElementById('gameCanvas'),
+        animationId: !!animationId,
+        renderSystemExists: !!renderSystem,
+        mapRendererExists: !!window.MapRenderer,
+        hasMap: !!(window.MapRenderer?.currentMap)
+    });
+}
+
+/**
+ * Debug function to check game state
+ */
+function debugGameState() {
+    console.log('🔍 Game State Debug:');
+    console.log('- isInLobby:', gameState.isInLobby);
+    console.log('- playerId:', gameState.playerId);
+    console.log('- players:', gameState.players);
+    console.log('- keys:', gameState.keys);
+    console.log('- camera:', gameState.camera);
+    console.log('- canvas:', document.getElementById('gameCanvas'));
+    console.log('- animationId:', animationId);
+    console.log('- renderSystem:', renderSystem);
+    console.log('- physicsSystem:', physicsSystem);
+    console.log('- inputSystem:', inputSystem);
+    
+    const player = gameState.players ? gameState.players[gameState.playerId] : null;
+    if (player) {
+        console.log('- player position:', { x: player.x, y: player.y });
+        console.log('- player velocity:', { vx: player.vx, vy: player.vy });
+    }
+    
+    // Check maps
+    console.log('🗺️ Map Debug:');
+    console.log('- MapRenderer exists:', !!window.MapRenderer);
+    console.log('- MapRenderer currentMap:', window.MapRenderer?.currentMap?.name);
+    console.log('- selectedCreatedMapId:', window.selectedCreatedMapId);
+    
+    // Check available maps
+    try {
+        const maps = JSON.parse(localStorage.getItem(STORAGE_KEYS.TANK_MAPS) || '[]');
+        console.log('- Available maps:', maps.length);
+        maps.forEach((map, i) => {
+            console.log(`  ${i + 1}. ${map.name} (ID: ${map.id}) - ${map.objects?.length || 0} objects`);
+        });
+    } catch (e) {
+        console.log('- Error reading maps:', e);
+    }
+}
+
+/**
+ * Debug function to check and create a test map if none exist
+ */
+function checkAndCreateTestMap() {
+    console.log('🗺️ Checking for created maps...');
+    
+    try {
+        const maps = JSON.parse(localStorage.getItem(STORAGE_KEYS.TANK_MAPS) || '[]');
+        console.log('Found', maps.length, 'maps');
+        
+        if (maps.length === 0) {
+            console.log('🆕 No maps found, creating a test map...');
+            
+            // Create a simple test map
+            const testMap = {
+                id: Date.now().toString(),
+                name: 'Test Battle Arena',
+                created: new Date().toISOString(),
+                isUserCreated: true,
+                vehicleType: 'tank',
+                groundTiles: [
+                    { key: '0,0', type: 'LightSand', image: '/assets/tank/Grounds/LightSand.png' },
+                    { key: '1,0', type: 'LightSand', image: '/assets/tank/Grounds/LightSand.png' },
+                    { key: '0,1', type: 'LightSand', image: '/assets/tank/Grounds/LightSand.png' },
+                    { key: '1,1', type: 'LightSand', image: '/assets/tank/Grounds/LightSand.png' }
+                ],
+                objects: [
+                    {
+                        name: 'house_01',
+                        x: 200,
+                        y: 200,
+                        image: '/assets/tank/Buildings/House_01/spr_top_down_view_house_01_front.png'
+                    }
+                ]
+            };
+            
+            const updatedMaps = [testMap];
+            localStorage.setItem(STORAGE_KEYS.TANK_MAPS, JSON.stringify(updatedMaps));
+            
+            console.log('✅ Test map created:', testMap.name);
+            
+            // Load the test map into MapRenderer
+            if (window.MapRenderer) {
+                window.MapRenderer.loadMap(testMap);
+                window.selectedCreatedMapId = testMap.id;
+                console.log('✅ Test map loaded into MapRenderer');
+            }
+            
+            return testMap;
+        } else {
+            console.log('✅ Maps already exist');
+            
+            // Load the first available map
+            const firstMap = maps[0];
+            if (window.MapRenderer && firstMap) {
+                window.MapRenderer.loadMap(firstMap);
+                window.selectedCreatedMapId = firstMap.id;
+                console.log('✅ Loaded first available map:', firstMap.name);
+            }
+            
+            return firstMap;
+        }
+    } catch (e) {
+        console.error('❌ Error checking/creating maps:', e);
+        return null;
+    }
+}
+
+/**
+ * Simple test to draw a tank immediately on canvas
+ */
+function testTankRender() {
+    console.log('🎨 Testing immediate tank render...');
+    
+    const canvas = document.getElementById('gameCanvas');
+    if (!canvas) {
+        console.error('❌ Canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('❌ Context not found');
+        return;
+    }
+    
+    // Set canvas size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Clear with blue background
+    ctx.fillStyle = '#4a9ad8';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw a simple tank in the center
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    
+    // Draw tank shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.ellipse(5, 5, 35, 25, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw tank body
+    ctx.fillStyle = '#2196F3'; // Blue tank
+    ctx.fillRect(-30, -40, 60, 80);
+    
+    // Draw tank tracks
+    ctx.fillStyle = '#333';
+    ctx.fillRect(-35, -35, 10, 70);
+    ctx.fillRect(25, -35, 10, 70);
+    
+    // Draw turret
+    ctx.fillStyle = '#1976D2'; // Darker blue
+    ctx.beginPath();
+    ctx.arc(0, 0, 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw gun barrel
+    ctx.fillStyle = '#444';
+    ctx.fillRect(-5, -50, 10, 35);
+    
+    // Draw player name
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(-40, -70, 80, 20);
+    ctx.fillStyle = '#00ff00';
+    ctx.fillText('Test Player', 0, -55);
+    
+    ctx.restore();
+    
+    // Draw debug grid
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    
+    const gridSize = 100;
+    for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+    
+    console.log('✅ Tank rendered at center:', centerX, centerY);
+}
+
+// Expose globally for console testing
+window.forceStartGame = forceStartGame;
+window.debugGameState = debugGameState;
+window.testTankRender = testTankRender;
+window.checkAndCreateTestMap = checkAndCreateTestMap;
+
+// Initialize weapon recoil animation system
+if (typeof window !== 'undefined') {
+    window.gunRecoilAnimation = {
+        left: 0,
+        shake: 0
+    };
+}
+
+// Expose classic game loop functions
+window.gameLoop = gameLoop;
+window.update = update;
+window.render = render;
+window.resizeCanvas = resizeCanvas;
 
 // ===== MISSING FUNCTION IMPLEMENTATIONS =====
 // These functions are called by HTML event handlers but were missing
@@ -347,10 +921,16 @@ function updateVehicleUI(vehicleType) {
 }
 
 /**
- * OLD SHOP FUNCTION - DISABLED
+ * Switch shop category
  * Shop category switching now handled by Figma shop in missingHandlers.js
  */
-// function switchShopCategory - REMOVED to prevent conflicts with Figma shop
+function switchShopCategory(category) {
+    console.log(`🛒 Shop category switched to: ${category}`);
+    // This function is kept for compatibility but actual shop logic is handled elsewhere
+    if (window.shopSystem && typeof window.shopSystem.switchCategory === 'function') {
+        window.shopSystem.switchCategory(category);
+    }
+}
 
 /**
  * Switch champions tab

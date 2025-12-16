@@ -60,206 +60,73 @@ const Renderer = {
     },
 
     clear() {
-        // Fill with bright blue water background to make sure it's visible
-        this.ctx.fillStyle = '#4a9ad8';
+        // Fill with simple dark background
+        this.ctx.fillStyle = '#2d4a3a'; // Dark green background
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        console.log('🌊 Cleared canvas with blue background');
     },
 
-    drawDefaultTerrain() {
-        // Draw sparse grass patches over water background (don't cover everything)
-        const tileSize = 120;
-        const camera = GameState.camera;
-        const viewWidth = this.canvas.width;
-        const viewHeight = this.canvas.height;
+    // Removed complex terrain rendering - using simple ground instead
+
+    drawSimpleGround() {
+        // Simple grass background
+        this.ctx.fillStyle = '#4a7c59'; // Dark green grass
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        const startX = Math.floor((camera.x - viewWidth / 2) / tileSize) * tileSize;
-        const startY = Math.floor((camera.y - viewHeight / 2) / tileSize) * tileSize;
-        const endX = startX + viewWidth + tileSize * 2;
-        const endY = startY + viewHeight + tileSize * 2;
+        // Add some texture with a subtle pattern
+        this.ctx.fillStyle = 'rgba(60, 120, 80, 0.3)';
+        const camera = GameState.camera || { x: 0, y: 0 };
         
-        // Draw sparse grass islands over water
-        for (let x = startX; x < endX; x += tileSize) {
-            for (let y = startY; y < endY; y += tileSize) {
-                const screenX = x - camera.x + this.canvas.width / 2;
-                const screenY = y - camera.y + this.canvas.height / 2;
-                
-                // Calculate distance from map center for circular boundary
-                const distFromCenter = Math.sqrt(x * x + y * y);
-                
-                // Only draw grass in center area, leave water visible at edges
-                if (distFromCenter < 2000) {
-                    // Use noise-like pattern to create islands
-                    const noiseX = Math.sin(x * 0.001) * Math.cos(y * 0.001);
-                    const noiseY = Math.cos(x * 0.001) * Math.sin(y * 0.001);
-                    const noise = (noiseX + noiseY) * 0.5;
-                    
-                    // Only draw grass where noise is positive (creates islands)
-                    if (noise > 0.2) {
-                        // Draw isometric grass tile
-                        this.ctx.fillStyle = 'rgba(60, 120, 80, 0.8)';
-                        
-                        // Draw isometric diamond shape
-                        const tileWidth = tileSize;
-                        const tileHeight = 30;
-                        
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(screenX, screenY - tileHeight / 2);
-                        this.ctx.lineTo(screenX + tileWidth / 2, screenY);
-                        this.ctx.lineTo(screenX, screenY + tileHeight / 2);
-                        this.ctx.lineTo(screenX - tileWidth / 2, screenY);
-                        this.ctx.closePath();
-                        this.ctx.fill();
-                        
-                        // Add grass texture
-                        this.ctx.strokeStyle = 'rgba(40, 100, 60, 0.6)';
-                        this.ctx.lineWidth = 1;
-                        this.ctx.stroke();
-                    }
+        for (let x = -camera.x % 40; x < this.canvas.width; x += 40) {
+            for (let y = -camera.y % 40; y < this.canvas.height; y += 40) {
+                if ((Math.floor(x / 40) + Math.floor(y / 40)) % 2 === 0) {
+                    this.ctx.fillRect(x, y, 40, 40);
                 }
             }
         }
-        
-        // Draw map boundary circle
-        this.ctx.strokeStyle = 'rgba(0, 247, 255, 0.3)';
-        this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        const screenCenterX = this.canvas.width / 2;
-        const screenCenterY = this.canvas.height / 2;
-        this.ctx.arc(screenCenterX, screenCenterY, 3750, 0, Math.PI * 2);
-        this.ctx.stroke();
     },
 
-    drawWaterBackground() {
-        // Use GameState camera if available, otherwise use default camera position
-        const camera = (GameState && GameState.camera) ? GameState.camera : { x: 0, y: 0 };
-        
-        // Add a simple test to make sure this function is being called
-        console.log('🌊 Drawing water background at camera:', camera);
-        
-        const tileWidth = 120;
-        const tileHeight = 30;
-        const drawHeight = 70;
-
-        // Calculate visible viewport bounds
-        const viewLeft = camera.x - this.canvas.width / 2;
-        const viewTop = camera.y - this.canvas.height / 2;
-        const viewRight = camera.x + this.canvas.width / 2;
-        const viewBottom = camera.y + this.canvas.height / 2;
-
-        // Add padding to ensure full coverage
-        const paddingX = tileWidth * 4;
-        const paddingY = drawHeight * 6;
-
-        // Calculate tile range
-        const startCol = Math.floor((viewLeft - paddingX) / tileWidth);
-        const endCol = Math.ceil((viewRight + paddingX) / tileWidth);
-        const startRow = Math.floor((viewTop - paddingY) / tileHeight);
-        const endRow = Math.ceil((viewBottom + paddingY) / tileHeight);
-
-        // Draw water tiles
-        let tilesDrawn = 0;
-        for (let row = startRow; row <= endRow; row++) {
-            for (let col = startCol; col <= endCol; col++) {
-                const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
-                const isoY = row * tileHeight;
-
-                const screenX = isoX - camera.x + this.canvas.width / 2;
-                const screenY = isoY - camera.y + this.canvas.height / 2;
-
-                // Draw water tile
-                this.drawWaterTile(screenX, screenY, tileWidth, drawHeight);
-                tilesDrawn++;
-            }
-        }
-        
-        console.log('🌊 Drew', tilesDrawn, 'water tiles');
-        
-        // Fallback: if no tiles were drawn, fill with solid blue
-        if (tilesDrawn === 0) {
-            this.ctx.fillStyle = '#4a9ad8';
+    renderDOMMap() {
+        // Render the current DOM map if available
+        if (window.DOMMapRenderer && window.DOMMapRenderer.currentMap) {
+            const camera = GameState.camera || { x: 0, y: 0 };
+            
+            // Simple map rendering - just draw ground tiles
+            this.ctx.fillStyle = '#4a7c59'; // Grass background
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            console.log('🌊 Drew fallback water background');
+            
+            // If the map has ground tiles, render them
+            const map = window.DOMMapRenderer.currentMap;
+            if (map.groundTiles && Array.isArray(map.groundTiles)) {
+                map.groundTiles.forEach(tile => {
+                    if (tile && tile.x !== undefined && tile.y !== undefined) {
+                        const screenX = tile.x - camera.x + this.canvas.width / 2;
+                        const screenY = tile.y - camera.y + this.canvas.height / 2;
+                        
+                        // Draw tile (simple colored rectangle for now)
+                        this.ctx.fillStyle = tile.color || '#6b8e23';
+                        this.ctx.fillRect(screenX - 30, screenY - 15, 60, 30);
+                    }
+                });
+            }
+        } else {
+            this.drawSimpleGround();
         }
-    },
-
-    drawWaterTile(x, y, width, height) {
-        // Isometric diamond points
-        const top = { x: x + width / 2, y: y };
-        const right = { x: x + width, y: y + height / 2 };
-        const bottom = { x: x + width / 2, y: y + height };
-        const left = { x: x, y: y + height / 2 };
-
-        // Enhanced water gradient with vibrant colors
-        const gradient = this.ctx.createLinearGradient(left.x, top.y, right.x, bottom.y);
-        gradient.addColorStop(0, '#4a9ad8');    // Brighter blue (top-left, lit by sun)
-        gradient.addColorStop(0.3, '#3a8ac8');  // Medium blue
-        gradient.addColorStop(0.7, '#2a7ab8');  // Darker blue
-        gradient.addColorStop(1, '#1a6aa8');    // Deep blue (bottom-right, shadow)
-
-        // Draw the water diamond
-        this.ctx.fillStyle = gradient;
-        this.ctx.beginPath();
-        this.ctx.moveTo(top.x, top.y);
-        this.ctx.lineTo(right.x, right.y);
-        this.ctx.lineTo(bottom.x, bottom.y);
-        this.ctx.lineTo(left.x, left.y);
-        this.ctx.closePath();
-        this.ctx.fill();
-
-        // Enhanced border for better definition
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.lineWidth = 1.5;
-        this.ctx.stroke();
-
-        // Bright highlight on top-left edge (sun reflection)
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.moveTo(top.x, top.y);
-        this.ctx.lineTo(left.x, left.y);
-        this.ctx.stroke();
-
-        // Secondary highlight (water shimmer)
-        this.ctx.strokeStyle = 'rgba(150, 200, 255, 0.5)';
-        this.ctx.lineWidth = 1.5;
-        this.ctx.beginPath();
-        this.ctx.moveTo(top.x + 2, top.y + 2);
-        this.ctx.lineTo(left.x + 4, left.y);
-        this.ctx.stroke();
-
-        // Deep shadow on bottom-right edge
-        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.lineWidth = 2.5;
-        this.ctx.beginPath();
-        this.ctx.moveTo(right.x, right.y);
-        this.ctx.lineTo(bottom.x, bottom.y);
-        this.ctx.stroke();
-
-        // Add subtle inner glow for water depth
-        this.ctx.save();
-        this.ctx.globalAlpha = 0.2;
-        const centerX = (left.x + right.x) / 2;
-        const centerY = (top.y + bottom.y) / 2;
-        const radialGradient = this.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, width * 0.4);
-        radialGradient.addColorStop(0, 'rgba(120, 200, 255, 0.4)');
-        radialGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        this.ctx.fillStyle = radialGradient;
-        this.ctx.fill();
-        this.ctx.restore();
     },
 
     render() {
         this.clear();
         
-        // Always draw water background first
-        this.drawWaterBackground();
+        // Render call (debug logging removed)
         
-        // Use MapRenderer if a map is loaded, otherwise show default terrain
+        // Render the created map if available
         if (window.MapRenderer && window.MapRenderer.isLoaded) {
             window.MapRenderer.render(this.ctx, GameState.camera);
+        } else if (window.DOMMapRenderer && window.DOMMapRenderer.currentMap) {
+            // Render DOM map if available
+            this.renderDOMMap();
         } else {
-            this.drawDefaultTerrain();
+            // Fallback to simple ground
+            this.drawSimpleGround();
         }
         
         this.ctx.save();
@@ -358,15 +225,140 @@ const Renderer = {
             }
         }
 
+        // Safety check for player position
+        const playerX = isFinite(player.x) ? player.x : 0;
+        const playerY = isFinite(player.y) ? player.y : 0;
+
         this.ctx.save();
-        this.ctx.translate(player.x, player.y);
-        this.ctx.rotate(player.angle || 0);
+        this.ctx.translate(playerX, playerY);
 
         // Glow effect for player
         if (player.id === GameState.playerId) {
             this.ctx.shadowColor = '#00f7ff';
             this.ctx.shadowBlur = 20;
         }
+
+        // Draw actual tank images if available
+        if (player.tankConfig && window.imageLoader) {
+            this.drawTankImages(player);
+        } else {
+            // Fallback to simple shapes
+            this.drawSimpleTank(player);
+        }
+
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        this.ctx.restore();
+        
+        // Draw name tag (with safety checks)
+        const namePlayerX = isFinite(player.x) ? player.x : 0;
+        const namePlayerY = isFinite(player.y) ? player.y : 0;
+        
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = 'bold 13px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        this.ctx.shadowBlur = 4;
+        this.ctx.fillText(player.name || 'Tank', namePlayerX, namePlayerY - 70);
+        this.ctx.shadowBlur = 0;
+
+        // Draw health bar (with safety checks)
+        const barWidth = 90;
+        const barHeight = 10;
+        const healthPercent = Math.max(0, Math.min(1, (player.health || 100) / 100));
+        
+        // Safety check for player position
+        const healthPlayerX = isFinite(player.x) ? player.x : 0;
+        const healthPlayerY = isFinite(player.y) ? player.y : 0;
+        
+        // Background
+        this.ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        this.ctx.fillRect(healthPlayerX - barWidth/2, healthPlayerY - 55, barWidth, barHeight);
+        
+        // Health gradient (with safety checks)
+        const gradientStartX = healthPlayerX - barWidth/2;
+        const gradientEndX = healthPlayerX + barWidth/2;
+        
+        if (isFinite(gradientStartX) && isFinite(gradientEndX)) {
+            const healthGradient = this.ctx.createLinearGradient(gradientStartX, 0, gradientEndX, 0);
+            if (healthPercent > 0.6) {
+                healthGradient.addColorStop(0, '#00ff00');
+                healthGradient.addColorStop(1, '#44ff44');
+            } else if (healthPercent > 0.3) {
+                healthGradient.addColorStop(0, '#ffaa00');
+                healthGradient.addColorStop(1, '#ffdd44');
+            } else {
+                healthGradient.addColorStop(0, '#ff3333');
+                healthGradient.addColorStop(1, '#ff6666');
+            }
+            
+            this.ctx.fillStyle = healthGradient;
+            this.ctx.fillRect(healthPlayerX - barWidth/2, healthPlayerY - 55, barWidth * healthPercent, barHeight);
+        }
+        
+        // Border
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(healthPlayerX - barWidth/2, healthPlayerY - 55, barWidth, barHeight);
+
+        // Draw level indicator (with safety checks)
+        if (player.level) {
+            const levelPlayerX = isFinite(player.x) ? player.x : 0;
+            const levelPlayerY = isFinite(player.y) ? player.y : 0;
+            
+            this.ctx.fillStyle = '#00f7ff';
+            this.ctx.font = 'bold 11px Arial';
+            this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            this.ctx.shadowBlur = 3;
+            this.ctx.fillText(`LvL ${player.level}`, levelPlayerX, levelPlayerY - 40);
+            this.ctx.shadowBlur = 0;
+        }
+    },
+
+    drawTankImages(player) {
+        const { color, body, weapon } = player.tankConfig;
+        const scale = 0.8; // Scale for game rendering
+        
+        // Get tank images from imageLoader
+        const bodyImg = window.imageLoader.tankImages[color] && window.imageLoader.tankImages[color][body];
+        const weaponImg = window.imageLoader.weaponImages[color] && window.imageLoader.weaponImages[color][weapon];
+
+        // Draw tank body (rotates with movement)
+        if (bodyImg) {
+            this.ctx.save();
+            this.ctx.rotate(player.angle || 0);
+            
+            const bodyWidth = bodyImg.width * scale;
+            const bodyHeight = bodyImg.height * scale;
+            this.ctx.drawImage(bodyImg, -bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight);
+            this.ctx.restore();
+        }
+
+        // Draw weapon/turret (rotates to face mouse)
+        if (weaponImg) {
+            this.ctx.save();
+            // Use turret angle if available, otherwise use mouse angle or player angle
+            const turretAngle = player.turretAngle !== undefined 
+                ? player.turretAngle 
+                : (window.gameState && window.gameState.mouse.angle !== undefined) 
+                    ? window.gameState.mouse.angle 
+                    : (player.angle || 0);
+            this.ctx.rotate(turretAngle);
+            
+            const weaponWidth = weaponImg.width * scale;
+            const weaponHeight = weaponImg.height * scale;
+            this.ctx.drawImage(weaponImg, -weaponWidth / 2, -weaponHeight / 2, weaponWidth, weaponHeight);
+            this.ctx.restore();
+        }
+
+        // If images aren't loaded, fall back to simple tank
+        if (!bodyImg || !weaponImg) {
+            this.drawSimpleTank(player);
+        }
+    },
+
+    drawSimpleTank(player) {
+        this.ctx.rotate(player.angle || 0);
 
         // Draw tank body with gradient
         const bodyGradient = this.ctx.createLinearGradient(-45, -30, 45, 30);
@@ -432,60 +424,6 @@ const Renderer = {
         // Barrel tip
         this.ctx.fillStyle = 'rgba(0,0,0,0.5)';
         this.ctx.fillRect(-6, -55, 12, 3);
-
-        // Reset shadow
-        this.ctx.shadowBlur = 0;
-
-        this.ctx.restore();
-        
-        // Draw name tag
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 13px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
-        this.ctx.shadowBlur = 4;
-        this.ctx.fillText(player.name || 'Tank', player.x, player.y - 70);
-        this.ctx.shadowBlur = 0;
-
-        // Draw health bar
-        const barWidth = 90;
-        const barHeight = 10;
-        const healthPercent = (player.health || 100) / 100;
-        
-        // Background
-        this.ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        this.ctx.fillRect(player.x - barWidth/2, player.y - 55, barWidth, barHeight);
-        
-        // Health gradient
-        const healthGradient = this.ctx.createLinearGradient(player.x - barWidth/2, 0, player.x + barWidth/2, 0);
-        if (healthPercent > 0.6) {
-            healthGradient.addColorStop(0, '#00ff00');
-            healthGradient.addColorStop(1, '#44ff44');
-        } else if (healthPercent > 0.3) {
-            healthGradient.addColorStop(0, '#ffaa00');
-            healthGradient.addColorStop(1, '#ffdd44');
-        } else {
-            healthGradient.addColorStop(0, '#ff3333');
-            healthGradient.addColorStop(1, '#ff6666');
-        }
-        
-        this.ctx.fillStyle = healthGradient;
-        this.ctx.fillRect(player.x - barWidth/2, player.y - 55, barWidth * healthPercent, barHeight);
-        
-        // Border
-        this.ctx.strokeStyle = '#fff';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(player.x - barWidth/2, player.y - 55, barWidth, barHeight);
-
-        // Draw level indicator
-        if (player.level) {
-            this.ctx.fillStyle = '#00f7ff';
-            this.ctx.font = 'bold 11px Arial';
-            this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            this.ctx.shadowBlur = 3;
-            this.ctx.fillText(`LvL ${player.level}`, player.x, player.y - 40);
-            this.ctx.shadowBlur = 0;
-        }
     },
 
     drawBullet(bullet) {

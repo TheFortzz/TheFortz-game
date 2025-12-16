@@ -2655,6 +2655,48 @@ body {
   animation: autoShootNotification 2.5s ease-out forwards;
 }
 
+/* Vehicle Selection Notification */
+.vehicle-notification {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, rgba(255, 165, 0, 0.95), rgba(255, 140, 0, 0.95));
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  z-index: 10001;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  animation: vehicleNotificationShow 5s ease-out forwards;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes vehicleNotificationShow {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-20px) scale(0.8);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1.05);
+  }
+  15% {
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-20px) scale(0.8);
+  }
+}
+
 /* Responsive Design */
 /* Lobby Background Logo */
 .lobby-logo-background {
@@ -10338,4 +10380,237 @@ it Mode Button - Always looks like hover state */
     0 10px 30px rgba(255, 160, 80, 0.7),
     0 0 0 1px rgba(255, 160, 80, 0.3) inset;
   transform: translateX(-50%) scale(1.05);
+}
+/* Coming Soon Screen Styles */
+.coming-soon-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: comingSoonFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.coming-soon-container {
+    text-align: center;
+    padding: 60px 80px;
+    background: linear-gradient(135deg, rgba(0, 247, 255, 0.15), rgba(0, 200, 220, 0.08));
+    border: 3px solid rgba(0, 247, 255, 0.4);
+    border-radius: 25px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 20px 40px rgba(0, 247, 255, 0.2), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: scale(0.8);
+    animation: comingSoonScale 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s forwards;
+}
+
+.coming-soon-title {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 5rem;
+    color: #00f7ff;
+    text-shadow: 0 0 30px rgba(0, 247, 255, 0.8),
+                 0 0 60px rgba(0, 247, 255, 0.4),
+                 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 25px;
+    animation: comingSoonGlow 2s ease-in-out infinite alternate;
+    letter-spacing: 3px;
+}
+
+.coming-soon-subtitle {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0;
+    letter-spacing: 1px;
+}
+
+/* Disabled Vehicle Buttons - Clean fixes */
+.vehicle-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(50%);
+    transition: all 0.3s ease;
+    /* pointer-events: none; <- removed so tooltips/hover info still works */
+}
+
+.vehicle-btn.disabled:hover {
+    opacity: 0.8;
+    filter: grayscale(30%);
+    transform: translateY(-2px);
+}
+
+.vehicle-btn.disabled .vehicle-btn-text {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Basic fixes: responsive canvas container */
+#gameContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Coming Soon Notification */
+.coming-soon-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: linear-gradient(135deg, rgba(0, 247, 255, 0.25), rgba(0, 200, 220, 0.15));
+    border: 3px solid rgba(0, 247, 255, 0.7);
+    border-radius: 20px;
+    padding: 40px 60px;
+    text-align: center;
+    z-index: 2000;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 15px 35px rgba(0, 247, 255, 0.3), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: notificationBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.coming-soon-notification h2 {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 3rem;
+    color: #00f7ff;
+    text-shadow: 0 0 25px rgba(0, 247, 255, 0.8),
+                 0 0 50px rgba(0, 247, 255, 0.4),
+                 0 3px 6px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+    animation: comingSoonGlow 2s ease-in-out infinite alternate;
+    letter-spacing: 2px;
+}
+
+.coming-soon-notification p {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
+}
+@keyfra
+mes fadeOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}/
+* Hover Tooltip Styles */
+.hover-tooltip {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(0, 247, 255, 0.9), rgba(0, 200, 220, 0.8));
+    color: #000;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 14px;
+    letter-spacing: 1px;
+    z-index: 3000;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 247, 255, 0.4);
+    animation: tooltipFadeIn 0.2s ease-out;
+    transform: translateY(-10px);
+}
+
+.hover-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 247, 255, 0.9);
+}
+
+/* Enhanced Animations */
+@keyframes comingSoonFadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(15px);
+    }
+}
+
+@keyframes comingSoonScale {
+    from {
+        transform: scale(0.8);
+        opacity: 0.8;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes comingSoonGlow {
+    0% {
+        text-shadow: 0 0 20px rgba(0, 247, 255, 0.6),
+                     0 0 40px rgba(0, 247, 255, 0.3),
+                     0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+    100% {
+        text-shadow: 0 0 40px rgba(0, 247, 255, 1),
+                     0 0 80px rgba(0, 247, 255, 0.6),
+                     0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+}
+
+@keyframes notificationBounceIn {
+    0% {
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05);
+        opacity: 0.8;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes notificationFadeOut {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+    }
 }

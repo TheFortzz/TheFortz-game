@@ -217,30 +217,8 @@ const InputHandler = {
             this.hideCooldownCursor();
         }
 
-        // Movement
-        let moveX = 0;
-        let moveY = 0;
-
-        if (window.gameState.keys['w']) moveY -= 1;
-        if (window.gameState.keys['s']) moveY += 1;
-        if (window.gameState.keys['a']) moveX -= 1;
-        if (window.gameState.keys['d']) moveX += 1;
-
-        // Normalize diagonal movement
-        if (moveX !== 0 && moveY !== 0) {
-            moveX *= 0.707;
-            moveY *= 0.707;
-        }
-
-        // Simple movement with speed
-        const speed = 3;
-        player.x += moveX * speed;
-        player.y += moveY * speed;
-
-        // Update angle to face mouse
-        if (window.gameState.mouse.angle !== undefined) {
-            player.angle = window.gameState.mouse.angle;
-        }
+        // Tank-like movement system
+        this.updateTankMovement(player);
 
         // Keep player in bounds
         player.x = Math.max(50, Math.min(window.gameState.gameWidth - 50, player.x));
@@ -255,6 +233,123 @@ const InputHandler = {
                 angle: player.angle
             }));
         }
+    },
+
+    updateTankMovement(player) {
+        // Initialize velocity if not exists
+        if (!player.velocity) {
+            player.velocity = { x: 0, y: 0 };
+        }
+
+        // Tank physics constants
+        const ACCELERATION = 0.3;
+        const DECELERATION = 0.85;
+        const MAX_SPEED = 4;
+        const TURN_SPEED = 0.06;
+
+        // Get input
+        const forward = window.gameState.keys['w'];
+        const backward = window.gameState.keys['s'];
+        const left = window.gameState.keys['a'];
+        const right = window.gameState.keys['d'];
+
+        // Tank rotation (body follows movement direction)
+        let targetAngle = player.angle || 0;
+        
+        if (forward || backward) {
+            // Calculate movement direction
+            let moveAngle = 0;
+            
+            if (forward && left) {
+                moveAngle = -Math.PI / 4; // Forward-left
+            } else if (forward && right) {
+                moveAngle = Math.PI / 4; // Forward-right
+            } else if (backward && left) {
+                moveAngle = -3 * Math.PI / 4; // Backward-left
+            } else if (backward && right) {
+                moveAngle = 3 * Math.PI / 4; // Backward-right
+            } else if (forward) {
+                moveAngle = 0; // Forward
+            } else if (backward) {
+                moveAngle = Math.PI; // Backward
+            } else if (left) {
+                moveAngle = -Math.PI / 2; // Left
+            } else if (right) {
+                moveAngle = Math.PI / 2; // Right
+            }
+
+            targetAngle = moveAngle;
+        } else if (left || right) {
+            // Pure rotation without movement
+            if (left) {
+                targetAngle -= TURN_SPEED;
+            }
+            if (right) {
+                targetAngle += TURN_SPEED;
+            }
+        }
+
+        // Smooth rotation towards target
+        const angleDiff = targetAngle - player.angle;
+        const normalizedDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
+        
+        if (Math.abs(normalizedDiff) > 0.01) {
+            player.angle += normalizedDiff * 0.15; // Smooth rotation
+        }
+
+        // Movement acceleration
+        let accelerating = false;
+        
+        if (forward || backward || left || right) {
+            accelerating = true;
+            
+            // Calculate acceleration direction
+            let accelX = 0, accelY = 0;
+            
+            if (forward) {
+                accelY -= ACCELERATION;
+            }
+            if (backward) {
+                accelY += ACCELERATION;
+            }
+            if (left) {
+                accelX -= ACCELERATION;
+            }
+            if (right) {
+                accelX += ACCELERATION;
+            }
+
+            // Normalize diagonal movement
+            if (accelX !== 0 && accelY !== 0) {
+                accelX *= 0.707;
+                accelY *= 0.707;
+            }
+
+            // Apply acceleration
+            player.velocity.x += accelX;
+            player.velocity.y += accelY;
+        }
+
+        // Apply deceleration when not accelerating
+        if (!accelerating) {
+            player.velocity.x *= DECELERATION;
+            player.velocity.y *= DECELERATION;
+        }
+
+        // Limit maximum speed
+        const currentSpeed = Math.sqrt(player.velocity.x * player.velocity.x + player.velocity.y * player.velocity.y);
+        if (currentSpeed > MAX_SPEED) {
+            player.velocity.x = (player.velocity.x / currentSpeed) * MAX_SPEED;
+            player.velocity.y = (player.velocity.y / currentSpeed) * MAX_SPEED;
+        }
+
+        // Apply velocity to position
+        player.x += player.velocity.x;
+        player.y += player.velocity.y;
+
+        // Store velocity for animation
+        player.vx = player.velocity.x;
+        player.vy = player.velocity.y;
     }
 };
 

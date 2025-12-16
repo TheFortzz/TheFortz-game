@@ -50,22 +50,7 @@
     <!-- Function Connection Checker -->
     <script src="/js/utils/missing-functions-finder.js"></script>
 
-    <!-- Enhanced Shop System (Load in dependency order) -->
-    <script src="/js/shop/ShopDataModels.js"></script>
-    <script src="/js/shop/AssetManager.js"></script>
-    <script src="/js/shop/ShopStateManager.js"></script>
-    <script src="/js/shop/ShopAnimations.js"></script>
-    <script src="/js/shop/InventorySystem.js"></script>
-    <script src="/js/shop/CurrencySystem.js"></script>
-    <script src="/js/shop/ItemRenderer.js"></script>
-    <script src="/js/shop/ShopController.js"></script>
-    <script src="/js/shop/ShopSystem.js"></script>
-    <script src="/js/shop/ShopSystemIntegration.js"></script>
-    <script src="/js/shop/ShopErrorHandler.js"></script>
-    <script src="/js/shop/ShopValidator.js"></script>
-    <script src="/js/shop/ShopIntegrationManager.js"></script>
-    <script src="/js/shop/ShopIntegrationTest.js"></script>
-    <script src="/js/shop/shop-init.js"></script>
+    <!-- Shop functionality replaced with Coming Soon message -->
     
 
 </head>
@@ -139,15 +124,22 @@
 
             <!-- Vehicle Type Selection Buttons -->
             <div class="vehicle-type-buttons">
-                <button class="vehicle-btn vehicle-btn-left" id="jetBtn" onclick="selectVehicleType('jet')">
+                <button class="vehicle-btn vehicle-btn-left disabled" id="jetBtn" onclick="showComingSoon('jet')" 
+                        onmouseenter="showHoverTooltip(this, 'Coming Soon')" onmouseleave="hideHoverTooltip()">
                     <span class="vehicle-btn-text">JET</span>
                 </button>
                 <button class="vehicle-btn vehicle-btn-middle active" id="tankBtn" onclick="selectVehicleType('tank')">
                     <span class="vehicle-btn-text">TANK</span>
                 </button>
-                <button class="vehicle-btn vehicle-btn-right" id="raceBtn" onclick="selectVehicleType('race')">
+                <button class="vehicle-btn vehicle-btn-right disabled" id="raceBtn" onclick="showComingSoon('race')"
+                        onmouseenter="showHoverTooltip(this, 'Coming Soon')" onmouseleave="hideHoverTooltip()">
                     <span class="vehicle-btn-text">RACE</span>
                 </button>
+            </div>
+
+            <!-- Vehicle Selection Notification -->
+            <div id="vehicleNotification" class="vehicle-notification hidden">
+                <span id="vehicleNotificationText"></span>
             </div>
 
             <!-- Create Map Screen -->
@@ -609,47 +601,12 @@
                 </div>
             </div>
 
-            <!-- Modern Shop Screen -->
-            <div id="shopScreen" class="figma-shop-screen hidden">
-                <div class="figma-shop-container">
-                    <!-- Close Button -->
-                    <button class="figma-shop-close" onclick="closeAllPanels()">×</button>
-                    
-                    <!-- Header with Category Navigation -->
-                    <div class="figma-shop-header">
-                        <button onclick="switchShopCategory('tanks')" class="figma-category-btn tanks-btn active" data-category="tanks">
-                            Tanks
-                        </button>
-                        <button onclick="switchShopCategory('jets')" class="figma-category-btn jets-btn" data-category="jets">
-                            Jets
-                        </button>
-                        <button onclick="switchShopCategory('cars')" class="figma-category-btn cars-btn" data-category="cars">
-                            Cars
-                        </button>
-                        <button onclick="switchShopCategory('music')" class="figma-category-btn music-btn" data-category="music">
-                            Music
-                        </button>
-                    </div>
-
-                    <!-- Main Content -->
-                    <div class="figma-shop-main">
-                        <h2 class="figma-shop-title" id="figmaShopTitle">Tanks</h2>
-
-                        <!-- Items Container with Scroll -->
-                        <div class="figma-items-container">
-                            <!-- Scroll Controls -->
-                            <button onclick="scrollShopLeft()" class="figma-scroll-btn figma-scroll-left">
-                                ‹
-                            </button>
-                            <button onclick="scrollShopRight()" class="figma-scroll-btn figma-scroll-right">
-                                ›
-                            </button>
-                            
-                            <!-- Items Grid -->
-                            <div class="figma-items-scroll" id="figmaItemsScroll">
-                                <!-- Items will be populated by JavaScript -->
-                            </div>
-                        </div>
+            <!-- Coming Soon Shop Screen -->
+            <div id="shopScreen" class="coming-soon-screen hidden">
+                <div class="coming-soon-container">
+                    <div class="coming-soon-content">
+                        <h1 class="coming-soon-title">COMING SOON</h1>
+                        <p class="coming-soon-subtitle">Enjoy the game!</p>
                     </div>
                 </div>
             </div>
@@ -1104,7 +1061,7 @@
                         <span class="button-3d-bottom"></span>
                         <span class="button-3d-base"></span>
                     </button>
-                    <button id="shopButton" class="button-3d button-3d-gold" onclick="openFeature('shop')"
+                    <button id="shopButton" class="button-3d button-3d-gold" onclick="showComingSoon('shop')"
                         data-testid="button-shop">
                         <span class="button-3d-top">Shop</span>
                         <span class="button-3d-bottom"></span>
@@ -1723,10 +1680,17 @@
     <script src="/js/missingHandlers.js"></script>
     <script type="module" src="/js/ui/Auth.js"></script>
     <script src="/js/locker/locker.js"></script>
-    <script src="/js/shop/shop.js?v=3"></script>
+    <!-- Shop script removed - replaced with Coming Soon -->
     
     <!-- Map Creator System (Tank-only) -->
+    <script src="/js/mapCreator/MapScriptEngine.js"></script>
+    <script src="/js/mapCreator/ScriptTemplates.js"></script>
+    <script src="/js/mapCreator/ScriptSyntaxHighlighter.js"></script>
+    <script src="/js/mapCreator/TankMapCreatorEnhanced.js"></script>
+    <script src="/js/mapCreator/TankMapCreatorFixed.js"></script>
     <script src="/js/mapCreator/TankMapCreator.js"></script>
+    <script src="/js/mapCreator/MapCreatorInit.js"></script>
+    <script src="/js/mapCreator/MapCreatorTest.js"></script>
     <script src="/js/mapCreator/MapRadiusPatch.js"></script>
     <script src="/js/settings.js"></script>
     <script src="/js/zoomSlider.js"></script>

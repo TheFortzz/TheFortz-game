@@ -33,6 +33,9 @@ class ImageLoader {
     this.totalImagesToLoad = 0;
     this.loadingStartTime = Date.now();
 
+    // Animation state
+    this.lobbyAnimationId = null;
+
     // Expose globally for compatibility
     this.exposeGlobally();
   }
@@ -457,11 +460,55 @@ class ImageLoader {
     const centerY = canvas.height / 2;
     const scale = options.scale || 0.6;
     const rotation = options.rotation || 0;
+    const isLobby = options.isLobby || canvasId === 'playerTankCanvas';
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const { color, body, weapon } = tankConfig;
+
+    // Use GIF animations for lobby, PNG for game
+    if (isLobby && this.lobbyTankImages[color] && this.lobbyWeaponImages[color]) {
+      this.renderTankWithGifs(ctx, centerX, centerY, scale, rotation, color, body, weapon);
+    } else {
+      this.renderTankWithPngs(ctx, centerX, centerY, scale, rotation, color, body, weapon);
+    }
+  }
+
+  /**
+   * Render tank using animated GIF images (for lobby)
+   */
+  renderTankWithGifs(ctx, centerX, centerY, scale, rotation, color, body, weapon) {
+    const bodyImg = this.lobbyTankImages[color] && this.lobbyTankImages[color][body];
+    const weaponImg = this.lobbyWeaponImages[color] && this.lobbyWeaponImages[color][weapon];
+
+    if (bodyImg) {
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(rotation);
+
+      const bodyWidth = bodyImg.width * scale;
+      const bodyHeight = bodyImg.height * scale;
+      ctx.drawImage(bodyImg, -bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight);
+      ctx.restore();
+    }
+
+    if (weaponImg) {
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(rotation);
+
+      const weaponWidth = weaponImg.width * scale;
+      const weaponHeight = weaponImg.height * scale;
+      ctx.drawImage(weaponImg, -weaponWidth / 2, -weaponHeight / 2, weaponWidth, weaponHeight);
+      ctx.restore();
+    }
+  }
+
+  /**
+   * Render tank using PNG images (for game and fallback)
+   */
+  renderTankWithPngs(ctx, centerX, centerY, scale, rotation, color, body, weapon) {
     const bodyPath = `/assets/tank/tanks/${color}/${color}_${body}.png`;
     const weaponPath = `/assets/tank/tanks/${color}/${color}_${weapon}.png`;
 
@@ -560,6 +607,67 @@ class ImageLoader {
       ctx.drawImage(raceImg, -raceWidth / 2, -raceHeight / 2, raceWidth, raceHeight);
       ctx.restore();
     });
+  }
+
+  /**
+   * Start lobby animation loop for GIF rendering
+   */
+  startLobbyAnimation() {
+    if (this.lobbyAnimationId) {
+      cancelAnimationFrame(this.lobbyAnimationId);
+    }
+
+    this.lobbyRotation = 0; // Initialize rotation
+
+    const animate = () => {
+      // Only animate if we're in the lobby and have a game state manager
+      if (typeof window !== 'undefined' && window.gameStateManager) {
+        const gameState = window.gameStateManager.getGameState();
+        
+        if (gameState && gameState.isInLobby) {
+          // Update rotation for animation
+          this.lobbyRotation += 0.01; // Slow rotation speed
+
+          // Re-render player tank with GIF animation and rotation
+          if (gameState.selectedTank) {
+            this.renderTankOnCanvas('playerTankCanvas', gameState.selectedTank, { 
+              isLobby: true, 
+              scale: 1.8, // 3 times bigger (0.6 * 3 = 1.8)
+              rotation: this.lobbyRotation 
+            });
+          }
+
+          // Re-render party member tanks if they exist
+          for (let i = 1; i <= 2; i++) {
+            const partyCanvas = document.getElementById(`partyTank${i}Canvas`);
+            if (partyCanvas && gameState.partyMembers && gameState.partyMembers[i-1]) {
+              const member = gameState.partyMembers[i-1];
+              if (member.selectedTank) {
+                this.renderTankOnCanvas(`partyTank${i}Canvas`, member.selectedTank, { 
+                  isLobby: true,
+                  scale: 1.8,
+                  rotation: this.lobbyRotation 
+                });
+              }
+            }
+          }
+        }
+      }
+
+      this.lobbyAnimationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+  }
+
+  /**
+   * Stop lobby animation loop
+   */
+  stopLobbyAnimation() {
+    if (this.lobbyAnimationId) {
+      cancelAnimationFrame(this.lobbyAnimationId);
+      this.lobbyAnimationId = null;
+    }
   }
 
   /**

@@ -1,6 +1,6 @@
 /**
- * RenderSystem - Centralized rendering system for all game visuals
- * Handles canvas management, rendering coordination, and all drawing operations
+ * RenderSystem - SIMPLE tank rendering
+ * Body follows WASD, weapon follows mouse - EASY!
  */
 
 export default class RenderSystem {
@@ -57,6 +57,14 @@ export default class RenderSystem {
         const ctx = this.ctx;
         const canvas = this.canvas;
         
+        if (!ctx || !canvas) {
+            console.warn('❌ Canvas or context not available for rendering');
+            return;
+        }
+        
+        // Update sprite animations
+        this.updateSpriteAnimations();
+        
         // Clear canvas with bright blue water background
         ctx.fillStyle = '#4a9ad8';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -70,7 +78,7 @@ export default class RenderSystem {
         const centerY = canvas.height / 2;
 
         // Get player position
-        const player = Object.values(this.gameState.players).find(p => p.id === this.gameState.playerId);
+        const player = this.gameState.players ? this.gameState.players[this.gameState.playerId] : null;
         
         if (player) {
             // Center the player tank on screen
@@ -78,7 +86,7 @@ export default class RenderSystem {
             ctx.scale(zoom, zoom);
             ctx.translate(-player.x, -player.y);
         } else {
-            // Fallback if no player found
+            // Fallback if no player found - use camera position
             ctx.translate(centerX, centerY);
             ctx.scale(zoom, zoom);
             ctx.translate(-this.gameState.camera.x, -this.gameState.camera.y);
@@ -88,12 +96,15 @@ export default class RenderSystem {
         if (window.MapRenderer && window.MapRenderer.currentMap) {
             // Render map (ground tiles and buildings) - map provides its own ground
             window.MapRenderer.render(ctx, this.gameState, canvas);
+        } else {
+            // Draw a simple grid pattern if no map is loaded
+            this.drawDebugGrid(ctx);
         }
 
         // Draw AI tanks from map
         this.drawAITanks();
 
-        // Draw player tank only
+        // Draw player tank
         this.drawPlayers();
         
         // Render particle effects
@@ -103,6 +114,31 @@ export default class RenderSystem {
 
         // Restore context
         ctx.restore();
+        
+        // Draw debug info
+        this.drawDebugInfo();
+    }
+    
+    /**
+     * Update all sprite animations
+     */
+    updateSpriteAnimations() {
+        const currentTime = Date.now();
+        
+        // Update weapon animations
+        Object.values(this.spriteAnimations.weapons).forEach(anim => {
+            if (anim.isPlaying && currentTime - anim.lastFrameTime > anim.frameDuration) {
+                anim.currentFrame = (anim.currentFrame + 1) % anim.numFrames;
+                anim.lastFrameTime = currentTime;
+                
+                // Stop non-looping animations when they complete
+                if (!anim.loop && anim.currentFrame === 0) {
+                    anim.isPlaying = false;
+                }
+            }
+        });
+        
+        // Tank animations are updated in updateTankAnimation method
     }
     
     /**
@@ -256,61 +292,162 @@ export default class RenderSystem {
      * Draw players
      */
     drawPlayers() {
-        if (!this.imagesLoaded) return;
+        const player = this.gameState.players ? this.gameState.players[this.gameState.playerId] : null;
+        if (!player) {
+            console.warn('❌ No player found for rendering');
+            return;
+        }
 
-        const player = this.gameState.players[this.gameState.playerId];
-        if (!player) return;
-
-        const playerTankConfig = player.selectedTank || this.gameState.selectedTank;
-        const { tankImg, weaponImg } = this.getCurrentTankImages(playerTankConfig);
-
-        if (!tankImg || !weaponImg || !tankImg.complete || !weaponImg.complete) return;
-
-        // Import Tank class dynamically
-        const Tank = window.Tank;
-        if (!Tank) return;
-
-        // Create Tank instance for rendering
-        const tank = new Tank(playerTankConfig);
-        tank.visualSize = this.TANK_VISUAL_SIZE;
-
-        // Use smooth position
+        const ctx = this.ctx;
+        
+        // Use smooth position or fallback to regular position
         const renderX = player.smoothX !== undefined ? player.smoothX : player.x;
         const renderY = player.smoothY !== undefined ? player.smoothY : player.y;
 
-        // Tank body rotation
-        const currentRotation = player.currentRotation || 0;
+        // DIRECT angles - no complex processing
+        const bodyRotation = player.bodyAngle || 0;
+        let weaponAngle = player.weaponAngle || 0;
         
-        // Draw weapon angle
-        const weaponAngle = player.smoothGunAngle !== undefined ? player.smoothGunAngle : (player.angle || 0);
+        console.log('🎨 RENDERING SEPARATE: Body=' + (bodyRotation * 180 / Math.PI).toFixed(1) + '° Weapon=' + (weaponAngle * 180 / Math.PI).toFixed(1) + '° (independent)');
+        
+        // No adjustment needed - use direct mouse angle
+        // weaponAngle -= Math.PI / 2;
 
-        // Get sprite animations
-        const tankAssetKey = tank.getTankAssetKey();
-        const tankAnimKey = `${player.id}_${tankAssetKey}`;
-        const tankAnim = this.spriteAnimations.tanks[tankAnimKey];
-        
-        const weaponAssetKey = tank.getWeaponAssetKey();
-        const weaponAnimKey = `${player.id}_${weaponAssetKey}`;
-        let weaponAnim = this.spriteAnimations.weapons[weaponAnimKey];
-        
-        // Initialize weapon animation if it doesn't exist
-        if (!weaponAnim) {
-            weaponAnim = this.initSpriteAnimation('weapons', player.id, weaponAssetKey);
-            weaponAnim.isPlaying = false;
-            weaponAnim.loop = false;
-            weaponAnim.currentFrame = 0;
+        // Try to render with images first
+        console.log('🖼️ Images loaded:', this.imagesLoaded, '| Tank images available:', !!this.tankImages, '| Weapon images available:', !!this.weaponImages);
+        if (this.imagesLoaded) {
+            const playerTankConfig = player.selectedTank || this.gameState.selectedTank;
+            const { tankImg, weaponImg } = this.getCurrentTankImages(playerTankConfig);
+
+            if (tankImg && weaponImg && tankImg.complete && weaponImg.complete) {
+                // Import Tank class dynamically
+                const Tank = window.Tank;
+                if (Tank) {
+                    // Create Tank instance for rendering
+                    const tank = new Tank(playerTankConfig);
+                    tank.visualSize = this.TANK_VISUAL_SIZE;
+
+                    // Get sprite animations
+                    const tankAssetKey = tank.getTankAssetKey();
+                    const tankAnimKey = `${player.id}_${tankAssetKey}`;
+                    let tankAnim = this.spriteAnimations.tanks[tankAnimKey];
+                    
+                    // Initialize tank animation if it doesn't exist
+                    if (!tankAnim) {
+                        tankAnim = this.initSpriteAnimation('tanks', player.id, tankAssetKey);
+                    }
+                    
+                    // Update tank animation based on movement
+                    this.updateTankAnimation(tankAnim, player);
+                    
+                    const weaponAssetKey = tank.getWeaponAssetKey();
+                    const weaponAnimKey = `${player.id}_${weaponAssetKey}`;
+                    let weaponAnim = this.spriteAnimations.weapons[weaponAnimKey];
+                    
+                    // Initialize weapon animation if it doesn't exist
+                    if (!weaponAnim) {
+                        weaponAnim = this.initSpriteAnimation('weapons', player.id, weaponAssetKey);
+                        weaponAnim.isPlaying = false;
+                        weaponAnim.loop = false;
+                        weaponAnim.currentFrame = 0;
+                    }
+
+                    // Render tank using Tank class with enhanced rendering
+                    this.renderEnhancedTank(ctx, tank, { tankImg, weaponImg }, {
+                        x: renderX,
+                        y: renderY,
+                        bodyRotation: bodyRotation,
+                        weaponAngle: weaponAngle,
+                        scale: 1,
+                        tankAnimation: tankAnim,
+                        weaponAnimation: weaponAnim,
+                        player: player
+                    });
+                    return;
+                }
+            }
         }
-
-        // Render tank using Tank class
-        tank.render(this.ctx, { tankImg, weaponImg }, {
-            x: renderX,
-            y: renderY,
-            bodyRotation: currentRotation,
-            weaponAngle: weaponAngle,
-            scale: 1,
-            tankAnimation: tankAnim,
-            weaponAnimation: weaponAnim
-        });
+        
+        // Fallback: Draw simple tank shapes if images aren't loaded
+        console.log('🎨 Drawing fallback tank at:', renderX, renderY, '| Reason: imagesLoaded =', this.imagesLoaded);
+        
+        ctx.save();
+        ctx.translate(renderX, renderY);
+        
+        // Draw tank shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.beginPath();
+        ctx.ellipse(5, 5, 35, 25, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw tank body - SEPARATE rotation context (IMPROVED FALLBACK)
+        ctx.save();
+        ctx.rotate(bodyRotation + Math.PI / 2);
+        
+        // Better looking tank body
+        ctx.fillStyle = '#2196F3'; // Blue tank
+        ctx.fillRect(-35, -45, 70, 90);
+        
+        // Tank tracks (more visible)
+        ctx.fillStyle = '#1a1a1a';
+        ctx.fillRect(-40, -40, 12, 80);
+        ctx.fillRect(28, -40, 12, 80);
+        
+        // Tank details
+        ctx.fillStyle = '#1976D2';
+        ctx.fillRect(-25, -35, 50, 70);
+        
+        ctx.restore(); // End body rotation
+        
+        // Draw weapon - DIRECT mouse angle (IMPROVED FALLBACK)
+        ctx.save();
+        ctx.rotate(weaponAngle + Math.PI / 2); // Direct mouse angle
+        
+        // Better looking turret base
+        ctx.fillStyle = '#1976D2'; // Darker blue
+        ctx.beginPath();
+        ctx.arc(0, 0, 22, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Turret ring
+        ctx.strokeStyle = '#0d47a1';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Gun barrel pointing toward mouse (more visible)
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-6, -55, 12, 40);
+        
+        // Gun tip
+        ctx.fillStyle = '#222';
+        ctx.fillRect(-4, -58, 8, 6);
+        
+        ctx.restore(); // End weapon rotation
+        
+        ctx.restore();
+        
+        // Draw player name
+        ctx.save();
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(renderX - 40, renderY - 70, 80, 20);
+        ctx.fillStyle = '#00ff00';
+        ctx.fillText(player.name || 'Player', renderX, renderY - 55);
+        ctx.restore();
+        
+        // Draw health bar
+        if (player.health < (player.maxHealth || 100)) {
+            const barWidth = 60;
+            const barHeight = 6;
+            const healthPercent = player.health / (player.maxHealth || 100);
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(renderX - barWidth/2, renderY - 85, barWidth, barHeight);
+            
+            ctx.fillStyle = healthPercent > 0.5 ? '#4CAF50' : healthPercent > 0.25 ? '#FF9800' : '#f44336';
+            ctx.fillRect(renderX - barWidth/2, renderY - 85, barWidth * healthPercent, barHeight);
+        }
     }
     
     /**
@@ -333,8 +470,8 @@ export default class RenderSystem {
 
             this.spriteAnimations[type][key] = {
                 currentFrame: 0,
-                lastFrameTime: 0,
-                frameDuration: type === 'weapons' ? 10 : 80,
+                lastFrameTime: Date.now(),
+                frameDuration: type === 'weapons' ? 50 : 120, // Slower, more realistic animation
                 numFrames: numFrames,
                 frameWidth: 128,
                 frameHeight: 128,
@@ -343,6 +480,177 @@ export default class RenderSystem {
             };
         }
         return this.spriteAnimations[type][key];
+    }
+    
+    /**
+     * Update tank animation based on movement
+     */
+    updateTankAnimation(tankAnim, player) {
+        if (!tankAnim) return;
+        
+        // Check if tank is moving
+        const isMoving = (player.vx && Math.abs(player.vx) > 0.1) || (player.vy && Math.abs(player.vy) > 0.1);
+        
+        if (isMoving) {
+            // Tank is moving - animate tracks
+            tankAnim.isPlaying = true;
+            tankAnim.loop = true;
+            
+            // Speed up animation based on velocity
+            const velocity = Math.sqrt((player.vx || 0) ** 2 + (player.vy || 0) ** 2);
+            const speedMultiplier = Math.max(0.5, Math.min(2.0, velocity / 50)); // Scale with speed
+            tankAnim.frameDuration = Math.max(60, 120 / speedMultiplier);
+            
+            // Update frame
+            const currentTime = Date.now();
+            if (currentTime - tankAnim.lastFrameTime > tankAnim.frameDuration) {
+                tankAnim.currentFrame = (tankAnim.currentFrame + 1) % tankAnim.numFrames;
+                tankAnim.lastFrameTime = currentTime;
+            }
+        } else {
+            // Tank is stationary - stop animation on frame 0
+            tankAnim.isPlaying = false;
+            tankAnim.currentFrame = 0;
+        }
+    }
+    
+
+    
+    /**
+     * Normalize angle to [-PI, PI] range
+     */
+    normalizeAngle(angle) {
+        while (angle > Math.PI) angle -= 2 * Math.PI;
+        while (angle < -Math.PI) angle += 2 * Math.PI;
+        return angle;
+    }
+    
+    /**
+     * Render enhanced tank with realistic effects
+     */
+    renderEnhancedTank(ctx, tank, images, options) {
+        const {
+            x, y, bodyRotation, weaponAngle, scale,
+            tankAnimation, weaponAnimation, player
+        } = options;
+
+        ctx.save();
+        
+        // Draw tank shadow first
+        ctx.save();
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = '#000000';
+        ctx.translate(x + 8, y + 8); // Offset shadow
+        ctx.rotate(bodyRotation + Math.PI / 2);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 45, 30, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        // Main tank position
+        ctx.translate(x, y);
+
+        // No extra animations - clean tank rendering
+
+        // Render tank body - COMPLETELY SEPARATE CONTEXT
+        ctx.save();
+        tank.renderBody(ctx, images.tankImg, {
+            rotation: bodyRotation,
+            scale,
+            spriteAnimation: tankAnimation
+        });
+        ctx.restore(); // End body context - weapon not affected
+
+        // Render weapon - COMPLETELY SEPARATE CONTEXT
+        ctx.save();
+        tank.renderWeapon(ctx, images.weaponImg, {
+            weaponAngle,
+            scale,
+            spriteAnimation: weaponAnimation
+        });
+        ctx.restore(); // End weapon context - body not affected
+
+        ctx.restore();
+        
+        // Draw enhanced player name with background
+        this.drawPlayerNameTag(ctx, x, y, player.name || 'Player', '#00ff00');
+        
+        // Draw enhanced health bar
+        if (player.health < (player.maxHealth || 100)) {
+            this.drawHealthBar(ctx, x, y - 85, player.health, player.maxHealth || 100);
+        }
+    }
+    
+    /**
+     * Draw enhanced player name tag
+     */
+    drawPlayerNameTag(ctx, x, y, name, color) {
+        ctx.save();
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        
+        // Measure text for background
+        const textWidth = ctx.measureText(name).width;
+        const padding = 8;
+        
+        // Draw background with rounded corners effect
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(x - textWidth/2 - padding, y - 75, textWidth + padding * 2, 20);
+        
+        // Draw border
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x - textWidth/2 - padding, y - 75, textWidth + padding * 2, 20);
+        
+        // Draw text with glow effect
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 3;
+        ctx.fillStyle = color;
+        ctx.fillText(name, x, y - 60);
+        
+        ctx.restore();
+    }
+    
+    /**
+     * Draw enhanced health bar
+     */
+    drawHealthBar(ctx, x, y, health, maxHealth) {
+        const barWidth = 60;
+        const barHeight = 8;
+        const healthPercent = health / maxHealth;
+        
+        ctx.save();
+        
+        // Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(x - barWidth/2 - 1, y - 1, barWidth + 2, barHeight + 2);
+        
+        // Health bar background
+        ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
+        ctx.fillRect(x - barWidth/2, y, barWidth, barHeight);
+        
+        // Health bar fill with gradient
+        const gradient = ctx.createLinearGradient(x - barWidth/2, y, x + barWidth/2, y);
+        if (healthPercent > 0.6) {
+            gradient.addColorStop(0, '#4CAF50');
+            gradient.addColorStop(1, '#8BC34A');
+        } else if (healthPercent > 0.3) {
+            gradient.addColorStop(0, '#FF9800');
+            gradient.addColorStop(1, '#FFC107');
+        } else {
+            gradient.addColorStop(0, '#f44336');
+            gradient.addColorStop(1, '#FF5722');
+        }
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x - barWidth/2, y, barWidth * healthPercent, barHeight);
+        
+        // Health bar border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x - barWidth/2, y, barWidth, barHeight);
+        
+        ctx.restore();
     }
     
     /**
@@ -387,6 +695,67 @@ export default class RenderSystem {
             (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
             (B < 255 ? B < 1 ? 0 : B : 255))
             .toString(16).slice(1);
+    }
+    
+    /**
+     * Draw debug grid when no map is loaded
+     */
+    drawDebugGrid(ctx) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        
+        const gridSize = 100;
+        const bounds = 2000;
+        
+        // Draw vertical lines
+        for (let x = -bounds; x <= bounds; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, -bounds);
+            ctx.lineTo(x, bounds);
+            ctx.stroke();
+        }
+        
+        // Draw horizontal lines
+        for (let y = -bounds; y <= bounds; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(-bounds, y);
+            ctx.lineTo(bounds, y);
+            ctx.stroke();
+        }
+        
+        // Draw origin marker
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.fillRect(-10, -10, 20, 20);
+    }
+    
+    /**
+     * Draw debug information
+     */
+    drawDebugInfo() {
+        const ctx = this.ctx;
+        const canvas = this.canvas;
+        
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(10, 10, 300, 120);
+        
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '14px monospace';
+        
+        const player = this.gameState.players ? this.gameState.players[this.gameState.playerId] : null;
+        
+        ctx.fillText(`Player ID: ${this.gameState.playerId || 'None'}`, 20, 30);
+        ctx.fillText(`Player Exists: ${player ? 'Yes' : 'No'}`, 20, 50);
+        
+        if (player) {
+            ctx.fillText(`Position: (${Math.round(player.x)}, ${Math.round(player.y)})`, 20, 70);
+            ctx.fillText(`Velocity: (${Math.round(player.vx || 0)}, ${Math.round(player.vy || 0)})`, 20, 90);
+            ctx.fillText(`Angle: ${Math.round((player.angle || 0) * 180 / Math.PI)}°`, 20, 110);
+        }
+        
+        ctx.fillText(`Images Loaded: ${this.imagesLoaded ? 'Yes' : 'No'}`, 20, 130);
+        
+        ctx.restore();
     }
     
     /**

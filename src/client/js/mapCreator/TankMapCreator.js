@@ -299,6 +299,12 @@ function startCreateMapRendering() {
     renderCreateMap();
 }
 
+// Immediately export startCreateMapRendering to ensure it's available
+if (typeof window !== 'undefined') {
+    window.startCreateMapRendering = startCreateMapRendering;
+    console.log('✅ startCreateMapRendering exported immediately');
+}
+
 function renderCreatedMapsView(ctx, canvas, time, startY) {
     const contentY = startY;
     const mapBoxWidth = 300;
@@ -2191,9 +2197,13 @@ function openObjectFolder(asset) {
         catGrid.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 8px;';
         
         const categories = [
-            { id: 'ground', name: 'GROUND', icon: '🌱' },
-            { id: 'buildings', name: 'BUILDS', icon: '🏗️' },
-            { id: 'tanks', name: 'TANKS', icon: '🚗' }
+            { id: 'ground', name: 'TERRAIN', icon: '🌍' },
+            { id: 'buildings', name: 'BUILDINGS', icon: '🏘️' },
+            { id: 'tanks', name: 'TANKS', icon: '🚛' },
+            { id: 'obstacles', name: 'OBSTACLES', icon: '🧱' },
+            { id: 'powerups', name: 'POWER-UPS', icon: '⚡' },
+            { id: 'players', name: 'SPAWNS', icon: '🎯' },
+            { id: 'script', name: 'SCRIPTS', icon: '📜' }
         ];
         
         categories.forEach(cat => {
@@ -2229,6 +2239,187 @@ function openObjectFolder(asset) {
         assetsGrid.style.cssText = 'padding: 15px 20px; display: flex; flex-direction: column; gap: 6px;';
         
         contentArea.appendChild(assetsGrid);
+        
+        // Create script editor container (hidden by default)
+        const textEditorContainer = document.createElement('div');
+        textEditorContainer.id = 'textEditorContainer';
+        textEditorContainer.style.cssText = `
+            display: none;
+            padding: 20px;
+            height: calc(85vh - 200px);
+            overflow: hidden;
+        `;
+        
+        textEditorContainer.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="color: #00f7ff; margin: 0; font-size: 18px;">📜 Map Script Editor</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="saveMapScript()" style="
+                        padding: 8px 16px;
+                        background: linear-gradient(135deg, rgba(0,247,255,0.2), rgba(0,200,220,0.1));
+                        border: 2px solid rgba(0,247,255,0.6);
+                        color: #00f7ff;
+                        font-size: 12px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        border-radius: 6px;
+                        transition: all 0.3s;
+                    ">💾 SAVE</button>
+                    <button onclick="clearMapScript()" style="
+                        padding: 8px 16px;
+                        background: linear-gradient(135deg, rgba(255,60,60,0.2), rgba(220,40,40,0.1));
+                        border: 2px solid rgba(255,80,80,0.6);
+                        color: #ff6666;
+                        font-size: 12px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        border-radius: 6px;
+                        transition: all 0.3s;
+                    ">🗑️ CLEAR</button>
+                </div>
+            </div>
+            <div style="
+                background: rgba(0,0,0,0.3);
+                border: 2px solid rgba(0,247,255,0.3);
+                border-radius: 8px;
+                height: calc(100% - 60px);
+                position: relative;
+                display: flex;
+                flex-direction: column;
+            ">
+                <div style="
+                    background: rgba(0,247,255,0.1);
+                    padding: 8px 15px;
+                    border-bottom: 1px solid rgba(0,247,255,0.3);
+                    font-size: 12px;
+                    color: rgba(255,255,255,0.7);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <span>📜 Lua Script Editor</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="showScriptTemplates()" style="
+                            padding: 4px 8px;
+                            background: rgba(255,0,255,0.2);
+                            border: 1px solid rgba(255,0,255,0.5);
+                            color: #ff00ff;
+                            font-size: 10px;
+                            cursor: pointer;
+                            border-radius: 4px;
+                        ">📋 TEMPLATES</button>
+                        <button onclick="testMapScript()" style="
+                            padding: 4px 8px;
+                            background: rgba(0,255,0,0.2);
+                            border: 1px solid rgba(0,255,0,0.5);
+                            color: #00ff00;
+                            font-size: 10px;
+                            cursor: pointer;
+                            border-radius: 4px;
+                        ">▶️ TEST</button>
+                        <button onclick="showScriptHelp()" style="
+                            padding: 4px 8px;
+                            background: rgba(255,255,0,0.2);
+                            border: 1px solid rgba(255,255,0,0.5);
+                            color: #ffff00;
+                            font-size: 10px;
+                            cursor: pointer;
+                            border-radius: 4px;
+                        ">❓ HELP</button>
+                    </div>
+                </div>
+                <div id="scriptEditorWrapper" style="
+                    width: 100%;
+                    flex: 1;
+                    position: relative;
+                    background: #0a0a0a;
+                    border-radius: 6px;
+                    overflow: hidden;
+                ">
+                    <textarea id="mapScriptEditor" placeholder="-- 🚛 TANK MAP SCRIPT EDITOR 🚛
+-- Write your tank battle script here (Lua syntax)
+
+-- 🎮 TANK BATTLE EVENTS:
+function onBattleStart()
+    showMessage('🚛 Tank Battle Started!')
+    spawnTankPowerUp('armor', 400, 300)
+end
+
+function onTankSpawn(tank)
+    showMessage('Tank deployed: ' .. tank.name)
+    giveTankWeapon(tank.id, 'cannon')
+end
+
+function onTankDestroyed(tank, killer)
+    spawnExplosion(tank.x, tank.y)
+    showMessage(tank.name .. ' tank destroyed!')
+    if killer then
+        rewardKiller(killer.id, 'damage_boost')
+    end
+end
+
+-- 🔧 TANK FUNCTIONS:
+-- spawnTank(color, x, y) - Spawn tank at position
+-- giveTankWeapon(tankId, weapon) - Give weapon to tank
+-- upgradeTankArmor(tankId, level) - Upgrade tank armor
+-- setTankSpeed(tankId, speed) - Set tank movement speed
+-- spawnTankPowerUp(type, x, y) - Spawn tank power-up
+-- createTankBarrier(x, y, width, height) - Create destructible barrier
+-- activateTankTurret(x, y) - Place defensive turret
+
+-- 💥 BATTLE FUNCTIONS:
+-- spawnExplosion(x, y, radius) - Create explosion
+-- createCrater(x, y) - Leave battle damage
+-- playTankSound(sound) - Play tank sound effect
+-- endBattle(winner) - End tank battle
+
+-- Example: Tank King of the Hill
+function tankKingOfHill()
+    local tanksInZone = getTanksInArea('control_zone')
+    if #tanksInZone == 1 then
+        local tank = tanksInZone[1]
+        showMessage(tank.name .. ' controls the zone!')
+        upgradeTankArmor(tank.id, 2)
+    end
+end" style="
+                        width: 100%;
+                        height: 100%;
+                        background: transparent;
+                        border: none;
+                        color: #00ff88;
+                        font-family: 'Fira Code', 'Courier New', monospace;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        padding: 15px;
+                        resize: none;
+                        outline: none;
+                        box-sizing: border-box;
+                        tab-size: 4;
+                    "></textarea>
+                    
+                    <!-- Syntax highlighting overlay -->
+                    <div id="syntaxHighlight" style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        pointer-events: none;
+                        font-family: 'Fira Code', 'Courier New', monospace;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        padding: 15px;
+                        box-sizing: border-box;
+                        white-space: pre-wrap;
+                        word-wrap: break-word;
+                        z-index: 1;
+                        color: transparent;
+                    "></div>
+                </div>
+            </div>
+        `;
+        
+        contentArea.appendChild(textEditorContainer);
         assetsPanel.appendChild(contentArea);
         
         // Add custom scrollbar styling
@@ -2554,47 +2745,244 @@ function openObjectFolder(asset) {
         return;
     }
 
-    // Show tanks/vehicles category
-    if (category === 'tanks' || category === 'vehicles') {
-        const colors = ['blue', 'camo', 'desert', 'purple', 'red'];
+    // Show obstacles category
+    if (category === 'obstacles') {
+        const obstaclesContainer = document.createElement('div');
+        obstaclesContainer.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+        `;
 
-        colors.forEach(color => {
-            const assetItem = document.createElement('div');
-            assetItem.className = 'asset-item-list';
+        const obstacles = [
+            { name: 'Concrete Barrier', type: 'barrier_concrete', health: 100, destructible: true },
+            { name: 'Steel Wall', type: 'barrier_steel', health: 200, destructible: true },
+            { name: 'Sandbags', type: 'barrier_sand', health: 50, destructible: true },
+            { name: 'Tank Trap', type: 'trap_spikes', health: 150, destructible: true },
+            { name: 'Mine Field', type: 'mines', health: 1, destructible: true },
+            { name: 'Oil Barrel', type: 'barrel_explosive', health: 25, destructible: true }
+        ];
 
-            // Prefer the halftrack body PNG, fallback to tracks image
-            let imagePath = `/assets/tank/tanks/${color}/${color}_body_halftrack.png`;
-            // Some folders use different naming - provide fallback
-            const fallback = `/assets/tank/tanks/${color}/${color}_body_tracks.png`;
+        obstacles.forEach(obstacle => {
+            const obstacleItem = document.createElement('div');
+            obstacleItem.className = 'asset-item-grid obstacle-item';
+            obstacleItem.style.cssText = `
+                background: linear-gradient(135deg, rgba(255,100,0,0.1), rgba(200,80,0,0.05));
+                border: 2px solid rgba(255,100,0,0.3);
+                border-radius: 8px;
+                padding: 15px;
+                cursor: pointer;
+                transition: all 0.3s;
+                text-align: center;
+            `;
 
             const asset = {
-                name: `${color.charAt(0).toUpperCase() + color.slice(1)} Tank`,
-                folder: color,
-                fileName: imagePath.split('/').pop(),
-                image: imagePath,
-                isFolder: false
+                name: obstacle.name,
+                type: obstacle.type,
+                category: 'obstacles',
+                health: obstacle.health,
+                destructible: obstacle.destructible,
+                isObstacle: true
             };
 
-            assetItem.onclick = () => selectAsset(asset, assetItem);
+            obstacleItem.innerHTML = `
+                <div style="font-size: 24px; margin-bottom: 8px;">🧱</div>
+                <div style="color: #ff6400; font-weight: bold; font-size: 12px; margin-bottom: 4px;">${obstacle.name}</div>
+                <div style="color: rgba(255,255,255,0.6); font-size: 10px;">HP: ${obstacle.health}</div>
+                <div style="color: rgba(255,255,255,0.4); font-size: 9px;">${obstacle.destructible ? 'Destructible' : 'Indestructible'}</div>
+            `;
 
-            assetItem.innerHTML = `
-                <div style="width: 50px; height: 50px; background: rgba(20, 30, 50, 0.5); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid rgba(255,255,255,0.08);">
-                    <img src="${imagePath}" onerror="this.src='${fallback}'" alt="${asset.name}" style="width: 100%; height: 100%; object-fit: contain;">
+            obstacleItem.onclick = () => selectAsset(asset, obstacleItem);
+            
+            obstacleItem.onmouseenter = () => {
+                obstacleItem.style.background = 'linear-gradient(135deg, rgba(255,100,0,0.2), rgba(200,80,0,0.1))';
+                obstacleItem.style.borderColor = 'rgba(255,100,0,0.6)';
+                obstacleItem.style.transform = 'translateY(-3px) scale(1.05)';
+            };
+            
+            obstacleItem.onmouseleave = () => {
+                obstacleItem.style.background = 'linear-gradient(135deg, rgba(255,100,0,0.1), rgba(200,80,0,0.05))';
+                obstacleItem.style.borderColor = 'rgba(255,100,0,0.3)';
+                obstacleItem.style.transform = 'translateY(0) scale(1)';
+            };
+
+            obstaclesContainer.appendChild(obstacleItem);
+        });
+
+        assetsGrid.appendChild(obstaclesContainer);
+        return;
+    }
+
+    // Show power-ups category
+    if (category === 'powerups') {
+        const powerupsContainer = document.createElement('div');
+        powerupsContainer.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+        `;
+
+        const powerups = [
+            { name: 'Armor Boost', type: 'armor', icon: '🛡️', effect: '+50 Armor', color: '#4CAF50' },
+            { name: 'Damage Boost', type: 'damage', icon: '💥', effect: '+25 Damage', color: '#F44336' },
+            { name: 'Speed Boost', type: 'speed', icon: '⚡', effect: '+30% Speed', color: '#FFEB3B' },
+            { name: 'Rapid Fire', type: 'firerate', icon: '🔥', effect: '2x Fire Rate', color: '#FF9800' },
+            { name: 'Health Pack', type: 'health', icon: '❤️', effect: '+75 Health', color: '#E91E63' },
+            { name: 'Ammo Crate', type: 'ammo', icon: '📦', effect: 'Full Ammo', color: '#9C27B0' }
+        ];
+
+        powerups.forEach(powerup => {
+            const powerupItem = document.createElement('div');
+            powerupItem.className = 'asset-item-grid powerup-item';
+            powerupItem.style.cssText = `
+                background: linear-gradient(135deg, ${powerup.color}20, ${powerup.color}10);
+                border: 2px solid ${powerup.color}60;
+                border-radius: 8px;
+                padding: 15px;
+                cursor: pointer;
+                transition: all 0.3s;
+                text-align: center;
+            `;
+
+            const asset = {
+                name: powerup.name,
+                type: powerup.type,
+                category: 'powerups',
+                effect: powerup.effect,
+                icon: powerup.icon,
+                isPowerUp: true
+            };
+
+            powerupItem.innerHTML = `
+                <div style="font-size: 24px; margin-bottom: 8px;">${powerup.icon}</div>
+                <div style="color: ${powerup.color}; font-weight: bold; font-size: 12px; margin-bottom: 4px;">${powerup.name}</div>
+                <div style="color: rgba(255,255,255,0.7); font-size: 10px;">${powerup.effect}</div>
+            `;
+
+            powerupItem.onclick = () => selectAsset(asset, powerupItem);
+            
+            powerupItem.onmouseenter = () => {
+                powerupItem.style.background = `linear-gradient(135deg, ${powerup.color}40, ${powerup.color}20)`;
+                powerupItem.style.borderColor = `${powerup.color}`;
+                powerupItem.style.transform = 'translateY(-3px) scale(1.05)';
+                powerupItem.style.boxShadow = `0 8px 25px ${powerup.color}40`;
+            };
+            
+            powerupItem.onmouseleave = () => {
+                powerupItem.style.background = `linear-gradient(135deg, ${powerup.color}20, ${powerup.color}10)`;
+                powerupItem.style.borderColor = `${powerup.color}60`;
+                powerupItem.style.transform = 'translateY(0) scale(1)';
+                powerupItem.style.boxShadow = 'none';
+            };
+
+            powerupsContainer.appendChild(powerupItem);
+        });
+
+        assetsGrid.appendChild(powerupsContainer);
+        return;
+    }
+
+    // Show tanks/vehicles category
+    if (category === 'tanks' || category === 'vehicles') {
+        const tanksContainer = document.createElement('div');
+        tanksContainer.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+        `;
+
+        const tankColors = [
+            { color: 'blue', name: 'Blue Squadron', theme: '#2196F3' },
+            { color: 'red', name: 'Red Army', theme: '#F44336' },
+            { color: 'camo', name: 'Camouflage', theme: '#4CAF50' },
+            { color: 'desert', name: 'Desert Storm', theme: '#FF9800' },
+            { color: 'purple', name: 'Purple Elite', theme: '#9C27B0' }
+        ];
+
+        tankColors.forEach(tankData => {
+            const tankItem = document.createElement('div');
+            tankItem.className = 'asset-item-grid tank-item';
+            tankItem.style.cssText = `
+                background: linear-gradient(135deg, ${tankData.theme}20, ${tankData.theme}10);
+                border: 2px solid ${tankData.theme}60;
+                border-radius: 8px;
+                padding: 15px;
+                cursor: pointer;
+                transition: all 0.3s;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            `;
+
+            // Create tank preview with body and turret (using animated GIFs)
+            const imagePath = `/assets/tank/tanks/${tankData.color}/${tankData.color}_body_halftrack.gif`;
+            const turretPath = `/assets/tank/tanks/${tankData.color}/${tankData.color}_turret_01_mk1.gif`;
+
+            const asset = {
+                name: tankData.name,
+                color: tankData.color,
+                category: 'tanks',
+                bodyImage: imagePath,
+                turretImage: turretPath,
+                theme: tankData.theme,
+                isTank: true,
+                stats: {
+                    armor: Math.floor(Math.random() * 50) + 100,
+                    damage: Math.floor(Math.random() * 30) + 50,
+                    speed: Math.floor(Math.random() * 20) + 30
+                }
+            };
+
+            tankItem.innerHTML = `
+                <div style="position: relative; margin-bottom: 10px;">
+                    <img src="${imagePath}" alt="${tankData.name} Body" style="
+                        width: 40px;
+                        height: 40px;
+                        object-fit: contain;
+                        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                    " onerror="this.style.display='none'">
+                    <img src="${turretPath}" alt="${tankData.name} Turret" style="
+                        width: 30px;
+                        height: 30px;
+                        object-fit: contain;
+                        position: absolute;
+                        top: -5px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                    " onerror="this.style.display='none'">
                 </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
-                    <div style="color: rgba(255, 255, 255, 0.9); font-size: 13px; font-weight: 500;">${asset.name}</div>
-                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 11px;">Click to place</div>
+                <div style="color: ${tankData.theme}; font-weight: bold; font-size: 12px; margin-bottom: 6px;">${tankData.name}</div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.6);">
+                    <span>🛡️${asset.stats.armor}</span>
+                    <span>💥${asset.stats.damage}</span>
+                    <span>⚡${asset.stats.speed}</span>
                 </div>
             `;
 
-            assetsGrid.appendChild(assetItem);
+            tankItem.onclick = () => selectAsset(asset, tankItem);
+            
+            tankItem.onmouseenter = () => {
+                tankItem.style.background = `linear-gradient(135deg, ${tankData.theme}40, ${tankData.theme}20)`;
+                tankItem.style.borderColor = tankData.theme;
+                tankItem.style.transform = 'translateY(-3px) scale(1.05)';
+                tankItem.style.boxShadow = `0 8px 25px ${tankData.theme}40`;
+            };
+            
+            tankItem.onmouseleave = () => {
+                tankItem.style.background = `linear-gradient(135deg, ${tankData.theme}20, ${tankData.theme}10)`;
+                tankItem.style.borderColor = `${tankData.theme}60`;
+                tankItem.style.transform = 'translateY(0) scale(1)';
+                tankItem.style.boxShadow = 'none';
+            };
+
+            tanksContainer.appendChild(tankItem);
         });
 
-        const infoMsg = document.createElement('div');
-        infoMsg.style.cssText = 'padding: 12px; margin-top: 10px; background: rgba(0, 247, 255, 0.04); border: 1px solid rgba(0, 247, 255, 0.06); border-radius: 8px; color: rgba(255,255,255,0.7); font-size: 12px;';
-        infoMsg.innerHTML = '<strong>Vehicles:</strong> Select a tank to place a vehicle prefab. Use the palette to select colors.';
-        assetsGrid.appendChild(infoMsg);
-
+        assetsGrid.appendChild(tanksContainer);
         return;
     }
 
@@ -2655,6 +3043,45 @@ function openObjectFolder(asset) {
         playersContainer.appendChild(spawnSection);
         assetsGrid.appendChild(playersContainer);
         
+        return;
+    }
+
+    // Show script editor category
+    if (category === 'script') {
+        // Show coming soon message
+        if (assetsGrid) {
+            assetsGrid.innerHTML = '';
+            assetsGrid.style.display = 'block';
+            
+            const comingSoonContainer = document.createElement('div');
+            comingSoonContainer.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 400px;
+                text-align: center;
+                padding: 40px;
+            `;
+            
+            comingSoonContainer.innerHTML = `
+                <div style="font-size: 64px; margin-bottom: 20px;">⚙️</div>
+                <h2 style="color: #00f7ff; margin: 0 0 15px 0; font-size: 24px;">Script Editor</h2>
+                <div style="color: #FFD700; font-size: 18px; font-weight: bold; margin-bottom: 15px;">Coming Soon!</div>
+                <div style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.6; max-width: 400px;">
+                    The script editor will allow you to create custom game modes, events, and interactive elements for your tank maps.
+                    <br><br>
+                    Features in development:
+                    <br>• Custom win conditions
+                    <br>• Dynamic events
+                    <br>• Power-up spawning
+                    <br>• Moving platforms
+                    <br>• And much more!
+                </div>
+            `;
+            
+            assetsGrid.appendChild(comingSoonContainer);
+        }
         return;
     }
 }
@@ -3029,6 +3456,7 @@ function initMapCreatorCanvas() {
     // Canvas initialized successfully
 
     // Load custom ground texture
+    console.log('🌱 Loading ground textures...');
     loadCustomGroundTexture();
 
     // Remove any existing event listeners first
@@ -3933,7 +4361,8 @@ function drawWaterTile(ctx, x, y, width, height) {
 // Draw ground textures randomly scattered in a circular map
 function drawGroundSamples(ctx, camera, viewWidth, viewHeight) {
     if (!groundTexturesLoaded) {
-        console.warn('⚠️ Ground textures not loaded yet');
+        // Draw simple colored ground as fallback
+        drawFallbackGround(ctx, camera, viewWidth, viewHeight);
         return;
     }
     if (groundTextureImages.size === 0) {
@@ -4174,10 +4603,14 @@ if (typeof window !== 'undefined') {
     window.loadSavedMaps = loadSavedMaps;
     
     console.log('✅ TankMapCreator functions exported to window');
+    console.log('🔍 Verifying exports:');
+    console.log('  - startCreateMapRendering:', typeof window.startCreateMapRendering);
+    console.log('  - loadSavedMaps:', typeof window.loadSavedMaps);
     
     // Dispatch event to notify other modules that TankMapCreator is ready
     if (typeof window.dispatchEvent === 'function') {
         window.dispatchEvent(new CustomEvent('tankMapCreatorReady'));
+        console.log('📡 tankMapCreatorReady event dispatched');
     }
     
     // Add fallback functions for safety
@@ -4559,7 +4992,47 @@ function drawParallelogramTile(ctx, x, y, width, height, terrainType) {
 let groundTextureImages = new Map();
 let groundTexturesLoaded = false;
 
+// Fallback ground drawing function
+function drawFallbackGround(ctx, camera, viewWidth, viewHeight) {
+    const tileSize = 64;
+    const startX = Math.floor(camera.x / tileSize) * tileSize;
+    const startY = Math.floor(camera.y / tileSize) * tileSize;
+    const endX = startX + viewWidth + tileSize;
+    const endY = startY + viewHeight + tileSize;
+    
+    ctx.save();
+    
+    for (let x = startX; x < endX; x += tileSize) {
+        for (let y = startY; y < endY; y += tileSize) {
+            const screenX = x - camera.x;
+            const screenY = y - camera.y;
+            
+            // Simple pattern: water at edges, grass in center
+            const distFromCenter = Math.sqrt(Math.pow(x - 400, 2) + Math.pow(y - 300, 2));
+            
+            if (distFromCenter > 300) {
+                // Water color
+                ctx.fillStyle = '#4A90E2';
+            } else {
+                // Grass color
+                ctx.fillStyle = '#7ED321';
+            }
+            
+            ctx.fillRect(screenX, screenY, tileSize, tileSize);
+            
+            // Add subtle border
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(screenX, screenY, tileSize, tileSize);
+        }
+    }
+    
+    ctx.restore();
+}
+
 function loadCustomGroundTexture() {
+    console.log('🌱 Starting ground texture loading...');
+    
     // Load all 18 ground PNG textures
     const groundFiles = [
         'tank/Grounds/water.png',
@@ -4583,6 +5056,15 @@ function loadCustomGroundTexture() {
     ];
 
     let loadedCount = 0;
+    let errorCount = 0;
+
+    // Set a timeout to force enable ground textures if loading takes too long
+    setTimeout(() => {
+        if (!groundTexturesLoaded) {
+            console.warn('⚠️ Ground texture loading timeout, enabling anyway');
+            groundTexturesLoaded = true;
+        }
+    }, 5000);
 
     groundFiles.forEach((file, index) => {
         const img = new Image();
@@ -4592,23 +5074,27 @@ function loadCustomGroundTexture() {
             groundTextureImages.set(groundType, img);
             groundTextureImages.set(file, img); // Also store by filename
             loadedCount++;
+            console.log(`✅ Loaded ground texture ${loadedCount}/${groundFiles.length}: ${file}`);
 
             if (loadedCount === groundFiles.length) {
                 groundTexturesLoaded = true;
-                console.log(`✓ All ${groundFiles.length} ground textures loaded`);
+                console.log(`🎉 All ${groundFiles.length} ground textures loaded successfully!`);
             }
         };
 
         img.onerror = () => {
-            console.warn(`Failed to load ground texture: ${file}`);
+            console.warn(`❌ Failed to load ground texture: ${file}`);
+            errorCount++;
             loadedCount++;
 
             if (loadedCount === groundFiles.length) {
                 groundTexturesLoaded = true;
+                console.log(`⚠️ Ground texture loading completed with ${errorCount} errors`);
             }
         };
 
         img.src = `/assets/${file}`;
+        console.log(`📥 Loading: ${img.src}`);
     });
 }
 
@@ -5204,6 +5690,12 @@ function loadSavedMaps() {
     displayMapCards(maps);
 }
 
+// Immediately export loadSavedMaps to ensure it's available
+if (typeof window !== 'undefined') {
+    window.loadSavedMaps = loadSavedMaps;
+    console.log('✅ loadSavedMaps exported immediately');
+}
+
 function displayMapCards(maps) {
     const mapsGrid = document.querySelector('.maps-grid');
     if (!mapsGrid) return;
@@ -5613,6 +6105,136 @@ function loadMapScript() {
     }
 }
 
+// Test map script
+function testMapScript() {
+    const textarea = document.getElementById('mapScriptEditor');
+    if (!textarea) return;
+    
+    const script = textarea.value.trim();
+    if (!script) {
+        alert('❌ No script to test!');
+        return;
+    }
+    
+    // Initialize script engine if not already done
+    if (!window.mapScriptEngine) {
+        console.error('❌ Map Script Engine not loaded!');
+        return;
+    }
+    
+    // Test the script
+    const mapName = window.currentMapName || 'test_map';
+    const success = window.mapScriptEngine.loadScript(script, mapName);
+    
+    if (success) {
+        alert('✅ Script syntax is valid!');
+        console.log('🧪 Testing script functions...');
+        
+        // Test common functions if they exist
+        try {
+            window.mapScriptEngine.executeFunction(mapName, 'onGameStart');
+            window.mapScriptEngine.executeFunction(mapName, 'onPlayerSpawn', { name: 'TestPlayer', id: 'test123' });
+        } catch (error) {
+            console.log('ℹ️ Some functions not found (this is normal)');
+        }
+    } else {
+        alert('❌ Script has syntax errors! Check the console for details.');
+    }
+}
+
+// Show script help
+function showScriptHelp() {
+    const helpModal = document.createElement('div');
+    helpModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+    
+    helpModal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #1a2a3a, #2a3a4a);
+            border: 2px solid #00f7ff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: white;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #00f7ff; margin: 0;">📜 Map Script Help</h2>
+                <button onclick="this.closest('div').parentElement.remove()" style="
+                    background: #ff4444;
+                    border: none;
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">✕</button>
+            </div>
+            
+            <div style="line-height: 1.6;">
+                <h3 style="color: #00f7ff;">🎮 Event Functions</h3>
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: monospace;">
+                    <div><strong>onGameStart()</strong> - Called when the game begins</div>
+                    <div><strong>onPlayerSpawn(player)</strong> - Called when a player spawns</div>
+                    <div><strong>onPlayerDeath(player, killer)</strong> - Called when a player dies</div>
+                    <div><strong>onObjectDestroy(objectId)</strong> - Called when an object is destroyed</div>
+                </div>
+                
+                <h3 style="color: #00f7ff;">🛠️ Available Functions</h3>
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: monospace; font-size: 13px;">
+                    <div><strong>showMessage(text)</strong> - Display message to all players</div>
+                    <div><strong>playSound(file)</strong> - Play sound effect</div>
+                    <div><strong>spawnExplosion(x, y)</strong> - Create explosion at position</div>
+                    <div><strong>spawnPowerUp(type, x, y)</strong> - Spawn power-up (shield, speed, damage)</div>
+                    <div><strong>getPlayersInArea(area)</strong> - Get list of players in named area</div>
+                    <div><strong>endGame(result)</strong> - End game with result (victory, defeat)</div>
+                    <div><strong>setTimer(callback, delay)</strong> - Execute function after delay (ms)</div>
+                    <div><strong>getObject(id)</strong> - Get object by ID</div>
+                    <div><strong>moveObject(id, x, y, duration)</strong> - Move object to position</div>
+                    <div><strong>destroyObject(id)</strong> - Destroy object</div>
+                    <div><strong>randomPosition()</strong> - Get random map position</div>
+                </div>
+                
+                <h3 style="color: #00f7ff;">💡 Example Scripts</h3>
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px;">
+                    <div style="color: #ffff00;">-- Welcome message</div>
+                    <div>function onGameStart()</div>
+                    <div>&nbsp;&nbsp;showMessage("Welcome to my custom map!")</div>
+                    <div>end</div>
+                    <br>
+                    <div style="color: #ffff00;">-- Spawn power-up every 30 seconds</div>
+                    <div>function onGameStart()</div>
+                    <div>&nbsp;&nbsp;setTimer(spawnRandomPowerUp, 30000)</div>
+                    <div>end</div>
+                    <br>
+                    <div>function spawnRandomPowerUp()</div>
+                    <div>&nbsp;&nbsp;local pos = randomPosition()</div>
+                    <div>&nbsp;&nbsp;spawnPowerUp("shield", pos.x, pos.y)</div>
+                    <div>&nbsp;&nbsp;setTimer(spawnRandomPowerUp, 30000)</div>
+                    <div>end</div>
+                </div>
+                
+                <div style="background: rgba(255,255,0,0.1); padding: 10px; border-radius: 6px; border-left: 4px solid #ffff00; margin-top: 15px;">
+                    <strong>💡 Tip:</strong> Use the TEST button to check your script for syntax errors before saving!
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(helpModal);
+}
+
 // Make functions globally available
 window.toggleTextEditor = toggleTextEditor;
 window.saveMapScript = saveMapScript;
@@ -5621,4 +6243,64 @@ window.clearMapScript = clearMapScript;
 // Call initialization when editor starts
 if (typeof window !== 'undefined') {
     window.initializeNewEditor = initializeNewEditor;
+}
+// Launch Enhanced Map Creator
+function launchEnhancedMapCreator() {
+    // Hide existing map creator if open
+    const existingCreator = document.getElementById('enhancedMapCreator');
+    if (existingCreator) {
+        existingCreator.remove();
+    }
+    
+    // Create and launch enhanced map creator
+    const enhancedCreator = new TankMapCreatorEnhanced();
+    enhancedCreator.init();
+    
+    console.log('🚛 Enhanced Tank Map Creator launched!');
+}
+
+// Test function to verify map creator is working
+function testMapCreatorFunctions() {
+    console.log('🧪 Testing Map Creator Functions:');
+    console.log('  - startCreateMapRendering:', typeof window.startCreateMapRendering);
+    console.log('  - loadSavedMaps:', typeof window.loadSavedMaps);
+    console.log('  - launchEnhancedMapCreator:', typeof window.launchEnhancedMapCreator);
+    
+    if (typeof window.startCreateMapRendering === 'function') {
+        console.log('✅ startCreateMapRendering is available');
+    } else {
+        console.error('❌ startCreateMapRendering is missing');
+    }
+    
+    if (typeof window.loadSavedMaps === 'function') {
+        console.log('✅ loadSavedMaps is available');
+    } else {
+        console.error('❌ loadSavedMaps is missing');
+    }
+    
+    return {
+        startCreateMapRendering: typeof window.startCreateMapRendering === 'function',
+        loadSavedMaps: typeof window.loadSavedMaps === 'function',
+        launchEnhancedMapCreator: typeof window.launchEnhancedMapCreator === 'function'
+    };
+}
+
+// Make functions globally available
+window.launchEnhancedMapCreator = launchEnhancedMapCreator;
+window.testMapCreatorFunctions = testMapCreatorFunctions;
+
+// Expose ground texture variables globally
+window.groundTexturesLoaded = groundTexturesLoaded;
+window.groundTextureImages = groundTextureImages;
+window.loadCustomGroundTexture = loadCustomGroundTexture;
+
+// Ensure ground textures are loaded when script loads
+if (typeof window !== 'undefined') {
+    // Load ground textures immediately
+    setTimeout(() => {
+        if (!groundTexturesLoaded) {
+            console.log('🌱 Auto-loading ground textures...');
+            loadCustomGroundTexture();
+        }
+    }, 1000);
 }

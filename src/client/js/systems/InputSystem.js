@@ -47,8 +47,11 @@ class InputSystem {
     // Setup canvas handlers only when canvas exists (will retry until successful)
     const canvas = document.getElementById('gameCanvas');
     if (!this.canvasHandlersSetup && canvas) {
+      console.log('🎯 Setting up canvas handlers for gameCanvas');
       this.setupCanvasHandlers(canvas);
       this.canvasHandlersSetup = true;
+    } else if (!canvas) {
+      console.log('❌ gameCanvas not found, retrying...');
     }
   }
 
@@ -170,8 +173,16 @@ class InputSystem {
     this.keys[keyLower] = true;
     this.keys[keyCode] = true;
 
+    // Debug key presses for WASD
+    if (['w', 'a', 's', 'd'].includes(keyLower) || ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(keyCode)) {
+      console.log('🎮 Key pressed:', { key: e.key, code: e.code, keyLower, keyCode });
+    }
+
     // Update global gameState if available
     if (window.gameState) {
+      if (!window.gameState.keys) {
+        window.gameState.keys = {};
+      }
       window.gameState.keys[keyLower] = true;
       window.gameState.keys[keyCode] = true;
     }
@@ -210,8 +221,16 @@ class InputSystem {
     this.keys[keyLower] = false;
     this.keys[keyCode] = false;
 
+    // Debug key releases for WASD
+    if (['w', 'a', 's', 'd'].includes(keyLower) || ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(keyCode)) {
+      console.log('🎮 Key released:', { key: e.key, code: e.code, keyLower, keyCode });
+    }
+
     // Update global gameState if available
     if (window.gameState) {
+      if (!window.gameState.keys) {
+        window.gameState.keys = {};
+      }
       window.gameState.keys[keyLower] = false;
       window.gameState.keys[keyCode] = false;
     }
@@ -329,7 +348,7 @@ class InputSystem {
   }
 
   /**
-   * Handle canvas mouse move events
+   * Handle canvas mouse move events - SUPER SIMPLE weapon tracking
    * @param {MouseEvent} e - Mouse event
    * @param {HTMLCanvasElement} canvas - Game canvas
    */
@@ -338,45 +357,29 @@ class InputSystem {
     this.mouse.x = e.clientX - rect.left;
     this.mouse.y = e.clientY - rect.top;
 
-    // Update global gameState if available
-    const gameState = window.gameState;
-    if (gameState) {
-      gameState.mouse.x = this.mouse.x;
-      gameState.mouse.y = this.mouse.y;
-
-      const player = gameState.players[gameState.playerId];
-      if (player) {
-        // Convert screen mouse position to world coordinates with new camera system
-        const zoom = gameState.camera.zoom || 1;
-
-        // Calculate mouse position relative to screen center
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const mouseOffsetX = (this.mouse.x - centerX) / zoom;
-        const mouseOffsetY = (this.mouse.y - centerY) / zoom;
-
-        // World mouse position relative to player (who is at screen center)
-        const worldMouseX = player.x + mouseOffsetX;
-        const worldMouseY = player.y + mouseOffsetY;
-
-        let targetAngle = Math.atan2(worldMouseY - player.y, worldMouseX - player.x);
-
-        // Apply aimbot assist if enabled
-        if (this.aimbotEnabled && typeof window.findNearestTarget === 'function' && typeof window.blendAngles === 'function') {
-          const assistTarget = window.findNearestTarget(player);
-          if (assistTarget) {
-            const assistAngle = Math.atan2(assistTarget.y - player.y, assistTarget.x - player.x);
-            // Blend between mouse angle and assist angle
-            const AIMBOT_ASSIST_STRENGTH = window.AIMBOT_ASSIST_STRENGTH || 0.3;
-            targetAngle = window.blendAngles(targetAngle, assistAngle, AIMBOT_ASSIST_STRENGTH);
-          }
-        }
-
-        // Store the raw angle for weapon rotation
-        this.mouse.angle = targetAngle;
-        gameState.mouse.angle = targetAngle;
-      }
-    }
+    // DIRECT weapon angle - from screen center to mouse
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const weaponAngle = Math.atan2(this.mouse.y - centerY, this.mouse.x - centerX);
+    
+    // Store DIRECTLY on window for immediate access - BYPASS ALL OTHER SYSTEMS
+    window.WEAPON_ANGLE = weaponAngle;
+    
+    // Also store mouse position for debugging
+    window.MOUSE_POS = { x: this.mouse.x, y: this.mouse.y };
+    
+    console.log('🎯 WEAPON SET:', (weaponAngle * 180 / Math.PI).toFixed(1), '° | Mouse:', this.mouse.x.toFixed(0), ',', this.mouse.y.toFixed(0));
+  }
+  
+  /**
+   * Normalize angle to [-PI, PI] range
+   * @param {number} angle - Angle to normalize
+   * @returns {number} Normalized angle
+   */
+  normalizeAngle(angle) {
+    while (angle > Math.PI) angle -= 2 * Math.PI;
+    while (angle < -Math.PI) angle += 2 * Math.PI;
+    return angle;
   }
 
   /**
@@ -421,13 +424,15 @@ class InputSystem {
     // Check shooting cooldown
     const lastShotTime = window.lastShotTime || 0;
     if (currentTime - lastShotTime >= cooldown) {
-      // Use smoothGunAngle if available for perfect bullet-weapon alignment
-      let shootAngle = this.mouse.angle; // Default to mouse angle
+      // Use precise target angle for bullet accuracy, not the smoothed visual angle
+      let shootAngle = gameState.mouse.targetAngle || this.mouse.angle;
+      
+      // Override with server-synced angle if available for perfect accuracy
       if (player.smoothGunAngle !== undefined) {
         shootAngle = player.smoothGunAngle;
       }
 
-      console.log('Shooting bullet at angle:', shootAngle);
+      console.log('Shooting bullet at precise angle:', shootAngle);
 
       // Send to server if function exists
       if (typeof window.sendToServer === 'function') {
@@ -448,8 +453,37 @@ class InputSystem {
         window.hideCooldownCursor();
       }
 
+      // Trigger weapon animation
+      this.triggerWeaponAnimation(gameState, player);
+
       // Create explosion effect and recoil animations
       this.handleShootingEffects(player, shootAngle);
+    }
+  }
+  
+  /**
+   * Trigger weapon shooting animation
+   * @param {Object} gameState - Current game state
+   * @param {Object} player - Player object
+   */
+  triggerWeaponAnimation(gameState, player) {
+    // Find weapon animation for this player
+    if (window.renderSystem && window.renderSystem.spriteAnimations) {
+      const playerTankConfig = player.selectedTank || gameState.selectedTank;
+      const weaponAssetKey = `${playerTankConfig.color}_${playerTankConfig.weapon}`;
+      const weaponAnimKey = `${player.id}_${weaponAssetKey}`;
+      const weaponAnim = window.renderSystem.spriteAnimations.weapons[weaponAnimKey];
+      
+      if (weaponAnim) {
+        // Start weapon animation from frame 0
+        weaponAnim.currentFrame = 0;
+        weaponAnim.isPlaying = true;
+        weaponAnim.loop = false;
+        weaponAnim.lastFrameTime = Date.now();
+        weaponAnim.frameDuration = 40; // Fast shooting animation
+        
+        console.log('🔫 Weapon animation triggered');
+      }
     }
   }
 
@@ -641,7 +675,15 @@ class InputSystem {
     if (!this.canvasHandlersSetup) {
       this.setupInputHandlers();
     }
+    
+    // Just update mouse position, weapon angle calculated directly in RenderSystem
+    if (gameState && gameState.mouse) {
+      gameState.mouse.x = this.mouse.x;
+      gameState.mouse.y = this.mouse.y;
+    }
   }
+  
+
 
   /**
    * Cleanup input system

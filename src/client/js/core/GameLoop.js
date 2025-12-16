@@ -15,9 +15,20 @@ export default class GameLoop {
      * Start the game loop
      */
     start() {
+        console.log('🎮 Starting game loop, isInLobby:', this.gameState.isInLobby);
         if (!this.gameState.isInLobby) {
             this.loop();
+        } else {
+            console.log('⏸️ Game loop not started - still in lobby');
         }
+    }
+    
+    /**
+     * Force start the game loop (for testing)
+     */
+    forceStart() {
+        console.log('🚀 Force starting game loop...');
+        this.loop();
     }
 
     /**
@@ -34,15 +45,14 @@ export default class GameLoop {
      * Main game loop - coordinates update and render
      */
     loop() {
-        if (!this.gameState.isInLobby) {
-            const currentTime = Date.now();
-            const deltaTime = currentTime - this.lastFrameTime;
-            this.lastFrameTime = currentTime;
+        // Always run the loop once started (for testing purposes)
+        const currentTime = Date.now();
+        const deltaTime = currentTime - this.lastFrameTime;
+        this.lastFrameTime = currentTime;
 
-            this.update(deltaTime);
-            this.render();
-            this.animationId = requestAnimationFrame(() => this.loop());
-        }
+        this.update(deltaTime);
+        this.render();
+        this.animationId = requestAnimationFrame(() => this.loop());
     }
 
     /**

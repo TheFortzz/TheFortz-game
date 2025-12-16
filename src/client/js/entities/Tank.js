@@ -52,7 +52,7 @@ class Tank {
   }
 
   /**
-   * Render tank body on canvas
+   * Render tank body on canvas - BODY ONLY, NO WEAPON INFLUENCE
    * @param {CanvasRenderingContext2D} ctx - Canvas context
    * @param {Object} tankImg - Tank body image
    * @param {Object} options - Rendering options
@@ -66,6 +66,7 @@ class Tank {
 
     if (!tankImg || !tankImg.complete) return;
 
+    // BODY ROTATION ONLY - completely separate from weapon
     ctx.save();
     ctx.rotate(rotation + Math.PI / 2);
 
@@ -104,11 +105,11 @@ class Tank {
       );
     }
 
-    ctx.restore();
+    ctx.restore(); // End body rotation - weapon not affected
   }
 
   /**
-   * Render tank weapon on canvas
+   * Render tank weapon on canvas - WEAPON ONLY, MOUSE CONTROLLED
    * @param {CanvasRenderingContext2D} ctx - Canvas context
    * @param {Object} weaponImg - Weapon image
    * @param {Object} options - Rendering options
@@ -122,8 +123,9 @@ class Tank {
 
     if (!weaponImg || !weaponImg.complete) return;
 
+    // WEAPON ROTATION ONLY - PURE mouse angle, no body influence
     ctx.save();
-    ctx.rotate(weaponAngle + Math.PI / 2);
+    ctx.rotate(weaponAngle + Math.PI / 2); // ONLY weapon angle, completely independent
 
     const isWeaponPng = weaponImg.src && weaponImg.src.includes('.png');
 
@@ -131,10 +133,22 @@ class Tank {
     const weaponScale = this.visualSize * 4.32 / Math.max(weaponImg.width, weaponImg.height) * scale;
 
     if (spriteAnimation && isWeaponPng) {
-      // PNG sprite sheet - draw specific frame
+      // PNG sprite sheet - draw specific frame with enhanced animation
       const frameWidth = spriteAnimation.frameWidth || 128;
       const frameHeight = spriteAnimation.frameHeight || 128;
-      const currentFrame = spriteAnimation.currentFrame || 0;
+      let currentFrame = spriteAnimation.currentFrame || 0;
+      
+      // Clamp frame to valid range
+      currentFrame = Math.max(0, Math.min(currentFrame, spriteAnimation.numFrames - 1));
+
+      // Add muzzle flash effect on first few frames of shooting animation
+      if (spriteAnimation.isPlaying && currentFrame < 3) {
+        ctx.save();
+        ctx.globalAlpha = 0.8 - (currentFrame * 0.2);
+        ctx.shadowColor = '#ffff00';
+        ctx.shadowBlur = 10;
+        ctx.restore();
+      }
 
       ctx.drawImage(
         weaponImg,
@@ -153,7 +167,7 @@ class Tank {
       );
     }
 
-    ctx.restore();
+    ctx.restore(); // End weapon rotation - body not affected
   }
 
   /**
@@ -173,27 +187,25 @@ class Tank {
       weaponAnimation = null
     } = options;
 
+    // Render tank body at position - SEPARATE context
     ctx.save();
     ctx.translate(x, y);
-
-    // Render tank body
     this.renderBody(ctx, images.tankImg, {
       rotation: bodyRotation,
       scale,
       spriteAnimation: tankAnimation
     });
+    ctx.restore(); // End body context completely
 
-    // Reset rotation for weapon
-    ctx.rotate(-(bodyRotation + Math.PI / 2));
-
-    // Render weapon
+    // Render weapon at same position - COMPLETELY SEPARATE context
+    ctx.save();
+    ctx.translate(x, y);
     this.renderWeapon(ctx, images.weaponImg, {
       weaponAngle,
       scale,
       spriteAnimation: weaponAnimation
     });
-
-    ctx.restore();
+    ctx.restore(); // End weapon context completely
   }
 
   /**
