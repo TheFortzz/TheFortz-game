@@ -44,15 +44,14 @@ function findMissingFunctions() {
 
 // Create missing function stubs
 function createMissingFunctionStubs(missingFunctions) {
-    console.log('🔧 Creating stubs for missing functions...');
-    
+    // Create lightweight no-op stubs to avoid console errors when UI references functions
     missingFunctions.forEach(funcName => {
         if (typeof window[funcName] !== 'function') {
             window[funcName] = function(...args) {
-                console.log(`🔧 STUB: ${funcName}() called with args:`, args);
-                console.warn(`Function ${funcName} is not implemented yet`);
+                // Debug-level stub: avoid noisy warnings
+                console.debug(`STUB: ${funcName}()`, args);
+                return null;
             };
-            console.log(`✅ Created stub for ${funcName}`);
         }
     });
 }
@@ -65,9 +64,10 @@ window.createMissingFunctionStubs = createMissingFunctionStubs;
 setTimeout(() => {
     const result = findMissingFunctions();
     if (result.missing.length > 0) {
-        console.log(`⚠️ Found ${result.missing.length} missing functions`);
+        // Create stubs to avoid runtime errors from missing handlers
         createMissingFunctionStubs(result.missing);
+        console.info(`Created ${result.missing.length} lightweight stubs for missing onclick handlers`);
     } else {
-        console.log('🎉 All onclick functions are properly defined!');
+        console.debug('All onclick handlers are present');
     }
 }, 1000);

@@ -26,7 +26,7 @@ let isInMapCreator = false;
 function startCreateMapRendering() {
     if (createMapAnimationId) return;
 
-    const canvas = document.getElementById('lobbyBackground');
+    const canvas = document.getElementById('tankLobbyBackground');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
@@ -2719,7 +2719,7 @@ playerStatsData.avgRating = 0;
 
 // Handle clicks on the create map canvas
 function handleMapCreatorClick(e) {
-    const canvas = document.getElementById('lobbyBackground');
+    const canvas = document.getElementById('tankLobbyBackground');
     if (!canvas) {
         console.log('❌ Canvas not found');
         return;

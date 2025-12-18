@@ -60,13 +60,14 @@
     loadDefaultMap() {
       try {
         const maps = JSON.parse(localStorage.getItem('thefortz.customMaps') || '[]');
-        const createdMaps = maps.filter((m) => m.isUserCreated !== false);
+        // Load any available maps, not just user-created ones
+        const availableMaps = maps.filter((m) => m && m.name && (m.objects || m.groundTiles));
 
-        if (createdMaps.length > 0) {
-          this.currentMap = createdMaps[0];
-          console.log('[DOMMapRenderer] Loaded player-created map:', this.currentMap.name);
+        if (availableMaps.length > 0) {
+          this.currentMap = availableMaps[0];
+          console.log('[DOMMapRenderer] Loaded map:', this.currentMap.name, 'Objects:', this.currentMap.objects?.length || 0, 'Tiles:', this.currentMap.groundTiles?.length || 0);
         } else {
-          console.log('[DOMMapRenderer] No player-created maps available');
+          console.log('[DOMMapRenderer] No maps available in localStorage');
           this.currentMap = null;
         }
       } catch (error) {
@@ -280,9 +281,16 @@
     },
 
     hideCanvasBackgrounds() {
+      console.log('🔍 hideCanvasBackgrounds called');
       const tankCanvas = document.getElementById('tankLobbyBackground');
       const jetCanvas = document.getElementById('jetLobbyBackground');
       const raceCanvas = document.getElementById('raceLobbyBackground');
+
+      console.log('🔍 Canvas visibility before hiding:', {
+        tank: tankCanvas ? tankCanvas.style.display : 'not found',
+        jet: jetCanvas ? jetCanvas.style.display : 'not found',
+        race: raceCanvas ? raceCanvas.style.display : 'not found'
+      });
 
       if (tankCanvas) tankCanvas.style.display = 'none';
       if (jetCanvas) jetCanvas.style.display = 'none';
@@ -292,8 +300,10 @@
     },
 
     showCanvasBackgrounds() {
+      console.log('🔍 showCanvasBackgrounds called');
       // Get current vehicle type and show appropriate canvas
       const currentVehicle = window.currentVehicleType || 'tank';
+      console.log('🔍 currentVehicle:', currentVehicle);
 
       if (currentVehicle === 'tank') {
         const tankCanvas = document.getElementById('tankLobbyBackground');
@@ -377,24 +387,6 @@
 
   DOMMapRenderer.init();
 
-  function tryLoadMap() {
-    if (DOMMapRenderer.currentMap) {
-      console.log('[DOMMapRenderer] Using pre-loaded map.');
-      DOMMapRenderer.renderToLobby();
-      return;
-    }
-
-    DOMMapRenderer.loadDefaultMap();
-    if (DOMMapRenderer.currentMap) {
-      DOMMapRenderer.renderToLobby();
-    } else {
-      console.log('[DOMMapRenderer] No map to render in lobby.');
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryLoadMap);
-  } else {
-    tryLoadMap();
-  }
+  // Removed automatic rendering on DOM ready - lobby background should only render when explicitly requested
+  // This prevents double rendering and ensures proper timing with lobby state
 })();
