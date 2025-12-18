@@ -76,6 +76,36 @@ let playerStatsData = {
     avgRating: 0
 };
 
+// Ensure essential MapCreator functions exist (fallback stubs) — attach to host to avoid duplicate declarations
+(function(){
+    const host = (typeof window !== 'undefined') ? window : (typeof globalThis !== 'undefined' ? globalThis : this);
+    if (!host.loadSavedMaps) {
+        host.loadSavedMaps = function() {
+            console.log('loadSavedMaps: stub (no-op)');
+            return [];
+        };
+    }
+
+    if (!host.stopCreateMapRendering) {
+        host.stopCreateMapRendering = function() {
+            try {
+                if (typeof createMapAnimationId !== 'undefined' && createMapAnimationId) {
+                    cancelAnimationFrame(createMapAnimationId);
+                    createMapAnimationId = null;
+                }
+            } catch (e) {
+                console.warn('stopCreateMapRendering stub error', e);
+            }
+        };
+    }
+
+    if (!host.handleMapCreatorClick) {
+        host.handleMapCreatorClick = function(evt) {
+            console.log('handleMapCreatorClick: stub', evt && evt.type);
+        };
+    }
+})();
+
 // Map creator state
 let isInMapCreator = false;
 let isEditingExistingMap = false;
@@ -83,7 +113,19 @@ let isEditingExistingMap = false;
 function startCreateMapRendering() {
     if (createMapAnimationId) return;
 
-    const canvas = document.getElementById('lobbyBackground');
+    // Use the correct canvas based on current vehicle type
+    const vehicleType = window.currentLobbyVehicleType || 'tank';
+    let canvasId = 'lobbyBackground'; // fallback
+
+    if (vehicleType === 'jet') {
+        canvasId = 'jetLobbyBackground';
+    } else if (vehicleType === 'race') {
+        canvasId = 'raceLobbyBackground';
+    } else {
+        canvasId = 'tankLobbyBackground';
+    }
+
+    const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
@@ -713,6 +755,17 @@ let keysPressed = {};
 // Placed objects on the map
 let placedObjects = [];
 
+// Helper: compute placement/preview scale for an asset (matches placement logic)
+function getPlacementScale(asset) {
+    if (!asset) return 1;
+    // self assets are smaller except respawner/speeder
+    if (asset.isSelfAsset && asset.subcategory !== 'respawner' && asset.subcategory !== 'speeder') {
+        return asset.scale || 0.5;
+    }
+    // If asset has explicit scale (e.g., resized speeder), use it
+    return asset.scale || 1;
+}
+
 // Duplicate detection
 function isPositionOccupied(x, y, tolerance = 30) {
     return placedObjects.some(obj => {
@@ -728,6 +781,8 @@ let redXTimer = null;
 
 // Ground tile customization - store custom ground textures per tile
 let customGroundTiles = new Map(); // key: "x,y", value: texture type
+// Overlays for special ground types (lava, liquid) so they don't replace base ground
+let customGroundOverlays = new Map(); // key: "x,y", value: overlay type
 
 // Hover preview state
 let hoverWorldX = 0;
@@ -1173,6 +1228,81 @@ function showObjectEditControls(obj) {
         };
         controlsContainer.appendChild(positionBtn);
     }
+
+    // If this is a speeder, add resize and free-move controls
+    if (obj.asset && obj.asset.subcategory && obj.asset.subcategory.toLowerCase() === 'speeder') {
+        const sizeLabel = document.createElement('div');
+        sizeLabel.id = 'speederSizeLabel';
+        sizeLabel.style.cssText = 'color:#fff;margin-left:8px;font-weight:600;';
+        sizeLabel.textContent = `Size: ${obj.scale || 1}`;
+        controlsContainer.appendChild(sizeLabel);
+
+        const shrinkBtn = document.createElement('button');
+        shrinkBtn.innerHTML = '−';
+        shrinkBtn.style.cssText = 'padding:6px 10px;margin-left:8px;cursor:pointer;';
+        shrinkBtn.onclick = () => {
+            changeSelectedObjectScale(-0.1);
+            sizeLabel.textContent = `Size: ${Math.round((selectedObject.scale||1)*100)/100}`;
+        };
+        controlsContainer.appendChild(shrinkBtn);
+
+        const growBtn = document.createElement('button');
+        growBtn.innerHTML = '+';
+        growBtn.style.cssText = 'padding:6px 10px;cursor:pointer;';
+        growBtn.onclick = () => {
+            changeSelectedObjectScale(0.1);
+            sizeLabel.textContent = `Size: ${Math.round((selectedObject.scale||1)*100)/100}`;
+        };
+        controlsContainer.appendChild(growBtn);
+
+        // Free move toggle
+        const freeMoveBtn = document.createElement('button');
+        freeMoveBtn.innerHTML = 'Free Move';
+        freeMoveBtn.style.cssText = 'padding:6px 10px;margin-left:8px;cursor:pointer;';
+        freeMoveBtn.onclick = () => {
+            if (!selectedObject) return;
+            selectedObject.freeMove = !selectedObject.freeMove;
+            freeMoveBtn.style.background = selectedObject.freeMove ? '#004466' : '';
+        };
+        controlsContainer.appendChild(freeMoveBtn);
+    }
+
+    // For any self asset (not just speeder), provide basic resize and free-move editing
+    if (obj.asset && obj.asset.isSelfAsset && !(obj.asset.subcategory && obj.asset.subcategory.toLowerCase() === 'speeder')) {
+        const sizeLabel2 = document.createElement('div');
+        sizeLabel2.id = 'selfSizeLabel';
+        sizeLabel2.style.cssText = 'color:#fff;margin-left:8px;font-weight:600;';
+        sizeLabel2.textContent = `Size: ${obj.scale || getPlacementScale(obj.asset)}`;
+        controlsContainer.appendChild(sizeLabel2);
+
+        const shrinkBtn2 = document.createElement('button');
+        shrinkBtn2.innerHTML = '−';
+        shrinkBtn2.style.cssText = 'padding:6px 10px;margin-left:8px;cursor:pointer;';
+        shrinkBtn2.onclick = () => {
+            changeSelectedObjectScale(-0.1);
+            sizeLabel2.textContent = `Size: ${Math.round((selectedObject.scale||1)*100)/100}`;
+        };
+        controlsContainer.appendChild(shrinkBtn2);
+
+        const growBtn2 = document.createElement('button');
+        growBtn2.innerHTML = '+';
+        growBtn2.style.cssText = 'padding:6px 10px;cursor:pointer;';
+        growBtn2.onclick = () => {
+            changeSelectedObjectScale(0.1);
+            sizeLabel2.textContent = `Size: ${Math.round((selectedObject.scale||1)*100)/100}`;
+        };
+        controlsContainer.appendChild(growBtn2);
+
+        const freeMoveBtn2 = document.createElement('button');
+        freeMoveBtn2.innerHTML = 'Free Move';
+        freeMoveBtn2.style.cssText = 'padding:6px 10px;margin-left:8px;cursor:pointer;';
+        freeMoveBtn2.onclick = () => {
+            if (!selectedObject) return;
+            selectedObject.freeMove = !selectedObject.freeMove;
+            freeMoveBtn2.style.background = selectedObject.freeMove ? '#004466' : '';
+        };
+        controlsContainer.appendChild(freeMoveBtn2);
+    }
     
     document.body.appendChild(controlsContainer);
 }
@@ -1202,6 +1332,13 @@ function deleteSelectedObject() {
             console.log('✓ Object deleted');
         }
     }
+}
+
+// Adjust selected object scale (for speeder resize control)
+function changeSelectedObjectScale(delta) {
+    if (!selectedObject) return;
+    selectedObject.scale = Math.max(0.1, Math.min(5, (selectedObject.scale || 1) + delta));
+    renderMapCreatorCanvas();
 }
 
 // Show position controls for buildings
@@ -1933,10 +2070,72 @@ function loadAssets(category) {
     } else if (category === 'buildings') {
         loadBuildingAssets(assetsGrid);
         console.log('✅ Building assets loaded');
+    } else if (category === 'self') {
+        loadSelfAssets(assetsGrid);
+        console.log('✅ Self assets loaded');
     } else if (category === 'players') {
         loadPlayersPanel();
         console.log('✅ Players panel loaded');
     }
+}
+
+// Load self (tank-specific) assets
+function loadSelfAssets(container) {
+    const sections = [
+        { title: 'Powers', path: 'powers', files: ['_Path_ (4).png', '_Path_ (6).png'] },
+        { title: 'Lootbox', path: 'lootbox', files: ['lootbox10+.png', 'lootbox20+.png', 'lootbox50+.png', 'lootbox100+.png'] },
+        { title: 'Respawner', path: 'respwaner', files: ['RedRe.png', 'blueRe.png'] },
+        { title: 'Speeder', path: 'speeder', files: ['speed2x.png'] },
+        { title: 'Bullets', path: 'bullets/bullets', files: [] }
+    ];
+
+    // For bullets we will show a single special box for SpecialBullets
+    // (user requested: "only the special bullet box")
+    const specialBulletsPreview = '/assets/tank/bullets/SpecialBullets/bullets/arrowBullet.png';
+
+    // build container
+    const selfContainer = document.createElement('div');
+    selfContainer.style.cssText = 'display:flex;flex-direction:column;gap:12px;padding:12px;';
+
+    sections.forEach(section => {
+        const header = document.createElement('div');
+        header.style.cssText = 'color:#00f7ff;font-weight:700;margin-bottom:6px;';
+        header.textContent = section.title;
+        selfContainer.appendChild(header);
+
+        const grid = document.createElement('div');
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;';
+
+        section.files.forEach(file => {
+            const imgPath = `/assets/tank/${section.path}/${file}`;
+            const displayName = file.replace(/\.png$/i, '').replace(/_/g, ' ').replace(/\d+/g, '').trim();
+
+            const item = document.createElement('div');
+            item.className = 'editor-asset-item';
+            item.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;';
+
+            item.innerHTML = `<div class="asset-preview"><img src="${imgPath}" alt="${displayName}" onerror="this.style.display='none'"></div><div class="asset-name">${displayName || section.title}</div>`;
+
+            const asset = {
+                name: displayName || section.title,
+                category: 'self',
+                subcategory: section.title.toLowerCase(),
+                image: imgPath,
+                isSelfAsset: true
+            };
+
+            item.onclick = () => selectAsset(asset, item);
+
+            item.onmouseenter = () => { item.style.transform = 'translateY(-3px)'; };
+            item.onmouseleave = () => { item.style.transform = 'translateY(0)'; };
+
+            grid.appendChild(item);
+        });
+
+        selfContainer.appendChild(grid);
+    });
+
+    container.appendChild(selfContainer);
 }
 
 // Ground assets loader with real textures
@@ -1958,7 +2157,11 @@ function loadGroundAssets(container) {
         { name: 'Sand', type: 'sand', file: 'tank/Grounds/Sand.png' },
         { name: 'Wooden Planks', type: 'woodenplanks', file: 'tank/Grounds/WoodenPlanks.png' },
         { name: 'Wooden Tile', type: 'woodentile', file: 'tank/Grounds/WoodenTile.png' },
-        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' }
+        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' },
+        { name: 'Lava 1', type: 'lava1', file: 'tank/Grounds/lava1.png' },
+        { name: 'Lava 2', type: 'lava2', file: 'tank/Grounds/lava2.png' },
+        { name: 'Liquid Bubbles 1', type: 'liquid1', file: 'tank/Grounds/liquidBubble1.png' },
+        { name: 'Liquid Bubbles 2', type: 'liquid2', file: 'tank/Grounds/liquidBubble2.png' }
     ];
 
     groundTextures.forEach(ground => {
@@ -2063,7 +2266,7 @@ function selectGroundAsset(ground) {
 }
 
 // Open object folder to show different directions
-function openObjectFolder(asset) {
+function __openObjectFolder_duplicate_removed__(asset) {
     const assetsGrid = document.getElementById('assetsGrid');
     assetsGrid.innerHTML = '';
 
@@ -2155,14 +2358,6 @@ function loadPlayersPanel() {
     if (playersPanel) playersPanel.style.display = 'block';
 }
 
-
-// Updated selectAsset function for new editor
-function selectAsset(asset, element) {
-    selectedAsset = asset;
-    updateAssetSelection();
-    updateSelectedAssetVisual();
-    console.log('Selected asset:', asset.name);
-    renderMapCreatorCanvas();
 
 function openObjectFolder(asset) {
         unselectBtn.style.cssText = 'width:100%; padding:12px; background: linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15)); border: 1px solid rgba(255,80,80,0.4); border-left: 3px solid #ff4444; color:#ff6666; cursor:pointer; font-weight:600; font-size:12px; letter-spacing:0.5px; transition:all 0.2s; text-align:left; border-radius: 0;';
@@ -2448,7 +2643,6 @@ end" style="
     // If we're viewing a specific object's files, show those
     if (currentObjectFolder) {
         loadObjectFiles(currentObjectFolder);
-        return;
     }
 
     // Ground PNG textures (use tank asset folder)
@@ -2470,11 +2664,18 @@ end" style="
         { name: 'Sand', type: 'sand', file: 'tank/Grounds/Sand.png' },
         { name: 'Wooden Planks', type: 'woodenplanks', file: 'tank/Grounds/WoodenPlanks.png' },
         { name: 'Wooden Tile', type: 'woodentile', file: 'tank/Grounds/WoodenTile.png' },
-        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' }
+        { name: 'Yellow Grass', type: 'yellowgrass', file: 'tank/Grounds/YellowGrass.png' },
+        { name: 'Lava 1', type: 'lava1', file: 'tank/Grounds/lava1.png' },
+        { name: 'Lava 2', type: 'lava2', file: 'tank/Grounds/lava2.png' },
+        { name: 'Liquid Bubbles 1', type: 'liquid1', file: 'tank/Grounds/liquidBubble1.png' },
+        { name: 'Liquid Bubbles 2', type: 'liquid2', file: 'tank/Grounds/liquidBubble2.png' }
     ];
 
+    // Determine active category for this assets panel
+    var _category = (typeof category !== 'undefined') ? category : (typeof currentAssetCategory !== 'undefined' ? currentAssetCategory : null);
+
     // Show only ground textures if ground category is selected
-    if (category === 'ground') {
+    if (_category === 'ground') {
         // Create perfect grid container for 2 grounds per row - 3x bigger
         const groundsGridContainer = document.createElement('div');
         groundsGridContainer.style.cssText = `
@@ -2590,14 +2791,12 @@ end" style="
         });
         
         assetsGrid.appendChild(groundsGridContainer);
-
-        return;
     }
 
 
 
     // Show buildings category
-    if (category === 'buildings') {
+    if (_category === 'buildings') {
         // Use Buildings folder
         const viewFolder = 'Buildings';
 
@@ -2741,12 +2940,10 @@ end" style="
         });
         
         assetsGrid.appendChild(buildingsGridContainer);
-        
-        return;
     }
 
     // Show obstacles category
-    if (category === 'obstacles') {
+    if (_category === 'obstacles') {
         const obstaclesContainer = document.createElement('div');
         obstaclesContainer.style.cssText = `
             display: grid;
@@ -2811,11 +3008,10 @@ end" style="
         });
 
         assetsGrid.appendChild(obstaclesContainer);
-        return;
     }
 
     // Show power-ups category
-    if (category === 'powerups') {
+    if (_category === 'powerups') {
         const powerupsContainer = document.createElement('div');
         powerupsContainer.style.cssText = `
             display: grid;
@@ -2880,12 +3076,119 @@ end" style="
             powerupsContainer.appendChild(powerupItem);
         });
 
-        assetsGrid.appendChild(powerupsContainer);
-        return;
-    }
+            assetsGrid.appendChild(powerupsContainer);
+        }
+
+        // Show self (tank-specific) assets: powers, health, respawner, speeder, bullets
+        if (_category === 'self') {
+            const selfContainer = document.createElement('div');
+            selfContainer.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+                padding: 18px;
+            `;
+
+            const sections = [
+                { title: 'Powers', path: 'powers', files: ['_Path_ (4).png', '_Path_ (6).png'] },
+                { title: 'Lootbox', path: 'lootbox', files: ['lootbox10+.png', 'lootbox20+.png', 'lootbox50+.png', 'lootbox100+.png'] },
+                { title: 'Respawner', path: 'respwaner', files: ['RedRe.png', 'blueRe.png'] },
+                { title: 'Speeder', path: 'speeder', files: ['speed2x.png'] },
+                { title: 'Bullets', path: 'bullets/bullets', files: [] }
+            ];
+
+            // populate bullets files (01..66)
+            for (let i = 1; i <= 66; i++) {
+                const num = String(i).padStart(2, '0');
+                sections[4].files.push(`${num}.png`);
+            }
+
+            sections.forEach(section => {
+                const header = document.createElement('div');
+                header.style.cssText = 'color: #00f7ff; font-weight: 700; margin-bottom: 6px;';
+                header.textContent = section.title;
+                selfContainer.appendChild(header);
+
+                // render bullets section: show only the special box linking to SpecialBullets
+                const grid = document.createElement('div');
+                grid.style.cssText = 'display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;';
+
+                if (section.title === 'Bullets') {
+                    const box = document.createElement('div');
+                    box.className = 'editor-asset-item';
+                    box.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;border:2px dashed rgba(255,255,255,0.08);';
+
+                    box.innerHTML = `
+                        <div style="width:64px;height:64px;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b1220,#0f2230);">
+                            <img src="${specialBulletsPreview}" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.style.display='none'">
+                        </div>
+                        <div style="color:#ffd880;margin-top:8px;font-weight:700;">Special Bullets</div>
+                        <div style="color:rgba(255,255,255,0.6);font-size:12px;">Open special bullets</div>
+                    `;
+
+                    box.onclick = () => {
+                        // open a simple modal-like listing of special bullets
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:100000;';
+
+                        const panel = document.createElement('div');
+                        panel.style.cssText = 'width:520px;max-width:90%;background:#07101a;padding:16px;border:2px solid rgba(0,247,255,0.14);border-radius:8px;';
+                        panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h3 style="color:#00f7ff;margin:0">Special Bullets</h3><button id="closeSpecialBullets" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer">✖</button></div>`;
+
+                        const list = document.createElement('div');
+                        list.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:10px;';
+
+                        const specialFiles = ['arrowBullet.png','axeBullet.png','fireBullet.png','greenBulet.png','iceBullet.png','purpleBullet.png'];
+                        specialFiles.forEach(f => {
+                            const p = document.createElement('div');
+                            p.className = 'editor-asset-item';
+                            p.style.cssText = 'padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;';
+                            const path = `/assets/tank/bullets/SpecialBullets/bullets/${f}`;
+                            p.innerHTML = `<div class="asset-preview"><img src="${path}" onerror="this.style.display='none'"/></div><div class="asset-name">${f.replace(/\.png$/,'')}</div>`;
+                            p.onclick = () => selectAsset({ name: f.replace(/\.png$/,''), category: 'self', subcategory: 'special-bullet', image: path }, p);
+                            list.appendChild(p);
+                        });
+
+                        panel.appendChild(list);
+                        overlay.appendChild(panel);
+                        document.body.appendChild(overlay);
+
+                        document.getElementById('closeSpecialBullets').onclick = () => overlay.remove();
+                    };
+
+                    grid.appendChild(box);
+                } else {
+                    section.files.forEach(file => {
+                        const imgPath = `/assets/tank/${section.path}/${file}`;
+                        const displayName = file.replace(/\.png$/i, '').replace(/_/g, ' ').replace(/\d+/g, '').trim();
+
+                        const item = document.createElement('div');
+                        item.className = 'editor-asset-item';
+                        item.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;';
+
+                        item.innerHTML = `<div class="asset-preview"><img src="${imgPath}" alt="${displayName}" onerror="this.style.display='none'"></div><div class="asset-name">${displayName || section.title}</div>`;
+
+                        const asset = {
+                            name: displayName || section.title,
+                            category: 'self',
+                            subcategory: section.title.toLowerCase(),
+                            image: imgPath,
+                            isSelfAsset: true
+                        };
+
+                        item.onclick = () => selectAsset(asset, item);
+                        grid.appendChild(item);
+                    });
+                }
+
+                selfContainer.appendChild(grid);
+            });
+
+            assetsGrid.appendChild(selfContainer);
+        }
 
     // Show tanks/vehicles category
-    if (category === 'tanks' || category === 'vehicles') {
+    if (_category === 'tanks' || _category === 'vehicles') {
         const tanksContainer = document.createElement('div');
         tanksContainer.style.cssText = `
             display: grid;
@@ -2983,11 +3286,10 @@ end" style="
         });
 
         assetsGrid.appendChild(tanksContainer);
-        return;
     }
 
     // Show players category
-    if (category === 'players') {
+    if (_category === 'players') {
         // Create players content directly in assetsGrid
         const playersContainer = document.createElement('div');
         playersContainer.style.cssText = `
@@ -3042,12 +3344,10 @@ end" style="
 
         playersContainer.appendChild(spawnSection);
         assetsGrid.appendChild(playersContainer);
-        
-        return;
     }
 
     // Show script editor category
-    if (category === 'script') {
+    if (_category === 'script') {
         // Show coming soon message
         if (assetsGrid) {
             assetsGrid.innerHTML = '';
@@ -3082,16 +3382,7 @@ end" style="
             
             assetsGrid.appendChild(comingSoonContainer);
         }
-        return;
     }
-}
-
-function openObjectFolder(asset) {
-    currentObjectFolder = asset;
-
-    // Load the individual files
-    loadObjectFiles(asset);
-}
 
 function backToObjects() {
     currentObjectFolder = null;
@@ -3578,10 +3869,11 @@ function actualRenderMapCreatorCanvas() {
     // Draw placed objects
     placedObjects.forEach((obj, index) => {
         if (obj.image && obj.image.complete && obj.image.naturalWidth > 0) {
-            const width = obj.image.naturalWidth;
-            const height = obj.image.naturalHeight;
+            const scale = obj.scale || 1;
+            const width = obj.image.naturalWidth * scale;
+            const height = obj.image.naturalHeight * scale;
 
-            // Draw the object
+            // Draw the object (centered)
             ctx.drawImage(obj.image, obj.x - width / 2, obj.y - height / 2, width, height);
 
             // Draw selection highlight if hovering
@@ -3594,8 +3886,9 @@ function actualRenderMapCreatorCanvas() {
                 ctx.shadowBlur = 0;
             }
         } else if (obj.useIcon && obj.asset && obj.asset.icon) {
-            // Draw icon fallback
-            const iconSize = 48;
+            // Draw icon fallback (respect scale by adjusting icon size)
+            const baseIconSize = 48;
+            const iconSize = (obj.scale || 1) * baseIconSize;
             
             // Draw background circle
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -3690,8 +3983,8 @@ function actualRenderMapCreatorCanvas() {
             ctx.strokeRect(isoX, isoY, tileWidth, drawHeight);
             ctx.restore();
         } else if (selectedAsset.image) {
-            // Draw glowing grid lines for building snapping
-            if (!selectedAsset.isGround) {
+            // Draw glowing grid lines for building snapping (exclude speeder/self objects)
+            if (!selectedAsset.isGround && !(selectedAsset.isSelfAsset && selectedAsset.subcategory && selectedAsset.subcategory.toLowerCase() === 'speeder')) {
                 ctx.save();
                 const gridSize = 60;
                 const gridColor = '#00f7ff';
@@ -3738,15 +4031,18 @@ function actualRenderMapCreatorCanvas() {
 
             const previewImg = selectedAsset.previewImage;
             if (previewImg.complete && previewImg.naturalWidth > 0) {
-                const width = previewImg.naturalWidth;
-                const height = previewImg.naturalHeight;
+                const baseW = previewImg.naturalWidth;
+                const baseH = previewImg.naturalHeight;
+                const scale = getPlacementScale(selectedAsset);
+                const width = baseW * scale;
+                const height = baseH * scale;
 
-                // Position at cursor
+                // Position at cursor (centered)
                 const posX = hoverWorldX - width / 2;
                 const posY = hoverWorldY - height / 2;
 
                 ctx.save();
-                // Draw semi-transparent building preview
+                // Draw semi-transparent building preview at placement size
                 ctx.globalAlpha = 0.6;
                 ctx.drawImage(previewImg, posX, posY, width, height);
 
@@ -3873,7 +4169,7 @@ function handleCanvasClick(e) {
     let worldY = (mouseY - canvasOffsetY) / canvasZoom;
     
     // Apply the same grid snapping as hover preview for buildings and objects (not ground)
-    if (selectedAsset && !selectedAsset.isGround) {
+    if (selectedAsset && !selectedAsset.isGround && !(selectedAsset.isSelfAsset && selectedAsset.subcategory && selectedAsset.subcategory.toLowerCase() === 'speeder')) {
         const gridSize = 32; // Same as TANK_GRID_SIZE - matches hover preview exactly
         worldX = Math.round(worldX / gridSize) * gridSize;
         worldY = Math.round(worldY / gridSize) * gridSize;
@@ -3897,10 +4193,22 @@ function handleCanvasClick(e) {
 
         const tileKey = `${tileCol},${tileRow}`;
 
-        // Store the ground type for this tile
-        customGroundTiles.set(tileKey, {
-            type: selectedAsset.groundType // This should match the key in groundTextureImages
-        });
+        // If this is a lava/liquid special ground, add as an overlay instead
+        const groundLower = (selectedAsset.groundFile || selectedAsset.groundType || '').toLowerCase();
+        if (groundLower.includes('lava') || groundLower.includes('liquid')) {
+            customGroundOverlays.set(tileKey, {
+                type: selectedAsset.groundType,
+                image: selectedAsset.image
+            });
+            console.log('🟠 Added overlay ground at', tileCol, tileRow, 'type:', selectedAsset.groundType);
+        } else {
+            // Store the ground type for this tile (replace only that tile)
+            customGroundTiles.set(tileKey, {
+                type: selectedAsset.groundType,
+                image: selectedAsset.image
+            });
+            console.log('✅ Painted ground tile at:', tileCol, tileRow, 'with type:', selectedAsset.groundType);
+        }
 
         console.log('✓ Painted ground tile at:', tileCol, tileRow, 'with type:', selectedAsset.groundType, 'at world pos:', worldX, worldY);
         renderMapCreatorCanvas();
@@ -3935,11 +4243,15 @@ function handleCanvasClick(e) {
                 return;
             }
             
+            // Determine scale for self assets (2x smaller), but keep respawner and speeder at normal size
+            const placementScale = (selectedAsset && selectedAsset.isSelfAsset && selectedAsset.subcategory !== 'respawner' && selectedAsset.subcategory !== 'speeder') ? 0.5 : 1;
+
             placedObjects.push({
                 asset: selectedAsset,
                 x: worldX,
                 y: worldY,
-                image: img
+                image: img,
+                scale: placementScale
             });
 
             console.log('✓✓✓ Successfully placed object at:', worldX, worldY);
@@ -3972,12 +4284,15 @@ function handleCanvasClick(e) {
         }
         
         // Place object with icon fallback
+        const placementScaleFallback = (selectedAsset && selectedAsset.isSelfAsset && selectedAsset.subcategory !== 'respawner' && selectedAsset.subcategory !== 'speeder') ? 0.5 : 1;
+
         placedObjects.push({
             asset: selectedAsset,
             x: worldX,
             y: worldY,
             image: null, // No image, will use icon
-            useIcon: true
+            useIcon: true,
+            scale: placementScaleFallback
         });
 
         console.log('✓ Successfully placed object with icon fallback at:', worldX, worldY);
@@ -4037,12 +4352,31 @@ let lastDragX = 0;
 let lastDragY = 0;
 let dragVelocityX = 0;
 let dragVelocityY = 0;
+// Object dragging state (for free-move objects)
+let objectDragging = false;
+let objectDragStartMouseX = 0;
+let objectDragStartMouseY = 0;
+let objectDragStartX = 0;
+let objectDragStartY = 0;
 
 function handleCanvasMouseDown(e) {
     // Store mouse down position and time for click detection
     mouseDownX = e.clientX;
     mouseDownY = e.clientY;
     mouseDownTime = Date.now();
+
+    // If in edit mode and left-clicking a selected object with freeMove enabled, start object drag
+    if (isEditMode && e.button === 0 && selectedObject && selectedObject.freeMove && selectedObject.isHovered) {
+        e.preventDefault();
+        objectDragging = true;
+        objectDragStartMouseX = e.clientX;
+        objectDragStartMouseY = e.clientY;
+        objectDragStartX = selectedObject.x;
+        objectDragStartY = selectedObject.y;
+        const canvas = document.getElementById('mapCreatorCanvas');
+        canvas.style.cursor = 'grabbing';
+        return;
+    }
 
     // Left click, right click, or middle click for panning
     if (e.button === 0 || e.button === 2 || e.button === 1) {
@@ -4072,8 +4406,8 @@ function handleCanvasMouseMove(e) {
     let worldX = (lastMouseX - canvasOffsetX) / canvasZoom;
     let worldY = (lastMouseY - canvasOffsetY) / canvasZoom;
     
-    // Grid snapping for buildings and objects (not ground) - match tankCreatmap.js
-    if (selectedAsset && !selectedAsset.isGround) {
+    // Grid snapping for buildings and objects (not ground) - exclude speeder/self objects
+    if (selectedAsset && !selectedAsset.isGround && !(selectedAsset.isSelfAsset && selectedAsset.subcategory && selectedAsset.subcategory.toLowerCase() === 'speeder')) {
         const gridSize = 32; // Same as TANK_GRID_SIZE in tankCreatmap.js
         worldX = Math.round(worldX / gridSize) * gridSize;
         worldY = Math.round(worldY / gridSize) * gridSize;
@@ -4093,10 +4427,11 @@ function handleCanvasMouseMove(e) {
             let isWithinBounds = false;
             
             if (obj.image && obj.image.complete && obj.image.naturalWidth > 0) {
-                const width = obj.image.naturalWidth;
-                const height = obj.image.naturalHeight;
-                
-                // Check if mouse is within object bounds
+                const scale = obj.scale || 1;
+                const width = obj.image.naturalWidth * scale;
+                const height = obj.image.naturalHeight * scale;
+
+                // Check if mouse is within object bounds (respecting scale)
                 isWithinBounds = worldX >= obj.x - width / 2 && worldX <= obj.x + width / 2 &&
                                 worldY >= obj.y - height / 2 && worldY <= obj.y + height / 2;
             } else if (obj.useIcon) {
@@ -4138,6 +4473,23 @@ function handleCanvasMouseMove(e) {
         targetCanvasOffsetY = newOffsetY;
     }
 
+    // Handle object dragging (free-move)
+    if (objectDragging && selectedObject) {
+        // Compute mouse delta in screen pixels
+        const dxPixels = e.clientX - objectDragStartMouseX;
+        const dyPixels = e.clientY - objectDragStartMouseY;
+
+        // Convert to world coordinates change
+        const dxWorld = dxPixels / canvasZoom;
+        const dyWorld = dyPixels / canvasZoom;
+
+        selectedObject.x = objectDragStartX + dxWorld;
+        selectedObject.y = objectDragStartY + dyWorld;
+
+        renderMapCreatorCanvas();
+        return;
+    }
+
     renderMapCreatorCanvas();
 }
 
@@ -4150,6 +4502,13 @@ function handleCanvasMouseUp(e) {
         // Apply momentum from drag
         velocityX = dragVelocityX * 0.8; // Scale down the momentum
         velocityY = dragVelocityY * 0.8;
+    }
+
+    if (objectDragging) {
+        objectDragging = false;
+        const canvas = document.getElementById('mapCreatorCanvas');
+        if (canvas) canvas.style.cursor = 'grab';
+        renderMapCreatorCanvas();
     }
 }
 
@@ -4546,7 +4905,19 @@ playerStatsData.avgRating = 0;
 
 // Handle clicks on the create map canvas
 function handleMapCreatorClick(e) {
-    const canvas = document.getElementById('lobbyBackground');
+    // Use the correct canvas based on current vehicle type
+    const vehicleType = window.currentLobbyVehicleType || 'tank';
+    let canvasId = 'lobbyBackground'; // fallback
+
+    if (vehicleType === 'jet') {
+        canvasId = 'jetLobbyBackground';
+    } else if (vehicleType === 'race') {
+        canvasId = 'raceLobbyBackground';
+    } else {
+        canvasId = 'tankLobbyBackground';
+    }
+
+    const canvas = document.getElementById(canvasId);
     if (!canvas) {
         console.log('❌ Canvas not found');
         return;
@@ -4898,6 +5269,31 @@ function renderCustomGroundTiles(ctx, camera, viewWidth, viewHeight) {
     if (customTilesRendered > 0) {
         console.log('✅ Rendered', customTilesRendered, 'custom ground tiles');
     }
+
+    // Render overlays (lava, liquid) on top of base ground without replacing it
+    if (customGroundOverlays && customGroundOverlays.size > 0) {
+        let overlayRendered = 0;
+        for (let row = startRow; row <= endRow; row++) {
+            for (let col = startCol; col <= endCol; col++) {
+                const tileKey = `${col},${row}`;
+                const overlay = customGroundOverlays.get(tileKey);
+                if (!overlay) continue;
+
+                const isoX = col * tileWidth + (row % 2) * (tileWidth / 2);
+                const isoY = row * tileHeight;
+
+                if (groundTexturesLoaded && groundTextureImages.has(overlay.type)) {
+                    const overlayImg = groundTextureImages.get(overlay.type);
+                    if (overlayImg && overlayImg.complete && overlayImg.naturalWidth > 0) {
+                        ctx.drawImage(overlayImg, isoX, isoY, tileWidth, drawHeight);
+                        overlayRendered++;
+                    }
+                }
+            }
+        }
+
+        if (overlayRendered > 0) console.log('🟠 Rendered', overlayRendered, 'ground overlays');
+    }
 }
 
 // Old terrain rendering function (kept for reference, not used)
@@ -5052,7 +5448,11 @@ function loadCustomGroundTexture() {
         'tank/Grounds/Sand.png',
         'tank/Grounds/WoodenPlanks.png',
         'tank/Grounds/WoodenTile.png',
-        'tank/Grounds/YellowGrass.png'
+        'tank/Grounds/YellowGrass.png',
+        'tank/Grounds/lava1.png',
+        'tank/Grounds/lava2.png',
+        'tank/Grounds/liquidBubble1.png',
+        'tank/Grounds/liquidBubble2.png'
     ];
 
     let loadedCount = 0;
