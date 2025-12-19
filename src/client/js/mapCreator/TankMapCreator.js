@@ -762,6 +762,10 @@ function getPlacementScale(asset) {
     if (asset.isSelfAsset && asset.subcategory !== 'respawner' && asset.subcategory !== 'speeder') {
         return asset.scale || 0.5;
     }
+    // Respawners need a better scale for visibility
+    if (asset.isSelfAsset && asset.subcategory === 'respawner') {
+        return asset.scale || 0.8;
+    }
     // If asset has explicit scale (e.g., resized speeder), use it
     return asset.scale || 1;
 }
@@ -2081,12 +2085,13 @@ function loadAssets(category) {
 
 // Load self (tank-specific) assets
 function loadSelfAssets(container) {
+    // Show self (tank-specific) assets: Powers, Lootbox, Respawner, Speeder, Bullets
     const sections = [
-        { title: 'Powers', path: 'powers', files: ['_Path_ (4).png', '_Path_ (6).png'] },
-        { title: 'Lootbox', path: 'lootbox', files: ['lootbox10+.png', 'lootbox20+.png', 'lootbox50+.png', 'lootbox100+.png'] },
-        { title: 'Respawner', path: 'respwaner', files: ['RedRe.png', 'blueRe.png'] },
-        { title: 'Speeder', path: 'speeder', files: ['speed2x.png'] },
-        { title: 'Bullets', path: 'bullets/bullets', files: [] }
+        { title: 'Powers', path: 'powers', files: ['_Path_ (4).png', '_Path_ (6).png'], icon: '⚡' },
+        { title: 'Lootbox', path: 'lootboxes', files: ['lootboxes10+.png', 'lootboxes20+.png', 'lootboxes50+.png', 'lootboxes100+.png'], icon: '🎁' },
+        { title: 'Respawner', path: 'respwaner', files: ['RedRe.png', 'blueRe.png'], icon: '🔄' },
+        { title: 'Speeder', path: 'speeder', files: ['speed2x.png'], icon: '💨' },
+        { title: 'Bullets', path: 'bullets/bullets', files: [], icon: '🔫' }
     ];
 
     // For bullets we will show a single special box for SpecialBullets
@@ -2121,6 +2126,7 @@ function loadSelfAssets(container) {
                 category: 'self',
                 subcategory: section.title.toLowerCase(),
                 image: imgPath,
+                icon: section.icon,
                 isSelfAsset: true
             };
 
@@ -2173,23 +2179,23 @@ function loadGroundAssets(container) {
 
 // Building assets loader with real assets
 function loadBuildingAssets(container) {
-    // Object file name mapping from backup
+    // Object file name mapping from backup with icons
     const objectFileNameMap = {
         'Buildings': {
-            'Cart': 'cart',
-            'Farm_House_01': 'farm_house_01',
-            'Farm_House_02': 'farm_house_02',
-            'Farm_House_With_CropFiled': 'farm_field',
-            'Guard_Tower': 'guard_tower',
-            'House_01': 'house_01',
-            'House_02': 'house_02',
-            'Inn': 'inn',
-            'Shop_01': 'shop_01',
-            'Shop_02': 'shop_02',
-            'Stall_01': 'stall_01',
-            'Stall_02': 'stall_02',
-            'Tree': 'trees',
-            'Wind_Mill': 'windmill'
+            'Cart': { fileName: 'cart', icon: '🚛' },
+            'Farm_House_01': { fileName: 'farm_house_01', icon: '🏠' },
+            'Farm_House_02': { fileName: 'farm_house_02', icon: '🏡' },
+            'Farm_House_With_CropFiled': { fileName: 'farm_field', icon: '🌾' },
+            'Guard_Tower': { fileName: 'guard_tower', icon: '🏰' },
+            'House_01': { fileName: 'house_01', icon: '🏘️' },
+            'House_02': { fileName: 'house_02', icon: '🏠' },
+            'Inn': { fileName: 'inn', icon: '🏨' },
+            'Shop_01': { fileName: 'shop_01', icon: '🏪' },
+            'Shop_02': { fileName: 'shop_02', icon: '🏬' },
+            'Stall_01': { fileName: 'stall_01', icon: '🍎' },
+            'Stall_02': { fileName: 'stall_02', icon: '🥕' },
+            'Tree': { fileName: 'trees', icon: '🌳' },
+            'Wind_Mill': { fileName: 'windmill', icon: '🌬️' }
         }
     };
 
@@ -2197,7 +2203,9 @@ function loadBuildingAssets(container) {
     const objects = Object.keys(objectFileNameMap[viewFolder]);
 
     objects.forEach(objName => {
-        const fileName = objectFileNameMap[viewFolder][objName];
+        const objData = objectFileNameMap[viewFolder][objName];
+        const fileName = objData.fileName;
+        const icon = objData.icon;
         const viewFolderName = 'top_down_view';
         const imagePath = `/assets/tank/${viewFolder}/${objName}/spr_${viewFolderName}_${fileName}_front.png`;
 
@@ -2207,11 +2215,13 @@ function loadBuildingAssets(container) {
             fileName: fileName,
             viewFolder: viewFolder,
             image: imagePath,
-            isFolder: true
+            icon: icon,
+            direction: 'front', // Default direction for direct selection
+            isFolder: false // Make it directly selectable like grounds
         };
 
         const item = createBuildingAssetItem(asset);
-        item.onclick = () => openObjectFolder(asset);
+        item.onclick = () => selectAsset(asset, item);
         container.appendChild(item);
     });
 }
@@ -2360,24 +2370,32 @@ function loadPlayersPanel() {
 
 
 function openObjectFolder(asset) {
-        unselectBtn.style.cssText = 'width:100%; padding:12px; background: linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15)); border: 1px solid rgba(255,80,80,0.4); border-left: 3px solid #ff4444; color:#ff6666; cursor:pointer; font-weight:600; font-size:12px; letter-spacing:0.5px; transition:all 0.2s; text-align:left; border-radius: 0;';
-        unselectBtn.onclick = () => {
-            selectedAsset = null;
-            updateAssetSelection();
-            renderMapCreatorCanvas();
-        };
-        unselectBtn.onmouseenter = () => {
-            unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.25), rgba(220,40,40,0.25))';
-            unselectBtn.style.borderLeftColor = '#ff6666';
-            unselectBtn.style.transform = 'translateX(2px)';
-        };
-        unselectBtn.onmouseleave = () => {
-            unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15))';
-            unselectBtn.style.borderLeftColor = '#ff4444';
-            unselectBtn.style.transform = 'translateX(0)';
-        };
-        controlSection.appendChild(unselectBtn);
-        assetsPanel.appendChild(controlSection);
+    // Control section
+    const controlSection = document.createElement('div');
+    controlSection.id = 'assetControlSection';
+    controlSection.style.cssText = 'padding: 15px 20px; border-bottom: 1px solid rgba(0,247,255,0.15); display: none;';
+
+    // Unselect button
+    const unselectBtn = document.createElement('button');
+    unselectBtn.textContent = '❌ Unselect Asset';
+    unselectBtn.style.cssText = 'width:100%; padding:12px; background: linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15)); border: 1px solid rgba(255,80,80,0.4); border-left: 3px solid #ff4444; color:#ff6666; cursor:pointer; font-weight:600; font-size:12px; letter-spacing:0.5px; transition:all 0.2s; text-align:left; border-radius: 0;';
+    unselectBtn.onclick = () => {
+        selectedAsset = null;
+        updateAssetSelection();
+        renderMapCreatorCanvas();
+    };
+    unselectBtn.onmouseenter = () => {
+        unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.25), rgba(220,40,40,0.25))';
+        unselectBtn.style.borderLeftColor = '#ff6666';
+        unselectBtn.style.transform = 'translateX(2px)';
+    };
+    unselectBtn.onmouseleave = () => {
+        unselectBtn.style.background = 'linear-gradient(90deg, rgba(255,60,60,0.15), rgba(220,40,40,0.15))';
+        unselectBtn.style.borderLeftColor = '#ff4444';
+        unselectBtn.style.transform = 'translateX(0)';
+    };
+    controlSection.appendChild(unselectBtn);
+    assetsPanel.appendChild(controlSection);
 
         // Category section
         const categorySection = document.createElement('div');
@@ -2393,7 +2411,7 @@ function openObjectFolder(asset) {
         
         const categories = [
             { id: 'ground', name: 'TERRAIN', icon: '🌍' },
-            { id: 'buildings', name: 'BUILDINGS', icon: '🏘️' },
+            { id: 'self', name: 'SELF', icon: '🎯' },
             { id: 'tanks', name: 'TANKS', icon: '🚛' },
             { id: 'obstacles', name: 'OBSTACLES', icon: '🧱' },
             { id: 'powerups', name: 'POWER-UPS', icon: '⚡' },
@@ -2795,152 +2813,7 @@ end" style="
 
 
 
-    // Show buildings category
-    if (_category === 'buildings') {
-        // Use Buildings folder
-        const viewFolder = 'Buildings';
 
-        // List of all objects in the view folders
-        const objects = Object.keys(objectFileNameMap[viewFolder]);
-
-        // Create perfect grid container for 2 buildings per row - 3x bigger
-        const buildingsGridContainer = document.createElement('div');
-        buildingsGridContainer.style.cssText = `
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 20px; 
-            margin: 20px auto;
-            padding: 20px;
-            justify-content: center;
-            align-items: start;
-            max-width: 100%;
-        `;
-
-        // Create asset items for each object (perfect grid style)
-        objects.forEach(objName => {
-            const assetItem = document.createElement('div');
-            assetItem.className = 'asset-item-grid building-item';
-
-            // Get the correct file name pattern for this view
-            const fileName = objectFileNameMap[viewFolder][objName];
-            const viewFolderName = 'top_down_view'; // Files use this prefix
-
-            // Use front view as default preview
-            let frontName = 'front';
-            if (viewFolder === 'Isometric View' && objName === 'Farm_House_01') {
-                frontName = 'font'; // Typo in actual file
-            }
-
-            const imagePath = `/assets/tank/${viewFolder}/${objName}/spr_${viewFolderName}_${fileName}_${frontName}.png`;
-
-            const asset = {
-                name: objName.replace(/_/g, ' '),
-                folder: objName,
-                fileName: fileName,
-                viewFolder: viewFolder,
-                image: imagePath,
-                isFolder: true
-            };
-
-            assetItem.onclick = () => openObjectFolder(asset);
-
-            assetItem.innerHTML = `
-                <div class="asset-preview" style="
-                    width: 100%; 
-                    height: 200px; 
-                    background: linear-gradient(145deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04)); 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center; 
-                    overflow: hidden; 
-                    border: 3px solid rgba(0,247,255,0.25); 
-                    transition: all 0.3s ease;
-                    margin-bottom: 15px;
-                    border-radius: 12px;
-                    position: relative;
-                ">
-                    <img src="${imagePath}" alt="${asset.name}" style="
-                        max-width: 180%; 
-                        max-height: 180%; 
-                        object-fit: contain;
-                        transition: transform 0.3s ease;
-                        transform-origin: center center;
-                    " onerror="this.style.display='none'">
-                    <div style="
-                        position: absolute; 
-                        top: 8px; 
-                        right: 10px; 
-                        color: rgba(255, 255, 255, 0.6); 
-                        font-size: 14px;
-                        background: rgba(0,0,0,0.4);
-                        padding: 4px 6px;
-                        border-radius: 4px;
-                        font-weight: bold;
-                    ">›</div>
-                </div>
-                <div class="asset-info" style="text-align: center; padding: 0 8px;">
-                    <div style="
-                        color: #00f7ff; 
-                        font-size: 14px; 
-                        font-weight: 700; 
-                        text-shadow: 0 0 8px rgba(0,247,255,0.4);
-                        margin-bottom: 4px;
-                        line-height: 1.3;
-                    ">${asset.name}</div>
-                    <div style="
-                        color: rgba(255, 255, 255, 0.6); 
-                        font-size: 11px;
-                        font-weight: 500;
-                    ">Click to expand</div>
-                </div>
-            `;
-
-            // Perfect square asset item styling - equal width and height
-            assetItem.style.cssText = `
-                width: 80px;
-                height: 80px;
-                padding: 8px; 
-                cursor: pointer; 
-                background: rgba(0, 247, 255, 0.1); 
-                border: 2px solid rgba(0, 247, 255, 0.6); 
-                transition: all 0.3s ease; 
-                position: relative; 
-                border-radius: 8px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                box-sizing: border-box;
-            `;
-            
-            assetItem.onmouseenter = () => {
-                assetItem.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.08), rgba(0,200,220,0.04))';
-                assetItem.style.borderColor = 'rgba(0,247,255,0.5)';
-                assetItem.style.borderLeftColor = '#00f7ff';
-                assetItem.style.transform = 'translateY(-6px) scale(1.02)';
-                assetItem.style.boxShadow = '0 12px 35px rgba(0,247,255,0.2)';
-                
-                const img = assetItem.querySelector('img');
-                if (img) img.style.transform = 'scale(1.08)';
-            };
-            
-            assetItem.onmouseleave = () => {
-                assetItem.style.background = 'linear-gradient(135deg, rgba(0,247,255,0.02), rgba(0,200,220,0.01))';
-                assetItem.style.borderColor = 'rgba(0,247,255,0.15)';
-                assetItem.style.borderLeftColor = 'rgba(0,247,255,0.3)';
-                assetItem.style.transform = 'translateY(0) scale(1)';
-                assetItem.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
-                
-                const img = assetItem.querySelector('img');
-                if (img) img.style.transform = 'scale(1)';
-            };
-
-            buildingsGridContainer.appendChild(assetItem);
-        });
-        
-        assetsGrid.appendChild(buildingsGridContainer);
-    }
 
     // Show obstacles category
     if (_category === 'obstacles') {
@@ -2953,12 +2826,12 @@ end" style="
         `;
 
         const obstacles = [
-            { name: 'Concrete Barrier', type: 'barrier_concrete', health: 100, destructible: true },
-            { name: 'Steel Wall', type: 'barrier_steel', health: 200, destructible: true },
-            { name: 'Sandbags', type: 'barrier_sand', health: 50, destructible: true },
-            { name: 'Tank Trap', type: 'trap_spikes', health: 150, destructible: true },
-            { name: 'Mine Field', type: 'mines', health: 1, destructible: true },
-            { name: 'Oil Barrel', type: 'barrel_explosive', health: 25, destructible: true }
+            { name: 'Concrete Barrier', type: 'barrier_concrete', lootbox: 100, destructible: true },
+            { name: 'Steel Wall', type: 'barrier_steel', lootbox: 200, destructible: true },
+            { name: 'Sandbags', type: 'barrier_sand', lootbox: 50, destructible: true },
+            { name: 'Tank Trap', type: 'trap_spikes', lootbox: 150, destructible: true },
+            { name: 'Mine Field', type: 'mines', lootbox: 1, destructible: true },
+            { name: 'Oil Barrel', type: 'barrel_explosive', lootbox: 25, destructible: true }
         ];
 
         obstacles.forEach(obstacle => {
@@ -2978,7 +2851,7 @@ end" style="
                 name: obstacle.name,
                 type: obstacle.type,
                 category: 'obstacles',
-                health: obstacle.health,
+                lootbox: obstacle.lootbox,
                 destructible: obstacle.destructible,
                 isObstacle: true
             };
@@ -2986,7 +2859,7 @@ end" style="
             obstacleItem.innerHTML = `
                 <div style="font-size: 24px; margin-bottom: 8px;">🧱</div>
                 <div style="color: #ff6400; font-weight: bold; font-size: 12px; margin-bottom: 4px;">${obstacle.name}</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 10px;">HP: ${obstacle.health}</div>
+                <div style="color: rgba(255,255,255,0.6); font-size: 10px;">Lootbox: ${obstacle.lootbox}</div>
                 <div style="color: rgba(255,255,255,0.4); font-size: 9px;">${obstacle.destructible ? 'Destructible' : 'Indestructible'}</div>
             `;
 
@@ -3025,7 +2898,7 @@ end" style="
             { name: 'Damage Boost', type: 'damage', icon: '💥', effect: '+25 Damage', color: '#F44336' },
             { name: 'Speed Boost', type: 'speed', icon: '⚡', effect: '+30% Speed', color: '#FFEB3B' },
             { name: 'Rapid Fire', type: 'firerate', icon: '🔥', effect: '2x Fire Rate', color: '#FF9800' },
-            { name: 'Health Pack', type: 'health', icon: '❤️', effect: '+75 Health', color: '#E91E63' },
+            { name: 'Lootbox', type: 'lootbox', icon: '🎁', effect: 'Random Rewards', color: '#E91E63' },
             { name: 'Ammo Crate', type: 'ammo', icon: '📦', effect: 'Full Ammo', color: '#9C27B0' }
         ];
 
@@ -3079,7 +2952,7 @@ end" style="
             assetsGrid.appendChild(powerupsContainer);
         }
 
-        // Show self (tank-specific) assets: powers, health, respawner, speeder, bullets
+        // Show self (tank-specific) assets: powers, lootbox, respawner, speeder, bullets
         if (_category === 'self') {
             const selfContainer = document.createElement('div');
             selfContainer.style.cssText = `
@@ -3091,8 +2964,9 @@ end" style="
 
             const sections = [
                 { title: 'Powers', path: 'powers', files: ['_Path_ (4).png', '_Path_ (6).png'] },
-                { title: 'Lootbox', path: 'lootbox', files: ['lootbox10+.png', 'lootbox20+.png', 'lootbox50+.png', 'lootbox100+.png'] },
-                { title: 'Respawner', path: 'respwaner', files: ['RedRe.png', 'blueRe.png'] },
+                { title: 'Lootbox', path: 'lootboxes', files: ['lootboxes10+.png', 'lootboxes20+.png', 'lootboxes50+.png', 'lootboxes100+.png'] },
+                { title: 'Buildings', path: 'buildings', files: ['cart', 'farm_house_01', 'farm_house_02', 'farm_field', 'guard_tower', 'house_01', 'house_02', 'inn', 'shop_01', 'shop_02', 'stall_01', 'stall_02', 'trees', 'windmill'], isBuildings: true },
+                { title: 'Respawner', path: 'respawner', files: ['RedRe.png', 'blueRe.png'] },
                 { title: 'Speeder', path: 'speeder', files: ['speed2x.png'] },
                 { title: 'Bullets', path: 'bullets/bullets', files: [] }
             ];
@@ -3555,10 +3429,14 @@ function saveMap() {
         viewFolder: obj.asset.viewFolder,
         direction: obj.asset.direction,
         image: obj.asset.image,
+        icon: obj.asset.icon,
+        subcategory: obj.asset.subcategory,
+        isSelfAsset: obj.asset.isSelfAsset,
         x: obj.x,
         y: obj.y,
-        width: obj.image.naturalWidth,
-        height: obj.image.naturalHeight
+        scale: obj.scale,
+        width: obj.image ? obj.image.naturalWidth : 0,
+        height: obj.image ? obj.image.naturalHeight : 0
     }));
 
     // Generate ALL ground tiles for the map (including defaults)
@@ -3683,6 +3561,10 @@ function loadMap(mapData) {
             img.src = objData.image;
 
             img.onload = () => {
+                // Determine scale based on asset type (same logic as placement)
+                const isSelfAsset = objData.viewFolder === 'self' || !objData.viewFolder; // Self assets don't have viewFolder
+                const scale = (isSelfAsset && objData.subcategory !== 'respawner' && objData.subcategory !== 'speeder') ? 0.5 : 1;
+
                 placedObjects.push({
                     asset: {
                         name: objData.name,
@@ -3690,11 +3572,43 @@ function loadMap(mapData) {
                         fileName: objData.fileName,
                         viewFolder: objData.viewFolder,
                         direction: objData.direction,
-                        image: objData.image
+                        image: objData.image,
+                        isSelfAsset: isSelfAsset,
+                        subcategory: objData.subcategory
                     },
                     x: objData.x,
                     y: objData.y,
-                    image: img
+                    image: img,
+                    scale: scale
+                });
+
+                renderMapCreatorCanvas();
+            };
+
+            img.onerror = () => {
+                console.warn('⚠️ Failed to load saved map image, using icon fallback:', objData.image);
+
+                // Determine scale based on asset type (same logic as placement)
+                const isSelfAsset = objData.viewFolder === 'self' || !objData.viewFolder;
+                const scale = (isSelfAsset && objData.subcategory !== 'respawner' && objData.subcategory !== 'speeder') ? 0.5 : 1;
+
+                placedObjects.push({
+                    asset: {
+                        name: objData.name,
+                        folder: objData.folder,
+                        fileName: objData.fileName,
+                        viewFolder: objData.viewFolder,
+                        direction: objData.direction,
+                        image: objData.image,
+                        isSelfAsset: isSelfAsset,
+                        subcategory: objData.subcategory,
+                        icon: objData.icon || '🎯' // Default icon if none specified
+                    },
+                    x: objData.x,
+                    y: objData.y,
+                    image: null, // No image, will use icon
+                    useIcon: true,
+                    scale: scale
                 });
 
                 renderMapCreatorCanvas();
@@ -4243,8 +4157,17 @@ function handleCanvasClick(e) {
                 return;
             }
             
-            // Determine scale for self assets (2x smaller), but keep respawner and speeder at normal size
-            const placementScale = (selectedAsset && selectedAsset.isSelfAsset && selectedAsset.subcategory !== 'respawner' && selectedAsset.subcategory !== 'speeder') ? 0.5 : 1;
+            // Determine scale for self assets (smaller), with specific scaling for respawners
+            let placementScale = 1;
+            if (selectedAsset && selectedAsset.isSelfAsset) {
+                if (selectedAsset.subcategory === 'respawner') {
+                    placementScale = 0.8; // Better size for respawners
+                } else if (selectedAsset.subcategory === 'speeder') {
+                    placementScale = 1; // Normal size for speeders
+                } else {
+                    placementScale = 0.5; // Smaller for other self assets
+                }
+            }
 
             placedObjects.push({
                 asset: selectedAsset,
@@ -4284,7 +4207,16 @@ function handleCanvasClick(e) {
         }
         
         // Place object with icon fallback
-        const placementScaleFallback = (selectedAsset && selectedAsset.isSelfAsset && selectedAsset.subcategory !== 'respawner' && selectedAsset.subcategory !== 'speeder') ? 0.5 : 1;
+        let placementScaleFallback = 1;
+        if (selectedAsset && selectedAsset.isSelfAsset) {
+            if (selectedAsset.subcategory === 'respawner') {
+                placementScaleFallback = 0.8; // Better size for respawners
+            } else if (selectedAsset.subcategory === 'speeder') {
+                placementScaleFallback = 1; // Normal size for speeders
+            } else {
+                placementScaleFallback = 0.5; // Smaller for other self assets
+            }
+        }
 
         placedObjects.push({
             asset: selectedAsset,
