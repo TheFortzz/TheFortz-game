@@ -169,18 +169,27 @@ class LobbyUI {
       // Update last frame time for smooth animation
       lastFrameTime = currentTime;
 
-      // Clear with darker background
+      // Check if DOM map is active - if so, don't render anything on canvas
+      const domMapContainer = document.getElementById('lobbyMapContainer');
+      const isDomMapActive = domMapContainer && domMapContainer.children.length > 0;
+      
+      // If DOM map is active, don't render canvas background at all
+      if (isDomMapActive) {
+        return;
+      }
+
+      // Clear with darker background (only when DOM map is not active)
       ctx.fillStyle = '#05080a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Static camera for stable background
       cameraX = 0;
       cameraY = 0;
-
-      // Render created map or tank-themed fallback
-      if (window.MapRenderer && window.MapRenderer.currentMap) {
+      
+      // Render created map or tank-themed fallback (only if DOM map is not active)
+      if (!isDomMapActive && window.MapRenderer && window.MapRenderer.currentMap) {
         window.MapRenderer.renderLobbyPreview(ctx, canvas);
-      } else {
+      } else if (!isDomMapActive) {
         // Tank-themed animated background
         const vehicleType = window.currentLobbyVehicleType || 'tank';
 
