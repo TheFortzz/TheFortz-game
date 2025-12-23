@@ -101,6 +101,24 @@ class InputSystem {
       { element: canvas, event: 'mousemove', handler: mousemoveHandler },
       { element: canvas, event: 'mousedown', handler: mousedownHandler }
     );
+
+    // Ensure weapon angle is initialized immediately (use last known gameState mouse or canvas center)
+    try {
+      const gs = window.gameState || null;
+      const rect = canvas.getBoundingClientRect();
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      const initMouseX = gs && gs.mouse && typeof gs.mouse.x === 'number' ? gs.mouse.x : centerX;
+      const initMouseY = gs && gs.mouse && typeof gs.mouse.y === 'number' ? gs.mouse.y : centerY;
+
+      const initialAngle = Math.atan2(initMouseY - centerY, initMouseX - centerX);
+      window.WEAPON_ANGLE = initialAngle;
+      window.MOUSE_POS = { x: initMouseX, y: initMouseY };
+      console.log('🎯 Initial WEAPON_ANGLE set to', (initialAngle * 180 / Math.PI).toFixed(1), '°');
+    } catch (e) {
+      // non-fatal
+    }
   }
 
   /**

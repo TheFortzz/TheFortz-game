@@ -68,6 +68,7 @@
             <canvas id="tankLobbyBackground" width="973" height="765"></canvas>
             <canvas id="jetLobbyBackground" width="973" height="765" style="display: none;"></canvas>
             <canvas id="raceLobbyBackground" width="973" height="765" style="display: none;"></canvas>
+            <canvas id="lobbyBackground" width="973" height="765" style="display: none;"></canvas>
             <div class="lobby-logo-background">
                 <img src="/assets/images/ui/logo.png" alt="TheFortz Background" class="lobby-logo-image">
             </div>
@@ -239,6 +240,10 @@
                                 <span class="tab-icon">🏛️</span>
                                 <span class="tab-text">Buildings</span>
                             </button>
+                            <button class="editor-tab" data-category="self" onclick="switchAssetCategory('self')">
+                                <span class="tab-icon">🧩</span>
+                                <span class="tab-text">Self</span>
+                            </button>
                             <button class="editor-tab" data-category="players" onclick="switchAssetCategory('players')">
                                 <span class="tab-icon">👥</span>
                                 <span class="tab-text">Players</span>
@@ -250,7 +255,7 @@
                         </div>
 
                         <!-- Clear Selection Button -->
-                        <div class="editor-controls" id="assetControlSection" style="display: none;">
+                            <div class="editor-controls" id="assetControlSection" style="display: none;">
                             <button class="clear-selection-btn" id="unselectAssetBtn" onclick="unselectCurrentAsset()">
                                 <span class="btn-icon">✖</span>
                                 <span class="btn-text">Clear Selection</span>
@@ -493,7 +498,7 @@
                                     </div>
                                     <div class="powerups-options" id="powerupsOptions">
                                         <div class="powerup-checkboxes">
-                                            <label class="powerup-checkbox"><input type="checkbox" checked> ❤️ Health</label>
+                                            <label class="powerup-checkbox"><input type="checkbox" checked> 🎁 Lootboxes</label>
                                             <label class="powerup-checkbox"><input type="checkbox" checked> 🛡️ Shield</label>
                                             <label class="powerup-checkbox"><input type="checkbox" checked> ⚡ Speed</label>
                                             <label class="powerup-checkbox"><input type="checkbox" checked> 🔥 Damage</label>
@@ -649,21 +654,21 @@
                                 <!-- Vehicle Stats Display -->
                                 <div class="locker-vehicle-stats" id="lockerVehicleStats">
                                     <div class="locker-stat-item">
-                                        <img src="/assets/damage.png" alt="Damage" class="locker-stat-icon">
+                                        <img src="/assets/images/ui/fortz-coin.png" alt="Damage" class="locker-stat-icon" onerror="this.onerror=null;this.src='/assets/images/ui/fortz-coin.png'">
                                         <div>
                                             <span class="locker-stat-value" id="lockerStatDamage">10</span>
                                             <span class="locker-stat-label">DMG</span>
                                         </div>
                                     </div>
                                     <div class="locker-stat-item">
-                                        <img src="/assets/health.png" alt="Health" class="locker-stat-icon">
+                                        <img src="/assets/images/ui/defaultprofile.png" alt="Health" class="locker-stat-icon" onerror="this.onerror=null;this.src='/assets/images/ui/defaultprofile.png'">
                                         <div>
                                             <span class="locker-stat-value" id="lockerStatHealth">100</span>
                                             <span class="locker-stat-label">HP</span>
                                         </div>
                                     </div>
                                     <div class="locker-stat-item">
-                                        <img src="/assets/fireRate.png" alt="Fire Rate" class="locker-stat-icon">
+                                        <img src="/assets/images/ui/lvl1.png" alt="Fire Rate" class="locker-stat-icon" onerror="this.onerror=null;this.src='/assets/images/ui/lvl1.png'">
                                         <div>
                                             <span class="locker-stat-value" id="lockerStatFireRate">1.0</span>
                                             <span class="locker-stat-label">RATE</span>

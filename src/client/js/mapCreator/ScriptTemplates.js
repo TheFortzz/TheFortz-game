@@ -32,7 +32,7 @@ end
 
 function spawnRandomTankPowerUp()
     local pos = randomPosition()
-    local tankPowerUps = {"armor", "damage", "speed", "firerate", "health"}
+    local tankPowerUps = {"armor", "damage", "speed", "firerate", "lootbox"}
     local randomType = tankPowerUps[math.random(1, 5)]
     
     spawnTankPowerUp(randomType, pos.x, pos.y)
@@ -45,8 +45,8 @@ end
 
 function onTankDestroyed(tank, killer)
     -- Spawn power-up where tank was destroyed
-    spawnTankPowerUp("health", tank.x, tank.y)
-    showMessage("💊 Health pack dropped!")
+    spawnTankPowerUp("lootbox", tank.x, tank.y)
+    showMessage("🎁 Lootbox dropped!")
 end`
     },
     

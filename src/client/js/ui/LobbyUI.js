@@ -98,29 +98,55 @@ class LobbyUI {
    * Initialize lobby background
    */
   initializeLobbyBackground() {
-    const canvas = document.getElementById('tankLobbyBackground');
+    // Stop any existing animation before starting new
+    this.stopTankBackgroundAnimation();
+
+    // Ensure correct canvas visibility
+    const tankCanvas = document.getElementById('tankLobbyBackground');
+    const jetCanvas = document.getElementById('jetLobbyBackground');
+    const raceCanvas = document.getElementById('raceLobbyBackground');
+
+    const vehicleType = window.currentLobbyVehicleType || 'tank';
+
+    // Hide all canvases first
+    if (tankCanvas) tankCanvas.style.display = 'none';
+    if (jetCanvas) jetCanvas.style.display = 'none';
+    if (raceCanvas) raceCanvas.style.display = 'none';
+
+    // Show appropriate canvas based on vehicle type
+    let canvas = null;
+    if (vehicleType === 'jet' && jetCanvas) {
+      jetCanvas.style.display = 'block';
+      canvas = jetCanvas;
+    } else if (vehicleType === 'race' && raceCanvas) {
+      raceCanvas.style.display = 'block';
+      canvas = raceCanvas;
+    } else if (vehicleType === 'tank' && tankCanvas) {
+      // Tank mode fallback to canvas
+      tankCanvas.style.display = 'block';
+      canvas = tankCanvas;
+    }
+
     if (!canvas) {
-      console.warn('Tank lobby background canvas not found');
+      console.warn(`${vehicleType} lobby background canvas not found`);
       return;
-    }
-
-    // If jet or race mode is active, don't override their backgrounds
-    if (window.currentLobbyVehicleType === 'jet' || window.currentLobbyVehicleType === 'race') {
-      console.log('Skipping tank background - vehicle mode active:', window.currentLobbyVehicleType);
-      return;
-    }
-
-    // Clear any DOM maps when switching back to canvas mode
-    if (window.DOMMapRenderer?.clearLobbyMap) {
-      window.DOMMapRenderer.clearLobbyMap();
     }
 
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // First, render the full map background immediately
-    this.renderLobbyBackground();
+    // Load a default map if none is loaded
+    if (window.MapRenderer && !window.MapRenderer.currentMap) {
+      const STORAGE_KEY = 'thefortz.customMaps';
+      const maps = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      // Load any available map, not just user-created ones
+      const availableMaps = maps.filter((m) => m && m.name && (m.objects || m.groundTiles));
+      if (availableMaps.length > 0) {
+        // Load the first available map
+        window.MapRenderer.loadMap(availableMaps[0]);
+      }
+    }
 
     // Connect to server to get live map data
     this.connectLobbyToServer();
@@ -128,7 +154,7 @@ class LobbyUI {
     let time = 0;
     let cameraX = 0;
     let cameraY = 0;
-    let targetCameraX = 0;
+    let targetCameraX = 0; // Start centered, then move
     let targetCameraY = 0;
     let lastCameraUpdate = 0;
     const CAMERA_UPDATE_INTERVAL = 5000; // 5 seconds between camera movements
@@ -136,51 +162,152 @@ class LobbyUI {
     let lastFrameTime = performance.now();
 
     const drawBackground = (currentTime) => {
-      // Stop if not in lobby or if jet/race mode is active
+      // Stop if not in lobby
       const gameState = gameStateManager.getGameState();
       if (!gameState.isInLobby) return;
-      if (window.currentLobbyVehicleType === 'jet' || window.currentLobbyVehicleType === 'race') {
-        return; // Stop the tank background animation
-      }
 
-      // Limit to 30 FPS for lobby (performance optimization)
-      const deltaTime = currentTime - lastFrameTime;
-      if (deltaTime < 33) {// ~30 FPS
-        window.tankBackgroundAnimationId = requestAnimationFrame(drawBackground);
-        return;
-      }
+      // Update last frame time for smooth animation
       lastFrameTime = currentTime;
 
-      // Clear with dark background
-      ctx.fillStyle = '#0a0a15';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Update camera target every 5 seconds
-      if (currentTime - lastCameraUpdate > CAMERA_UPDATE_INTERVAL) {
-        targetCameraX = (Math.random() - 0.5) * 2000;
-        targetCameraY = (Math.random() - 0.5) * 2000;
-        lastCameraUpdate = currentTime;
+      // Check if DOM map is active - if so, don't render anything on canvas
+      const domMapContainer = document.getElementById('lobbyMapContainer');
+      const isDomMapActive = domMapContainer && domMapContainer.children.length > 0;
+      
+      // If DOM map is active, don't render canvas background at all
+      if (isDomMapActive) {
+        return;
       }
 
-      // Smooth camera movement (very slow)
-      const smoothing = 0.001; // Very slow smooth movement
-      cameraX += (targetCameraX - cameraX) * smoothing;
-      cameraY += (targetCameraY - cameraY) * smoothing;
+      // Clear with darker background (only when DOM map is not active)
+      ctx.fillStyle = '#05080a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Render created map ONLY (no water fallback)
-      if (window.MapRenderer && window.MapRenderer.currentMap) {
-        ctx.save();
-        ctx.translate(-cameraX, -cameraY);
+      // Static camera for stable background
+      cameraX = 0;
+      cameraY = 0;
+      
+      // Render created map or tank-themed fallback (only if DOM map is not active)
+      if (!isDomMapActive && window.MapRenderer && window.MapRenderer.currentMap) {
+        window.MapRenderer.renderLobbyPreview(ctx, canvas);
+      } else if (!isDomMapActive) {
+        // Tank-themed animated background
+        const vehicleType = window.currentLobbyVehicleType || 'tank';
 
-        const lobbyCamera = { x: cameraX, y: cameraY };
-        window.MapRenderer.render(ctx, lobbyCamera, canvas);
+        if (vehicleType === 'tank') {
+          // Tank-specific background: armored theme with moving tanks
+          ctx.fillStyle = '#030507';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.restore();
+          // Draw armored grid background
+          ctx.strokeStyle = 'rgba(0, 247, 255, 0.1)';
+          ctx.lineWidth = 1;
+          const gridSize = 100;
+          for (let x = 0; x < canvas.width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+          }
+          for (let y = 0; y < canvas.height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+          }
+
+          // Draw animated tank silhouettes
+          for (let i = 0; i < 8; i++) {
+            const x = (i * 300 + time * 0.02) % (canvas.width + 300) - 150;
+            const y = canvas.height * 0.7 + Math.sin(time * 0.003 + i) * 50;
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(0.8, 0.8);
+
+            // Tank body
+            ctx.fillStyle = 'rgba(0, 247, 255, 0.3)';
+            ctx.fillRect(-40, -15, 80, 30);
+
+            // Tank turret
+            ctx.beginPath();
+            ctx.arc(0, 0, 20, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Tank tracks
+            ctx.fillStyle = 'rgba(0, 247, 255, 0.5)';
+            ctx.fillRect(-45, -20, 5, 40);
+            ctx.fillRect(40, -20, 5, 40);
+
+            ctx.restore();
+          }
+
+          // Draw floating lootbox icons
+          for (let i = 0; i < 5; i++) {
+            const x = canvas.width * 0.2 + i * 150 + Math.sin(time * 0.001 + i) * 30;
+            const y = canvas.height * 0.3 + Math.cos(time * 0.002 + i) * 40;
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(time * 0.0005 + i);
+
+            // Lootbox icon (gift box)
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.8)';
+            ctx.fillRect(-20, -15, 40, 30);
+
+            // Box ribbon
+            ctx.fillStyle = 'rgba(255, 0, 128, 0.9)';
+            ctx.fillRect(-25, -5, 50, 10);
+
+            // Vertical ribbon
+            ctx.fillRect(-5, -20, 10, 40);
+
+            // Glow effect
+            ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+            ctx.shadowBlur = 15;
+            ctx.strokeStyle = 'rgba(255, 215, 0, 1)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-20, -15, 40, 30);
+
+            ctx.restore();
+          }
+
+          // Draw "OPEN LOOTBOX" text
+          ctx.save();
+          ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+          ctx.font = 'bold 48px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('OPEN LOOTBOXES', canvas.width / 2, canvas.height / 2);
+          ctx.font = '24px Arial';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+          ctx.fillText('Discover rare tanks, weapons, and epic rewards', canvas.width / 2, canvas.height / 2 + 60);
+          ctx.restore();
+
+        } else {
+          // Default animated background for jet/race
+          ctx.fillStyle = '#0d0f1a';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Draw some animated shapes
+          for (let i = 0; i < 10; i++) {
+            const x = (i * 200 + time * 0.01) % (canvas.width + 200) - 100;
+            const y = canvas.height / 2 + Math.sin(time * 0.002 + i) * 100;
+            const size = 50 + Math.sin(time * 0.003 + i * 0.5) * 20;
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(time * 0.001 + i);
+            ctx.fillStyle = `hsl(${(i * 36 + time * 0.1) % 360}, 70%, 60%)`;
+            ctx.beginPath();
+            ctx.arc(0, 0, size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        }
       }
 
       // Draw shapes and other elements on top
       ctx.save();
-      ctx.translate(-cameraX, -cameraY);
 
       // Draw shapes (only visible ones)
       lobbyMapData.shapes.forEach((shape, index) => {
@@ -320,44 +447,102 @@ class LobbyUI {
     if (lobbySocket) return;
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    let host = window.location.hostname;
-    // Fix for 0.0.0.0 - use localhost instead
-    if (host === '0.0.0.0') {
-      host = 'localhost';
-    }
-    const port = NETWORK_CONFIG.port;
-    const wsUrl = `${protocol}//${host}:${port}/ws?lobby=true`;
+    const configuredPort = NETWORK_CONFIG.port;
 
-    try {
-      lobbySocket = new WebSocket(wsUrl);
+    // Candidate websocket URLs to try (best-effort). Order matters.
+    const host = (window.location.hostname === '0.0.0.0') ? 'localhost' : window.location.hostname;
+    const candidates = [];
 
-      lobbySocket.onopen = () => {
-        console.log('Connected to lobby server');
-        lobbySocket.send(JSON.stringify({ type: 'lobby_join' }));
-      };
+    // 1) explicit host:port from current hostname and configured port
+    candidates.push(`${protocol}//${host}:${configuredPort}/ws?lobby=true`);
+    // 2) try localhost with configured port (common in devcontainers)
+    candidates.push(`${protocol}//localhost:${configuredPort}/ws?lobby=true`);
+    // 3) try relative to current origin (no explicit port) - works when server is proxied
+    candidates.push(`${protocol}//${window.location.host.replace(/:\d+$/, '')}/ws?lobby=true`);
 
-      lobbySocket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
+    let attemptIndex = 0;
 
-          if (data.type === 'lobby_update') {
-            lobbyMapData = data.mapData || lobbyMapData;
+    const tryNext = () => {
+      if (attemptIndex >= candidates.length) {
+        console.warn('All lobby WebSocket connection attempts failed');
+        return;
+      }
+
+      const url = candidates[attemptIndex++];
+      console.log('Attempting lobby WebSocket:', url);
+
+      try {
+        const socket = new WebSocket(url);
+
+        let opened = false;
+
+        const cleanup = () => {
+          socket.onopen = null;
+          socket.onmessage = null;
+          socket.onerror = null;
+          socket.onclose = null;
+        };
+
+        // Success
+        socket.onopen = () => {
+          opened = true;
+          lobbySocket = socket;
+          console.log('Connected to lobby server via', url);
+          lobbySocket.send(JSON.stringify({ type: 'lobby_join' }));
+
+          socket.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              if (data.type === 'lobby_update') {
+                lobbyMapData = data.mapData || lobbyMapData;
+              }
+            } catch (e) {
+              console.error('Error parsing lobby message:', e);
+            }
+          };
+
+          socket.onerror = (err) => console.error('Lobby WebSocket error:', err);
+          socket.onclose = () => {
+            console.log('Lobby socket closed');
+            lobbySocket = null;
+            // Try to reconnect after delay
+            setTimeout(() => tryNext(), 1000);
+          };
+        };
+
+        socket.onerror = () => {
+          cleanup();
+          if (!opened) {
+            console.warn('WebSocket connect failed for', url);
+            // try next candidate after short delay
+            setTimeout(tryNext, 250);
           }
-        } catch (e) {
-          console.error('Error parsing lobby message:', e);
-        }
-      };
+        };
 
-      lobbySocket.onerror = (error) => {
-        console.error('Lobby WebSocket error:', error);
-      };
+        socket.onclose = () => {
+          cleanup();
+          if (!opened) {
+            console.warn('WebSocket closed before open for', url);
+            setTimeout(tryNext, 250);
+          }
+        };
+      } catch (err) {
+        console.error('Failed to create WebSocket for', url, err);
+        setTimeout(tryNext, 250);
+      }
+    };
 
-      lobbySocket.onclose = () => {
-        console.log('Disconnected from lobby server');
-        lobbySocket = null;
-      };
-    } catch (error) {
-      console.error('Failed to connect to lobby server:', error);
+    // Start trying candidate URLs
+    tryNext();
+  }
+
+  /**
+   * Stop tank background animation
+   */
+  stopTankBackgroundAnimation() {
+    if (window.tankBackgroundAnimationId) {
+      cancelAnimationFrame(window.tankBackgroundAnimationId);
+      window.tankBackgroundAnimationId = null;
     }
   }
 
@@ -409,6 +594,10 @@ class LobbyUI {
     if (typeof window.stopCreateMapRendering === 'function') {
       window.stopCreateMapRendering();
     }
+    this.stopTankBackgroundAnimation();
+
+    // Initialize canvas background for all vehicle types
+    this.initializeLobbyBackground();
 
     // Show lobby screen
     const lobbyScreen = document.getElementById('lobbyScreen');
@@ -454,6 +643,7 @@ class LobbyUI {
   updateLobbyBackgroundWithMap(mapData, vehicleType) {
     console.log(`🗺️ Updating lobby background with map: ${mapData.name} (${vehicleType})`);
 
+    // Use canvas renderer for all vehicle types
     if (window.MapRenderer) {
       window.MapRenderer.loadMap(mapData);
       this.renderLobbyBackground();
@@ -578,7 +768,7 @@ class LobbyUI {
       }
       const tankCanvas = document.getElementById('tankLobbyBackground');
       if (tankCanvas) {
-        tankCanvas.style.zIndex = '1';
+        tankCanvas.style.zIndex = '10';
       }
     }
 
@@ -596,10 +786,16 @@ class LobbyUI {
 
     // Render DOM map to lobby
     if (window.DOMMapRenderer && window.DOMMapRenderer.initialized) {
-      window.DOMMapRenderer.renderToLobby();
+      // Ensure we have a map loaded before rendering
+      if (!window.DOMMapRenderer.currentMap) {
+        window.DOMMapRenderer.loadDefaultMap();
+      }
+      if (window.DOMMapRenderer.currentMap) {
+        window.DOMMapRenderer.renderToLobby();
+      }
     }
 
-    // Initialize lobby background
+    // Initialize canvas background for all vehicle types
     this.initializeLobbyBackground();
 
     console.log('Returned to lobby');
@@ -737,9 +933,21 @@ if (typeof window !== 'undefined') {
     const gameState = gameStateManager.getGameState();
     gameStateManager.updateGameState({ selectedVehicleType: type });
 
+    // Update global vehicle type for background rendering
+    window.currentLobbyVehicleType = type;
+
     // Update button states
     document.querySelectorAll('.vehicle-btn').forEach((btn) => btn.classList.remove('active'));
     document.getElementById(`${type}Btn`)?.classList.add('active');
+
+    // Clear existing background rendering
+    lobbyUI.stopTankBackgroundAnimation();
+    if (window.DOMMapRenderer?.clearLobbyMap) {
+      window.DOMMapRenderer.clearLobbyMap();
+    }
+
+    // Initialize canvas background for all vehicle types
+    lobbyUI.initializeLobbyBackground();
 
     // Show notification messages for jet and race vehicles
     if (type === 'jet') {
@@ -748,16 +956,69 @@ if (typeof window !== 'undefined') {
       lobbyUI.showVehicleNotification('🏎️ RACE MODE - Coming Soon! Fast-paced racing action!');
     }
 
-    // Update lobby background
+    // Update lobby vehicle preview
     lobbyUI.updateLobbyVehiclePreview();
   };
 
   // Feature panel functions
   window.openFeature = (feature) => {
     console.log('🔧 Opening feature:', feature);
-    
-    // Close all panels first
-    lobbyUI.closeAllPanels();
+
+    // Special handling for create-map: don't restart lobby background
+    if (feature === 'create-map' || feature === 'createMap') {
+      // Close all panels but don't restart lobby background
+      const gameState = gameStateManager.getGameState();
+
+      // Close all features
+      gameStateManager.updateGameState({
+        showShop: false,
+        showLocker: false,
+        showParty: false,
+        showFriends: false,
+        showSettings: false,
+        showLeaderboard: false,
+        showCreateMap: false,
+        showPass: false,
+        showChampions: false,
+        showGameModes: false
+      });
+
+      // Hide all feature screens
+      const featureScreens = [
+      'shopScreen',
+      'lockerScreen',
+      'partyScreen',
+      'friendsScreen',
+      'settingsScreen',
+      'leaderboardScreen',
+      'createMapScreen',
+      'passScreen',
+      'championsScreen',
+      'gameModesScreen'];
+
+      featureScreens.forEach((screenId) => {
+        const screen = document.getElementById(screenId);
+        if (screen) {
+          screen.classList.add('hidden');
+          screen.style.display = 'none';
+        }
+      });
+
+      // Stop any rendering animations (canvas shop removed)
+      if (typeof window.stopLockerRendering === 'function') {
+        window.stopLockerRendering();
+      }
+      if (typeof window.stopCreateMapRendering === 'function') {
+        window.stopCreateMapRendering();
+      }
+      // Note: We don't call stopTankBackgroundAnimation() here to avoid restarting it
+      // The map creator will handle its own rendering
+
+      console.log('✅ All panels closed for create-map (lobby background preserved)');
+    } else {
+      // Normal behavior for other features
+      lobbyUI.closeAllPanels();
+    }
 
     // Convert kebab-case to camelCase for feature names
     const featureCamel = feature.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
@@ -778,17 +1039,17 @@ if (typeof window !== 'undefined') {
 
     const screenId = featureMap[feature] || featureMap[featureCamel];
     console.log(`📝 Feature: ${feature} -> Screen ID: ${screenId}`);
-    
+
     if (screenId) {
       const screen = document.getElementById(screenId);
       if (screen) {
         console.log(`✅ Found screen element: ${screenId}`);
-        
+
         // Force show the screen
         screen.classList.remove('hidden');
         screen.style.display = 'block';
         screen.style.visibility = 'visible';
-        
+
         console.log(`📝 Screen classes after show: ${screen.className}`);
         console.log(`📝 Screen display style: ${screen.style.display}`);
 
@@ -800,7 +1061,10 @@ if (typeof window !== 'undefined') {
         // Initialize specific features
         if (feature === 'create-map' || feature === 'createMap') {
           console.log('🗺️ Initializing map creator...');
-          
+
+          // Stop lobby background animation before starting map creator
+          lobbyUI.stopTankBackgroundAnimation();
+
           // Function to initialize map creator when ready
           const initMapCreator = () => {
             // Initialize map creator
@@ -810,7 +1074,7 @@ if (typeof window !== 'undefined') {
             } else {
               console.warn('⚠️ startCreateMapRendering function not found');
             }
-            
+
             // Load saved maps
             if (typeof window.loadSavedMaps === 'function') {
               console.log('✅ Calling loadSavedMaps()');
@@ -819,18 +1083,18 @@ if (typeof window !== 'undefined') {
               console.warn('⚠️ loadSavedMaps function not found');
             }
           };
-          
+
           // Check if map creator is ready
-          if (typeof window.startCreateMapRendering === 'function' && 
+          if (typeof window.startCreateMapRendering === 'function' &&
               typeof window.loadSavedMaps === 'function') {
             // Functions are available, initialize immediately
             initMapCreator();
           } else {
             // Wait for map creator to be ready
             console.log('⏳ Waiting for map creator to be ready...');
-            
+
             const waitForMapCreator = () => {
-              if (typeof window.startCreateMapRendering === 'function' && 
+              if (typeof window.startCreateMapRendering === 'function' &&
                   typeof window.loadSavedMaps === 'function') {
                 console.log('✅ Map creator is now ready!');
                 initMapCreator();
@@ -839,13 +1103,13 @@ if (typeof window !== 'undefined') {
                 setTimeout(waitForMapCreator, 100);
               }
             };
-            
+
             // Listen for map creator ready event
             window.addEventListener('mapCreatorReady', (event) => {
               console.log('📡 Map creator ready event received:', event.detail);
               initMapCreator();
             }, { once: true });
-            
+
             // Also try with timeout as fallback
             setTimeout(waitForMapCreator, 50);
           }

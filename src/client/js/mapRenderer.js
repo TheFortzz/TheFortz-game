@@ -284,9 +284,10 @@
         }
 
         if (img && img.complete && img.naturalWidth > 0) {
-          const w = img.naturalWidth;
-          const h = img.naturalHeight;
-          // Draw at EXACT position from map creator
+          // Use saved width/height if available, otherwise fall back to natural dimensions with scale
+          const w = obj.width || (img.naturalWidth * (obj.scale || 1));
+          const h = obj.height || (img.naturalHeight * (obj.scale || 1));
+          // Draw at EXACT position from map creator with proper scaling
           ctx.drawImage(img, obj.x - w / 2, obj.y - h / 2, w, h);
         } else {
           // Draw placeholder while loading
@@ -351,8 +352,11 @@
         let img = this.objectImages.get(o.image);
         if (!img) {img = new Image();img.src = o.image;this.objectImages.set(o.image, img);}
         if (img && img.complete && img.naturalWidth > 0) {
-          const w = img.naturalWidth * scale * 0.6;
-          const h = img.naturalHeight * scale * 0.6;
+          // Use saved width/height if available, otherwise fall back to natural dimensions with scale
+          const baseW = o.width || (img.naturalWidth * (o.scale || 1));
+          const baseH = o.height || (img.naturalHeight * (o.scale || 1));
+          const w = baseW * scale * 0.6;
+          const h = baseH * scale * 0.6;
           ctx.drawImage(img, o.x * scale + offX - w / 2, o.y * scale + offY - h / 2, w, h);
         }
       });

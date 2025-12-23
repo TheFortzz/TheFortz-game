@@ -43,7 +43,7 @@
             window.startCreateMapRendering = function() {
                 console.log('🚛 Fallback: startCreateMapRendering called');
                 // Try to initialize basic map creator UI
-                const canvas = document.getElementById('lobbyBackground');
+                const canvas = document.getElementById('tankLobbyBackground');
                 if (canvas) {
                     console.log('✅ Canvas found, map creator can initialize');
                 } else {

@@ -37,6 +37,7 @@
                 z-index: 2;
                 overflow: hidden;
                 will-change: transform;
+                opacity: 0.3;
             `;
 
       // Create game map container
@@ -60,13 +61,14 @@
     loadDefaultMap() {
       try {
         const maps = JSON.parse(localStorage.getItem('thefortz.customMaps') || '[]');
-        const createdMaps = maps.filter((m) => m.isUserCreated !== false);
+        // Load any available maps, not just user-created ones
+        const availableMaps = maps.filter((m) => m && m.name && (m.objects || m.groundTiles));
 
-        if (createdMaps.length > 0) {
-          this.currentMap = createdMaps[0];
-          console.log('[DOMMapRenderer] Loaded player-created map:', this.currentMap.name);
+        if (availableMaps.length > 0) {
+          this.currentMap = availableMaps[0];
+          console.log('[DOMMapRenderer] Loaded map:', this.currentMap.name, 'Objects:', this.currentMap.objects?.length || 0, 'Tiles:', this.currentMap.groundTiles?.length || 0);
         } else {
-          console.log('[DOMMapRenderer] No player-created maps available');
+          console.log('[DOMMapRenderer] No maps available in localStorage');
           this.currentMap = null;
         }
       } catch (error) {
@@ -250,6 +252,24 @@
       objects.forEach((obj) => {
         if (!obj || !obj.image || typeof obj.x !== 'number' || typeof obj.y !== 'number') return;
 
+        // Skip red and blue respawners in lobby background
+        if (obj.image.includes('RedRe.png') || obj.image.includes('blueRe.png')) return;
+
+        // Check if this is a lootbox or power-up to make it smaller but still visible
+        const isLootbox = obj.image.includes('lootboxes');
+        const isPowerUp = obj.image.includes('powers');
+        let width = obj.width || 64; // Default size if not specified
+        let height = obj.height || 64; // Default size if not specified
+        
+        if (isLootbox || isPowerUp) {
+          // Make lootboxes and power-ups smaller but still visible (1.5x smaller instead of 2x)
+          width = Math.round(width / 1.5);
+          height = Math.round(height / 1.5);
+          // Ensure minimum size for visibility
+          width = Math.max(width, 32);
+          height = Math.max(height, 32);
+        }
+
         objectsHTML += `
                     <div class="map-object" style="
                         position: absolute;
@@ -262,8 +282,8 @@
                         <img src="${obj.image}" style="
                             display: block;
                             max-width: none;
-                            width: ${obj.width || 'auto'}px;
-                            height: ${obj.height || 'auto'}px;
+                            width: ${width}px;
+                            height: ${height}px;
                             image-rendering: pixelated;
                             image-rendering: -moz-crisp-edges;
                             image-rendering: crisp-edges;
@@ -280,9 +300,16 @@
     },
 
     hideCanvasBackgrounds() {
+      console.log('🔍 hideCanvasBackgrounds called');
       const tankCanvas = document.getElementById('tankLobbyBackground');
       const jetCanvas = document.getElementById('jetLobbyBackground');
       const raceCanvas = document.getElementById('raceLobbyBackground');
+
+      console.log('🔍 Canvas visibility before hiding:', {
+        tank: tankCanvas ? tankCanvas.style.display : 'not found',
+        jet: jetCanvas ? jetCanvas.style.display : 'not found',
+        race: raceCanvas ? raceCanvas.style.display : 'not found'
+      });
 
       if (tankCanvas) tankCanvas.style.display = 'none';
       if (jetCanvas) jetCanvas.style.display = 'none';
@@ -292,8 +319,10 @@
     },
 
     showCanvasBackgrounds() {
+      console.log('🔍 showCanvasBackgrounds called');
       // Get current vehicle type and show appropriate canvas
       const currentVehicle = window.currentVehicleType || 'tank';
+      console.log('🔍 currentVehicle:', currentVehicle);
 
       if (currentVehicle === 'tank') {
         const tankCanvas = document.getElementById('tankLobbyBackground');
@@ -377,24 +406,6 @@
 
   DOMMapRenderer.init();
 
-  function tryLoadMap() {
-    if (DOMMapRenderer.currentMap) {
-      console.log('[DOMMapRenderer] Using pre-loaded map.');
-      DOMMapRenderer.renderToLobby();
-      return;
-    }
-
-    DOMMapRenderer.loadDefaultMap();
-    if (DOMMapRenderer.currentMap) {
-      DOMMapRenderer.renderToLobby();
-    } else {
-      console.log('[DOMMapRenderer] No map to render in lobby.');
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryLoadMap);
-  } else {
-    tryLoadMap();
-  }
+  // Removed automatic rendering on DOM ready - lobby background should only render when explicitly requested
+  // This prevents double rendering and ensures proper timing with lobby state
 })();

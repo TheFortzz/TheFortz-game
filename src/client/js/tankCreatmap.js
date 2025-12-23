@@ -4065,7 +4065,10 @@ function startMapTest(canvas, vehicleType) {
         ctx.translate(-camera.x, -camera.y);
         placedObjects.forEach(obj => {
             if (obj.image && obj.image.complete) {
-                ctx.drawImage(obj.image, obj.x - obj.image.width / 2, obj.y - obj.image.height / 2);
+                const scale = obj.scale || 1;
+                const w = obj.image.width * scale;
+                const h = obj.image.height * scale;
+                ctx.drawImage(obj.image, obj.x - w / 2, obj.y - h / 2, w, h);
             }
         });
         ctx.restore();

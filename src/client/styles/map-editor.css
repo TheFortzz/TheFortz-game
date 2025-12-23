@@ -4,7 +4,7 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 320px;
+    width: 384px; /* increased by 20% from 320px */
     max-height: calc(100vh - 40px);
     background: linear-gradient(135deg, rgba(8,18,28,0.95), rgba(12,22,32,0.95));
     border: 2px solid rgba(0,247,255,0.6);
