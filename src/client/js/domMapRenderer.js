@@ -37,6 +37,7 @@
                 z-index: 2;
                 overflow: hidden;
                 will-change: transform;
+                opacity: 0.3;
             `;
 
       // Create game map container
@@ -251,6 +252,24 @@
       objects.forEach((obj) => {
         if (!obj || !obj.image || typeof obj.x !== 'number' || typeof obj.y !== 'number') return;
 
+        // Skip red and blue respawners in lobby background
+        if (obj.image.includes('RedRe.png') || obj.image.includes('blueRe.png')) return;
+
+        // Check if this is a lootbox or power-up to make it smaller but still visible
+        const isLootbox = obj.image.includes('lootboxes');
+        const isPowerUp = obj.image.includes('powers');
+        let width = obj.width || 64; // Default size if not specified
+        let height = obj.height || 64; // Default size if not specified
+        
+        if (isLootbox || isPowerUp) {
+          // Make lootboxes and power-ups smaller but still visible (1.5x smaller instead of 2x)
+          width = Math.round(width / 1.5);
+          height = Math.round(height / 1.5);
+          // Ensure minimum size for visibility
+          width = Math.max(width, 32);
+          height = Math.max(height, 32);
+        }
+
         objectsHTML += `
                     <div class="map-object" style="
                         position: absolute;
@@ -263,8 +282,8 @@
                         <img src="${obj.image}" style="
                             display: block;
                             max-width: none;
-                            width: ${obj.width || 'auto'}px;
-                            height: ${obj.height || 'auto'}px;
+                            width: ${width}px;
+                            height: ${height}px;
                             image-rendering: pixelated;
                             image-rendering: -moz-crisp-edges;
                             image-rendering: crisp-edges;

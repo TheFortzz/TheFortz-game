@@ -66,14 +66,14 @@ class TankMapCreatorEnhanced {
 
     getBuildingAssets() {
         return [
-            { name: 'House 01', folder: 'House_01', type: 'residential', health: 100 },
-            { name: 'House 02', folder: 'House_02', type: 'residential', health: 100 },
-            { name: 'Guard Tower', folder: 'Guard_Tower', type: 'military', health: 200 },
-            { name: 'Farm House', folder: 'Farm_House_01', type: 'farm', health: 80 },
-            { name: 'Shop', folder: 'Shop_01', type: 'commercial', health: 120 },
-            { name: 'Inn', folder: 'Inn', type: 'commercial', health: 150 },
-            { name: 'Wind Mill', folder: 'Wind_Mill', type: 'industrial', health: 180 },
-            { name: 'Tree', folder: 'Tree', type: 'nature', health: 50 }
+            { name: 'House 01', folder: 'House_01', type: 'residential', lootbox: 100 },
+            { name: 'House 02', folder: 'House_02', type: 'residential', lootbox: 100 },
+            { name: 'Guard Tower', folder: 'Guard_Tower', type: 'military', lootbox: 200 },
+            { name: 'Farm House', folder: 'Farm_House_01', type: 'farm', lootbox: 80 },
+            { name: 'Shop', folder: 'Shop_01', type: 'commercial', lootbox: 120 },
+            { name: 'Inn', folder: 'Inn', type: 'commercial', lootbox: 150 },
+            { name: 'Wind Mill', folder: 'Wind_Mill', type: 'industrial', lootbox: 180 },
+            { name: 'Tree', folder: 'Tree', type: 'nature', lootbox: 50 }
         ];
     }
 
@@ -89,12 +89,12 @@ class TankMapCreatorEnhanced {
 
     getObstacleAssets() {
         return [
-            { name: 'Concrete Barrier', type: 'barrier_concrete', health: 150, destructible: true },
-            { name: 'Steel Wall', type: 'barrier_steel', health: 250, destructible: true },
-            { name: 'Sandbags', type: 'barrier_sand', health: 80, destructible: true },
-            { name: 'Tank Trap', type: 'trap_spikes', health: 120, destructible: true },
-            { name: 'Mine Field', type: 'mines', health: 1, destructible: true },
-            { name: 'Oil Barrel', type: 'barrel_explosive', health: 30, destructible: true }
+            { name: 'Concrete Barrier', type: 'barrier_concrete', lootbox: 150, destructible: true },
+            { name: 'Steel Wall', type: 'barrier_steel', lootbox: 250, destructible: true },
+            { name: 'Sandbags', type: 'barrier_sand', lootbox: 80, destructible: true },
+            { name: 'Tank Trap', type: 'trap_spikes', lootbox: 120, destructible: true },
+            { name: 'Mine Field', type: 'mines', lootbox: 1, destructible: true },
+            { name: 'Oil Barrel', type: 'barrel_explosive', lootbox: 30, destructible: true }
         ];
     }
 
@@ -104,7 +104,7 @@ class TankMapCreatorEnhanced {
             { name: 'Damage Boost', type: 'damage', effect: '+25 Damage', duration: 20 },
             { name: 'Speed Boost', type: 'speed', effect: '+30% Speed', duration: 15 },
             { name: 'Rapid Fire', type: 'firerate', effect: '2x Fire Rate', duration: 10 },
-            { name: 'Health Pack', type: 'health', effect: '+75 Health', duration: 0 },
+            { name: 'Lootbox', type: 'lootbox', effect: 'Random Rewards', duration: 0 },
             { name: 'Ammo Crate', type: 'ammo', effect: 'Full Ammo', duration: 0 }
         ];
     }
@@ -474,7 +474,7 @@ class TankMapCreatorEnhanced {
     }
 
     getAssetDescription(asset) {
-        if (asset.health) return `Health: ${asset.health}`;
+        if (asset.lootbox) return `Lootbox: ${asset.lootbox}`;
         if (asset.effect) return asset.effect;
         if (asset.armor) return `Armor: ${asset.armor} | Damage: ${asset.damage}`;
         return asset.type || 'Asset';
@@ -508,10 +508,36 @@ class TankMapCreatorEnhanced {
 
     handleCanvasClick(x, y) {
         if (this.currentTool === 'select') {
-            this.selectObjectAt(x, y);
+            // If we have a selected asset (like a building), place it instead of selecting
+            if (this.selectedAsset) {
+                this.placeAsset(x, y);
+            } else {
+                this.selectObjectAt(x, y);
+            }
         } else if (this.currentTool === 'paint' && this.selectedAsset) {
             this.placeAsset(x, y);
         }
+    }
+
+    selectObjectAt(x, y) {
+        // Find object at position
+        const clickedObject = this.placedObjects.find(obj => {
+            const dx = obj.x - x;
+            const dy = obj.y - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < 20; // 20 pixel hit radius
+        });
+
+        if (clickedObject) {
+            this.selectedAsset = clickedObject.asset;
+            this.updatePropertiesPanel();
+            console.log('Selected object:', clickedObject.asset.name);
+        } else {
+            this.selectedAsset = null;
+            this.updatePropertiesPanel();
+        }
+
+        this.render();
     }
 
     placeAsset(x, y) {
@@ -592,13 +618,53 @@ class TankMapCreatorEnhanced {
         ctx.restore();
     }
 
+    updateToolbar() {
+        // Update toolbar button states
+        const buttons = document.querySelectorAll('#enhancedMapCreator button');
+        buttons.forEach(button => {
+            if (button.textContent.includes(this.currentTool)) {
+                button.style.background = '#00f7ff';
+                button.style.borderColor = '#00f7ff';
+                button.style.color = '#000';
+            } else {
+                button.style.background = 'rgba(255,255,255,0.1)';
+                button.style.borderColor = 'rgba(255,255,255,0.2)';
+                button.style.color = '#fff';
+            }
+        });
+    }
+
+    handleCanvasPaint(x, y) {
+        // Continuous painting for terrain
+        if (this.selectedAsset && this.selectedAsset.category.name === 'TERRAIN') {
+            this.placeAsset(x, y);
+        }
+    }
+
+    updateCursor(x, y) {
+        const canvas = document.getElementById('tankMapCanvas');
+        if (!canvas) return;
+
+        if (this.selectedAsset) {
+            canvas.style.cursor = 'crosshair';
+        } else {
+            canvas.style.cursor = 'default';
+        }
+    }
+
+    handleZoom(delta) {
+        this.camera.zoom = Math.max(0.1, Math.min(3, this.camera.zoom + delta));
+        document.getElementById('zoomLevel').textContent = Math.round(this.camera.zoom * 100) + '%';
+        this.render();
+    }
+
     init() {
         const ui = this.createEnhancedUI();
         document.body.appendChild(ui);
-        
+
         // Show terrain category by default
         this.showCategory('terrain');
-        
+
         // Start rendering
         this.render();
     }
