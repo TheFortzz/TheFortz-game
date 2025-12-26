@@ -1278,11 +1278,19 @@ function closeFriendsModal() {
 }
 
 function openGameModeModal() {
-    openModal('gameModeModal');
+    if (window.openMapBrowserModal) {
+        window.openMapBrowserModal();
+    } else {
+        console.log('Map Browser Modal not loaded yet');
+    }
 }
 
 function closeGameModeModal() {
-    closeModal('gameModeModal');
+    if (window.closeMapBrowserModal) {
+        window.closeMapBrowserModal();
+    } else {
+        console.log('Map Browser Modal not loaded yet');
+    }
 }
 
 // Event Listeners for buttons and inputs
@@ -2554,5 +2562,61 @@ window.saveAIBotConfig = saveAIBotConfig;
 window.deleteAIBot = deleteAIBot;
 window.saveMap = saveMap;
 window.testMap = testMap;
+
+// ===== TEAM MODE FUNCTIONS =====
+
+/**
+ * Toggle team mode dropdown
+ */
+function toggleTeamModeDropdown() {
+    console.log('🔽 Toggle team mode dropdown');
+
+    const dropdown = document.getElementById('teamModeDropdown');
+    if (dropdown) {
+        const isHidden = dropdown.classList.contains('hidden');
+        if (isHidden) {
+            dropdown.classList.remove('hidden');
+            console.log('✅ Team mode dropdown shown');
+        } else {
+            dropdown.classList.add('hidden');
+            console.log('✅ Team mode dropdown hidden');
+        }
+    } else {
+        console.error('❌ Team mode dropdown not found');
+    }
+}
+
+/**
+ * Select team mode
+ */
+function selectTeamMode(mode) {
+    console.log(`👥 Selecting team mode: ${mode}`);
+
+    // Update the button text
+    const teamModeText = document.getElementById('teamModeText');
+    if (teamModeText) {
+        teamModeText.textContent = mode.toUpperCase();
+    }
+
+    // Hide the dropdown
+    const dropdown = document.getElementById('teamModeDropdown');
+    if (dropdown) {
+        dropdown.classList.add('hidden');
+    }
+
+    // Update game state if available
+    if (window.gameState) {
+        window.gameState.selectedTeamMode = mode;
+    }
+
+    // Show notification
+    showNotification(`Team mode set to ${mode.toUpperCase()}`, '#00d4ff');
+
+    console.log(`✅ Team mode set to ${mode}`);
+}
+
+// Export team mode functions
+window.toggleTeamModeDropdown = toggleTeamModeDropdown;
+window.selectTeamMode = selectTeamMode;
 
 console.log('✅ All missing onclick functions have been implemented!');

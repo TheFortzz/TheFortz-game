@@ -169,27 +169,18 @@ class LobbyUI {
       // Update last frame time for smooth animation
       lastFrameTime = currentTime;
 
-      // Check if DOM map is active - if so, don't render anything on canvas
-      const domMapContainer = document.getElementById('lobbyMapContainer');
-      const isDomMapActive = domMapContainer && domMapContainer.children.length > 0;
-      
-      // If DOM map is active, don't render canvas background at all
-      if (isDomMapActive) {
-        return;
-      }
-
-      // Clear with darker background (only when DOM map is not active)
+      // Clear with darker background
       ctx.fillStyle = '#05080a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Static camera for stable background
       cameraX = 0;
       cameraY = 0;
-      
-      // Render created map or tank-themed fallback (only if DOM map is not active)
-      if (!isDomMapActive && window.MapRenderer && window.MapRenderer.currentMap) {
+
+      // Render created map or tank-themed fallback
+      if (window.MapRenderer && window.MapRenderer.currentMap) {
         window.MapRenderer.renderLobbyPreview(ctx, canvas);
-      } else if (!isDomMapActive) {
+      } else {
         // Tank-themed animated background
         const vehicleType = window.currentLobbyVehicleType || 'tank';
 
@@ -1141,10 +1132,26 @@ if (typeof window !== 'undefined') {
     }
   };
 
-  // Team mode dropdown (placeholder)
+  // Team mode dropdown
   window.toggleTeamModeDropdown = () => {
     console.log('Toggle team mode dropdown');
-    // TODO: Implement team mode dropdown
+    const dropdown = document.getElementById('teamModeDropdown');
+    if (dropdown) {
+      const isHidden = dropdown.classList.contains('hidden');
+      console.log('Dropdown currently hidden:', isHidden);
+
+      if (isHidden) {
+        dropdown.classList.remove('hidden');
+        dropdown.style.display = 'block';
+        console.log('Dropdown shown');
+      } else {
+        dropdown.classList.add('hidden');
+        dropdown.style.display = 'none';
+        console.log('Dropdown hidden');
+      }
+    } else {
+      console.error('Team mode dropdown not found');
+    }
   };
 
   // Debug function for create map issues
@@ -1193,6 +1200,10 @@ if (typeof window !== 'undefined') {
   // Open map selection modal (Battle Royal / Game Mode Modal)
   window.openBattleRoyal = () => {
     console.log('Opening map selection modal');
+    if (window.openMapBrowserModal) {
+      window.openMapBrowserModal();
+      return;
+    }
     const modal = document.getElementById('gameModeModal');
     if (modal) {
       modal.classList.remove('hidden');
@@ -1326,12 +1337,42 @@ if (typeof window !== 'undefined') {
   // Game mode functions
   window.selectTeamMode = (mode) => {
     console.log('Select team mode:', mode);
-    document.querySelectorAll('.team-mode-btn').forEach((btn) => {
-      btn.classList.remove('active');
+
+    // Update button text
+    const teamModeText = document.getElementById('teamModeText');
+    if (teamModeText) {
+      teamModeText.textContent = mode.toUpperCase();
+    }
+
+    // Close dropdown
+    const dropdown = document.getElementById('teamModeDropdown');
+    if (dropdown) {
+      dropdown.classList.add('hidden');
+      dropdown.style.display = 'none';
+    }
+
+    // Update active state of options
+    document.querySelectorAll('.team-mode-option').forEach((option) => {
+      option.classList.remove('selected');
     });
-    document.querySelector(`[onclick*="${mode}"]`)?.classList.add('active');
-    // TODO: Update game mode
+    document.querySelector(`[onclick*="selectTeamMode('${mode}')"]`)?.classList.add('selected');
+
+    // TODO: Update game mode logic
   };
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (event) => {
+    const dropdown = document.getElementById('teamModeDropdown');
+    const soloBtn = document.getElementById('soloBtn');
+
+    if (dropdown && soloBtn && !dropdown.classList.contains('hidden')) {
+      if (!dropdown.contains(event.target) && !soloBtn.contains(event.target)) {
+        dropdown.classList.add('hidden');
+        dropdown.style.display = 'none';
+        console.log('Dropdown closed by clicking outside');
+      }
+    }
+  });
 
   window.scrollGameModeList = (direction) => {
     console.log('Scroll game mode list:', direction);
@@ -1340,6 +1381,10 @@ if (typeof window !== 'undefined') {
 
   window.closeGameModeModal = () => {
     console.log('Close game mode modal');
+    if (window.closeMapBrowserModal) {
+      window.closeMapBrowserModal();
+      return;
+    }
     const modal = document.getElementById('gameModesScreen');
     if (modal) modal.classList.add('hidden');
   };
@@ -1386,6 +1431,116 @@ if (typeof window !== 'undefined') {
     );
 
     displayMaps(filteredMaps);
+  }
+
+  function showMapInfoBox(map) {
+    // Create map info box overlay
+    const infoBox = document.createElement('div');
+    infoBox.id = 'mapInfoBox';
+    infoBox.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    infoBox.innerHTML = `
+      <div style="
+        background: linear-gradient(135deg, rgba(26, 42, 65, 0.95), rgba(40, 40, 60, 0.95));
+        border: 3px solid rgba(0, 247, 255, 0.6);
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        text-align: center;
+      ">
+        <div style="
+          width: 200px;
+          height: 150px;
+          margin: 0 auto 20px;
+          border-radius: 12px;
+          overflow: hidden;
+          background: linear-gradient(135deg, #0a0e27, #1a1a2e);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 48px;
+        ">
+          ${map.thumbnail ? `<img src="${map.thumbnail}" alt="${map.name}" style="width: 100%; height: 100%; object-fit: cover;">` : '🗺️'}
+        </div>
+
+        <h2 style="color: #00f7ff; margin: 0 0 15px 0; font-size: 28px;">${map.name || 'Untitled Map'}</h2>
+
+        <div style="color: rgba(255,255,255,0.8); margin-bottom: 20px; line-height: 1.6;">
+          <p style="margin: 5px 0;"><strong>👥 Max Players:</strong> ${map.maxPlayers || 10}</p>
+          <p style="margin: 5px 0;"><strong>🎮 Plays:</strong> ${map.plays || 0}</p>
+          <p style="margin: 5px 0;"><strong>⭐ Rating:</strong> ${map.rating || 0}/5</p>
+          ${map.description ? `<p style="margin: 10px 0; font-style: italic;">${map.description}</p>` : ''}
+        </div>
+
+        <div style="display: flex; gap: 15px; justify-content: center;">
+          <button id="selectMapBtn" style="
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            border: 2px solid rgba(0, 212, 255, 0.8);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          ">SELECT MAP</button>
+
+          <button id="cancelMapBtn" style="
+            background: rgba(120, 120, 120, 0.3);
+            border: 2px solid rgba(120, 120, 120, 0.6);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          ">CANCEL</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(infoBox);
+
+    // Add button event listeners
+    document.getElementById('selectMapBtn').onclick = () => {
+      window.selectedCreatedMapId = map.id;
+      console.log('✅ Selected map:', map.name);
+
+      // Highlight selected map
+      document.querySelectorAll('.map-card').forEach((card) => {
+        card.style.borderColor = 'rgba(0, 247, 255, 0.3)';
+      });
+
+      // Close both info box and modal
+      document.body.removeChild(infoBox);
+      closeGameModeModal();
+    };
+
+    document.getElementById('cancelMapBtn').onclick = () => {
+      document.body.removeChild(infoBox);
+    };
+
+    // Close on background click
+    infoBox.onclick = (e) => {
+      if (e.target === infoBox) {
+        document.body.removeChild(infoBox);
+      }
+    };
   }
 
   function displayMaps(maps) {
@@ -1455,21 +1610,9 @@ if (typeof window !== 'undefined') {
         mapCard.style.boxShadow = 'none';
       });
 
-      // Click to select map
+      // Click to show map info box
       mapCard.onclick = () => {
-        window.selectedCreatedMapId = map.id;
-        console.log('✅ Selected map:', map.name);
-
-        // Highlight selected map
-        document.querySelectorAll('.map-card').forEach((card) => {
-          card.style.borderColor = 'rgba(0, 247, 255, 0.3)';
-        });
-        mapCard.style.borderColor = '#00ff00';
-
-        // Close modal after short delay
-        setTimeout(() => {
-          closeGameModeModal();
-        }, 300);
+        showMapInfoBox(map);
       };
 
       mapList.appendChild(mapCard);

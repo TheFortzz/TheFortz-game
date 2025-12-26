@@ -177,11 +177,29 @@ function initializeGame() {
         };
     }
     
-    // Initialize DIRECT weapon angle - completely isolated
+    // Initialize DIRECT weapon angle - calculate from current mouse position immediately
     if (window.WEAPON_ANGLE === undefined) {
-        window.WEAPON_ANGLE = 0; // Start pointing right
-        console.log('🎯 DIRECT weapon angle initialized to 0°');
+        // Calculate initial weapon angle from current mouse position
+        const initialMousePos = window.globalMousePos || {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2
+        };
+
+        // Calculate angle from canvas center to mouse position
+        const centerX = canvas ? canvas.width / 2 : window.innerWidth / 2;
+        const centerY = canvas ? canvas.height / 2 : window.innerHeight / 2;
+        const rect = canvas ? canvas.getBoundingClientRect() : { left: 0, top: 0 };
+
+        const mouseX = initialMousePos.x - rect.left;
+        const mouseY = initialMousePos.y - rect.top;
+        const initialAngle = Math.atan2(mouseY - centerY, mouseX - centerX);
+
+        window.WEAPON_ANGLE = initialAngle;
+        window.WEAPON_ANGLE_INITIALIZED = true; // Mark as properly initialized from mouse
+        console.log(`🎯 DIRECT weapon angle initialized to ${(initialAngle * 180 / Math.PI).toFixed(1)}° (from mouse position)`);
     }
+
+    // Weapon angle will be initialized on first mouse move
     
     // Create local player for testing if no server connection
     if (!gameState.playerId) {
@@ -230,7 +248,16 @@ function initializeGame() {
     
     // Initialize input system
     inputSystem.initialize();
-    
+
+    // Initialize weapon angle immediately based on current mouse position
+    if (inputSystem && typeof inputSystem.initializeWeaponAngle === 'function') {
+        // Small delay to ensure canvas is fully ready
+        setTimeout(() => {
+            inputSystem.initializeWeaponAngle(canvas);
+            console.log('🎯 Weapon angle initialized based on current mouse position during game init');
+        }, 50);
+    }
+
     // Start the classic game loop (like in backup)
     gameLoop();
     
@@ -357,12 +384,75 @@ function updateTankAnimations() {
     
     // WEAPON: Use DIRECT window variable - NO gameState interference!
     if (window.WEAPON_ANGLE !== undefined) {
+        // Check if weapon angle has been properly initialized from mouse position
+        if (!window.WEAPON_ANGLE_INITIALIZED && window.globalMousePos) {
+            // Force initialization if not done yet
+            const canvas = document.getElementById('gameCanvas');
+            if (canvas && inputSystem && typeof inputSystem.initializeWeaponAngle === 'function') {
+                console.log('🔄 Force initializing weapon angle from current mouse position');
+                inputSystem.initializeWeaponAngle(canvas);
+            }
+        }
+
+        // Normal case: weapon angle has been set by mouse movement
         const oldWeaponAngle = player.weaponAngle;
         player.weaponAngle = window.WEAPON_ANGLE; // DIRECT from mouse, no processing
-        
-        // PROTECTION: Make sure weapon angle ONLY changes when mouse moves
+
+        // Debug: Track weapon angle changes (only in development)
         if (oldWeaponAngle !== undefined && Math.abs(oldWeaponAngle - player.weaponAngle) > 0.1) {
-            console.log('⚠️ WEAPON ANGLE CHANGED! From', (oldWeaponAngle * 180 / Math.PI).toFixed(1), '° to', (player.weaponAngle * 180 / Math.PI).toFixed(1), '° - Should only happen on mouse move!');
+            console.debug('Weapon angle updated:', (player.weaponAngle * 180 / Math.PI).toFixed(1), '°');
+        }
+
+        // Optional debug display (can be removed in production)
+        if (window.DEBUG_WEAPON_ANGLE) {
+            if (!window.weaponAngleDebug) {
+                window.weaponAngleDebug = document.createElement('div');
+                Object.assign(window.weaponAngleDebug.style, {
+                    position: 'fixed',
+                    top: '10px',
+                    right: '10px',
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    color: '#00f7ff',
+                    padding: '5px 10px',
+                    borderRadius: '5px',
+                    fontSize: '12px',
+                    fontFamily: 'monospace',
+                    zIndex: '10000'
+                });
+                document.body.appendChild(window.weaponAngleDebug);
+            }
+            const initStatus = window.WEAPON_ANGLE_INITIALIZED ? '✓' : '✗';
+            window.weaponAngleDebug.textContent = `🎯 Weapon: ${(player.weaponAngle * 180 / Math.PI).toFixed(1)}° ${initStatus}`;
+        }
+    } else {
+        // FALLBACK: If weapon angle not set, calculate it from current mouse position
+        const canvas = document.getElementById('gameCanvas');
+        if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Use global mouse position if available, otherwise assume center of canvas
+            const globalMousePos = window.globalMousePos || {
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2
+            };
+
+            const mouseX = globalMousePos.x - rect.left;
+            const mouseY = globalMousePos.y - rect.top;
+            const fallbackAngle = Math.atan2(mouseY - centerY, mouseX - centerX);
+
+            player.weaponAngle = fallbackAngle;
+            window.WEAPON_ANGLE = fallbackAngle; // Also set the global variable
+
+            console.log('🔄 FALLBACK weapon angle calculation:', (fallbackAngle * 180 / Math.PI).toFixed(1), '° (mouse:', mouseX.toFixed(0), ',', mouseY.toFixed(0), ')');
+
+            // Weapon angle will be updated on next mouse move
+        } else {
+            // Emergency fallback: point weapon to the right if no canvas available
+            console.warn('🚨 Weapon angle emergency fallback - pointing right (no canvas)');
+            player.weaponAngle = 0; // Default: point right
+            window.WEAPON_ANGLE = 0;
         }
     }
 }
@@ -446,14 +536,26 @@ function joinGame() {
             }
         }
         
-        // Show game canvas
+        // Show game canvas and initialize weapon tracking
         setTimeout(() => {
             const gameCanvas = document.getElementById('gameCanvas');
             if (gameCanvas) {
                 gameCanvas.style.display = 'block';
+
+                // Ensure input system canvas handlers are set up now that canvas is visible
+                if (inputSystem && typeof inputSystem.setupInputHandlers === 'function') {
+                    inputSystem.setupInputHandlers();
+                    console.log('🎮 Input handlers re-setup after canvas visibility');
+                }
+
+                // Initialize weapon angle immediately based on current mouse position
+                if (inputSystem && typeof inputSystem.initializeWeaponAngle === 'function') {
+                    inputSystem.initializeWeaponAngle(gameCanvas);
+                    console.log('🎯 Weapon angle initialized based on current mouse position');
+                }
             }
         }, 100);
-        
+
         initializeGame();
         
         console.log('✅ Game joined successfully');
@@ -1157,6 +1259,10 @@ function declineFriendRequest(requestId) {
  */
 function closeGameModeModal() {
     console.log('❌ Closing game mode modal');
+    if (window.closeMapBrowserModal) {
+        window.closeMapBrowserModal();
+        return;
+    }
     
     const modal = document.querySelector('.game-mode-modal');
     if (modal) {
@@ -1182,35 +1288,76 @@ function scrollGameModeList(direction) {
 
 function toggleTeamModeDropdown() {
     console.log('🔽 Toggling team mode dropdown');
-    
+
     const dropdown = document.querySelector('.team-mode-dropdown');
     if (dropdown) {
-        const isVisible = dropdown.style.display === 'block';
-        dropdown.style.display = isVisible ? 'none' : 'block';
+        const isVisible = !dropdown.classList.contains('hidden');
+        if (isVisible) {
+            dropdown.classList.add('hidden');
+        } else {
+            dropdown.classList.remove('hidden');
+            // Initialize selected option if not already done
+            if (!dropdown.querySelector('.team-mode-option.selected')) {
+                const soloOption = dropdown.querySelector('.team-mode-option');
+                if (soloOption && soloOption.textContent.toLowerCase() === 'solo') {
+                    soloOption.classList.add('selected');
+                }
+            }
+        }
     }
 }
 
 function selectTeamMode(mode) {
     console.log(`👥 Team mode selected: ${mode}`);
-    
+
     // Update game state
     if (gameState) {
         gameState.teamMode = mode;
     }
-    
+
     // Update UI
-    const modeDisplay = document.querySelector('.selected-team-mode');
+    const modeDisplay = document.getElementById('teamModeText');
     if (modeDisplay) {
-        modeDisplay.textContent = mode;
+        modeDisplay.textContent = mode.toUpperCase();
     }
-    
+
+    // Update selected option in dropdown
+    const options = document.querySelectorAll('.team-mode-option');
+    options.forEach(option => {
+        option.classList.remove('selected');
+        if (option.textContent.toLowerCase() === mode.toLowerCase()) {
+            option.classList.add('selected');
+        }
+    });
+
     // Hide dropdown
     toggleTeamModeDropdown();
 }
 
 function openBattleRoyal() {
-    console.log('👑 Opening Battle Royal mode');
-    alert('Battle Royal mode coming soon! This will be an epic multiplayer experience.');
+    console.log('👑 Opening Battle Royal mode - showing map selection modal');
+    if (window.openMapBrowserModal) {
+        window.openMapBrowserModal();
+        return;
+    }
+
+    // Show the game mode modal for map selection
+    const modal = document.getElementById('gameModeModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex'; // Ensure it's visible
+        console.log('✅ Game mode modal shown');
+
+        // Populate the modal with available maps
+        if (typeof window.populateGameModeList === 'function') {
+            window.populateGameModeList();
+            console.log('✅ Map list populated');
+        } else {
+            console.warn('⚠️ populateGameModeList function not available');
+        }
+    } else {
+        console.error('❌ Game mode modal not found');
+    }
 }
 
 // Make functions globally available for HTML event handlers

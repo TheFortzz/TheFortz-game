@@ -29,9 +29,45 @@ class InputSystem {
    * Initialize input system
    */
   initialize() {
+    // Set up global mouse position tracking immediately
+    this.setupGlobalMouseTracking();
+
     this.setupInputHandlers();
     this.initialized = true;
     console.log('🎮 InputSystem initialized');
+  }
+
+  /**
+   * Setup global mouse position tracking
+   */
+  setupGlobalMouseTracking() {
+    if (!window.globalMousePos) {
+      // Initialize to current mouse position if available, otherwise center of screen
+      const currentMouseEvent = window.currentMouseEvent;
+      if (currentMouseEvent) {
+        window.globalMousePos = { x: currentMouseEvent.clientX, y: currentMouseEvent.clientY };
+        console.log('🖱️ Global mouse tracking initialized with current mouse position');
+      } else {
+        window.globalMousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        console.log('🖱️ Global mouse tracking initialized to center of screen');
+      }
+
+      // Track mouse globally for weapon angle calculations
+      const mouseMoveHandler = (e) => {
+        window.globalMousePos = { x: e.clientX, y: e.clientY };
+        // Store the current event for initialization
+        window.currentMouseEvent = e;
+      };
+
+      document.addEventListener('mousemove', mouseMoveHandler);
+
+      // Store reference for cleanup
+      this.listeners.push({
+        element: document,
+        event: 'mousemove',
+        handler: mouseMoveHandler
+      });
+    }
   }
 
   /**
@@ -89,7 +125,7 @@ class InputSystem {
     const mousedownHandler = (e) => this.handleCanvasMouseDown(e, canvas);
 
     canvas.addEventListener('wheel', wheelHandler, { passive: false });
-    canvas.addEventListener('mousemove', mousemoveHandler);
+    document.addEventListener('mousemove', mousemoveHandler);
     canvas.addEventListener('mousedown', mousedownHandler);
 
     // Setup lobby canvas handlers
@@ -98,26 +134,28 @@ class InputSystem {
     // Store references for cleanup
     this.listeners.push(
       { element: canvas, event: 'wheel', handler: wheelHandler },
-      { element: canvas, event: 'mousemove', handler: mousemoveHandler },
+      { element: document, event: 'mousemove', handler: mousemoveHandler },
       { element: canvas, event: 'mousedown', handler: mousedownHandler }
     );
 
-    // Ensure weapon angle is initialized immediately (use last known gameState mouse or canvas center)
-    try {
-      const gs = window.gameState || null;
+    // Weapon angle is now initialized properly in game.js - don't override it here
+    // It will be updated on mouse move through handleCanvasMouseMove
+    if (window.WEAPON_ANGLE === undefined) {
+      // Fallback only if somehow not initialized - calculate from current mouse position
+      const globalMousePos = window.globalMousePos || {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+      };
       const rect = canvas.getBoundingClientRect();
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
+      const mouseX = globalMousePos.x - rect.left;
+      const mouseY = globalMousePos.y - rect.top;
+      const fallbackAngle = Math.atan2(mouseY - centerY, mouseX - centerX);
 
-      const initMouseX = gs && gs.mouse && typeof gs.mouse.x === 'number' ? gs.mouse.x : centerX;
-      const initMouseY = gs && gs.mouse && typeof gs.mouse.y === 'number' ? gs.mouse.y : centerY;
-
-      const initialAngle = Math.atan2(initMouseY - centerY, initMouseX - centerX);
-      window.WEAPON_ANGLE = initialAngle;
-      window.MOUSE_POS = { x: initMouseX, y: initMouseY };
-      console.log('🎯 Initial WEAPON_ANGLE set to', (initialAngle * 180 / Math.PI).toFixed(1), '°');
-    } catch (e) {
-      // non-fatal
+      window.WEAPON_ANGLE = fallbackAngle;
+      window.WEAPON_ANGLE_INITIALIZED = true;
+      console.log(`🎯 WEAPON_ANGLE fallback initialized to ${(fallbackAngle * 180 / Math.PI).toFixed(1)}° from mouse position`);
     }
   }
 
@@ -371,7 +409,10 @@ class InputSystem {
    * @param {HTMLCanvasElement} canvas - Game canvas
    */
   handleCanvasMouseMove(e, canvas) {
+    // Get canvas bounds - CRITICAL for accurate mouse tracking
     const rect = canvas.getBoundingClientRect();
+
+    // Calculate mouse position relative to canvas
     this.mouse.x = e.clientX - rect.left;
     this.mouse.y = e.clientY - rect.top;
 
@@ -379,14 +420,64 @@ class InputSystem {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const weaponAngle = Math.atan2(this.mouse.y - centerY, this.mouse.x - centerX);
-    
+
     // Store DIRECTLY on window for immediate access - BYPASS ALL OTHER SYSTEMS
     window.WEAPON_ANGLE = weaponAngle;
-    
+    window.WEAPON_ANGLE_INITIALIZED = true; // Mark as properly initialized
+
     // Also store mouse position for debugging
     window.MOUSE_POS = { x: this.mouse.x, y: this.mouse.y };
-    
-    console.log('🎯 WEAPON SET:', (weaponAngle * 180 / Math.PI).toFixed(1), '° | Mouse:', this.mouse.x.toFixed(0), ',', this.mouse.y.toFixed(0));
+
+    // Debug logging (only in development)
+    if (window.DEBUG_MOUSE_TRACKING) {
+        console.debug(`Mouse: (${this.mouse.x.toFixed(0)}, ${this.mouse.y.toFixed(0)}) -> Weapon: ${(weaponAngle * 180 / Math.PI).toFixed(1)}°`);
+    }
+
+    // Update global mouse position for initialization consistency
+    if (window.globalMousePos) {
+      window.globalMousePos.x = e.clientX;
+      window.globalMousePos.y = e.clientY;
+    }
+  }
+
+  /**
+   * Initialize weapon angle based on current mouse position
+   * Ensures weapon follows mouse immediately when game starts
+   * @param {HTMLCanvasElement} canvas - Game canvas
+   */
+  initializeWeaponAngle(canvas) {
+    if (!canvas) {
+      console.warn('Cannot initialize weapon angle: canvas not available');
+      return;
+    }
+
+    // Get current global mouse position, fallback to center of screen
+    const globalMousePos = window.globalMousePos || {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2
+    };
+
+    const rect = canvas.getBoundingClientRect();
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    // Calculate mouse position relative to canvas (same as handleCanvasMouseMove)
+    const mouseX = globalMousePos.x - rect.left;
+    const mouseY = globalMousePos.y - rect.top;
+
+    // Calculate weapon angle from canvas center to mouse position
+    const weaponAngle = Math.atan2(mouseY - centerY, mouseX - centerX);
+
+    // Update global weapon angle
+    window.WEAPON_ANGLE = weaponAngle;
+    window.WEAPON_ANGLE_INITIALIZED = true; // Mark as properly initialized
+
+    // Also update internal mouse state for consistency
+    this.mouse.x = mouseX;
+    this.mouse.y = mouseY;
+    this.mouse.angle = weaponAngle;
+
+    console.log(`🎯 Weapon angle initialized: ${(weaponAngle * 180 / Math.PI).toFixed(1)}° (mouse: ${mouseX.toFixed(0)}, ${mouseY.toFixed(0)})`);
   }
   
   /**

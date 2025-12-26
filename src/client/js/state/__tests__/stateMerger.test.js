@@ -223,16 +223,19 @@ describe('StateMerger', () => {
           gameStateArb,
           timestampArb,
           (localState, serverState, timestamp) => {
+            // Reset merger to ensure clean state
+            merger.resetTimestamps();
+
             // Initial timestamp should be 0
             expect(merger.getLastTimestamp()).toBe(0);
-            
+
             // Process update
             const result = merger.merge(localState, serverState, timestamp);
             expect(result.success).toBe(true);
-            
+
             // PROPERTY: Last timestamp should be updated
             expect(merger.getLastTimestamp()).toBe(timestamp);
-            
+
             return true;
           }
         ),
@@ -259,15 +262,18 @@ describe('StateMerger', () => {
             timestamp: timestampArb,
           }),
           (testData) => {
+            // Reset merger to ensure clean state
+            merger.resetTimestamps();
+
             // Skip if health values are the same (no conflict)
             if (testData.localHealth === testData.serverHealth) {
               return true;
             }
-            
+
             // Create conflicting states
             const localState = createDefaultGameState();
             const serverState = createDefaultGameState();
-            
+
             // Add conflicting player data
             const player = {
               id: testData.playerId,
@@ -277,23 +283,23 @@ describe('StateMerger', () => {
               maxHealth: 100,
               lastUpdate: testData.timestamp - 1000,
             };
-            
+
             localState.players.byId[testData.playerId] = { ...player, health: testData.localHealth };
             localState.players.allIds = [testData.playerId];
-            
+
             serverState.players.byId[testData.playerId] = { ...player, health: testData.serverHealth };
             serverState.players.allIds = [testData.playerId];
-            
+
             // Merge states
             const result = merger.merge(localState, serverState, testData.timestamp);
-            
+
             expect(result.success).toBe(true);
             expect(result.conflicts.length).toBeGreaterThan(0);
-            
+
             // PROPERTY: Server health should win
             const mergedPlayer = result.mergedState.players.byId[testData.playerId];
             expect(mergedPlayer.health).toBe(testData.serverHealth);
-            
+
             return true;
           }
         ),
@@ -310,26 +316,29 @@ describe('StateMerger', () => {
             timestamp: timestampArb,
           }),
           (testData) => {
+            // Reset merger to ensure clean state
+            merger.resetTimestamps();
+
             // Skip if volumes are the same
             if (Math.abs(testData.localVolume - testData.serverVolume) < 0.01) {
               return true;
             }
-            
+
             // Create conflicting settings
             const localState = createDefaultGameState();
             const serverState = createDefaultGameState();
-            
+
             localState.settings.sound.masterVolume = testData.localVolume;
             serverState.settings.sound.masterVolume = testData.serverVolume;
-            
+
             // Merge states
             const result = merger.merge(localState, serverState, testData.timestamp);
-            
+
             expect(result.success).toBe(true);
-            
+
             // PROPERTY: Local settings should be preserved
             expect(result.mergedState.settings.sound.masterVolume).toBe(testData.localVolume);
-            
+
             return true;
           }
         ),
@@ -344,22 +353,25 @@ describe('StateMerger', () => {
           gameStateArb,
           timestampArb,
           (localState, serverState, timestamp) => {
+            // Reset merger to ensure clean state
+            merger.resetTimestamps();
+
             const result = merger.merge(localState, serverState, timestamp);
-            
+
             expect(result.success).toBe(true);
             expect(Array.isArray(result.conflicts)).toBe(true);
-            
+
             // PROPERTY: If states are identical, no conflicts should be detected
             if (deepEqual(localState, serverState)) {
               expect(result.conflicts.length).toBe(0);
             }
-            
+
             // PROPERTY: Each conflict should have required properties
             result.conflicts.forEach(conflict => {
               expect(conflict.type).toBeTruthy();
               expect(typeof conflict.type).toBe('string');
             });
-            
+
             return true;
           }
         ),

@@ -18,18 +18,15 @@
     <link rel="stylesheet" href="/styles/edit-button.css">
     <link rel="stylesheet" href="/styles/map-creator-buttons.css">
     <link rel="stylesheet" href="/styles/map-editor.css">
+    <link rel="stylesheet" href="map-browser-modal.css">
 
     <!-- CrazyGames SDK v2 -->
     <script src="https://sdk.crazygames.com/crazygames-sdk-v2.js"></script>
 
     <!-- Enhanced Game Systems -->
-    <script src="/js/advanced-graphics.js"></script>
-    <script src="/js/enhanced-audio.js"></script>
-    <script src="/js/ai-opponents.js"></script>
-    <script src="/js/dynamic-weather.js"></script>
-    <script src="/js/power-up-system.js"></script>
-    <script src="/js/tournament-system.js"></script>
-    <script src="/js/map-renderer.js"></script>
+        <script src="/js/enhanced-audio.js"></script>
+            <script src="/js/power-up-system.js"></script>
+        <script src="/js/map-renderer.js"></script>
     <script src="/js/game-integration.js"></script>
 
     <!-- Core Config (MUST load first) -->
@@ -45,11 +42,9 @@
     <script src="/js/game/main.js"></script>
 
     <!-- Game State Utilities -->
-    <script src="/js/utils/GameStateValidator.js"></script>
-    
+        
     <!-- Function Connection Checker -->
-    <script src="/js/utils/missing-functions-finder.js"></script>
-
+    
     <!-- Shop functionality replaced with Coming Soon message -->
     
 
@@ -1360,43 +1355,121 @@
             <div id="gameModesScreen" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 10000; display: flex; align-items: center; justify-content: center;">
                 <div style="background: rgba(0, 0, 0, 0.8); padding: 40px; border-radius: 10px; max-width: 600px; width: 90%;">
                     <h2 style="color: white; text-align: center; margin-bottom: 30px;">Select Game Mode</h2>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                        <button onclick="selectGameMode('battle-royale')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Battle Royale</button>
-                        <button onclick="selectGameMode('team-deathmatch')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Team Deathmatch</button>
-                        <button onclick="selectGameMode('free-for-all')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Free For All</button>
-                        <button onclick="selectGameMode('capture-flag')" style="padding: 20px; background: #00f7ff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Capture The Flag</button>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                        <!-- Legacy game mode buttons removed per request -->
                     </div>
                     <button onclick="closeGameModesScreen()" style="margin-top: 20px; padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%;">Cancel</button>
                 </div>
             </div>
 
-            <!-- Game Mode Modal -->
-            <div id="gameModeModal" class="game-mode-modal hidden">
-                <div class="game-mode-header">
-                    <div class="container">
-                        <div class="search-container">
-                            <input id="gameModeSearch" class="input" type="text" placeholder="Search maps...">
-                            <svg viewBox="0 0 24 24" class="search__icon">
-                                <g>
-                                    <path
-                                        d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
-                                    </path>
-                                </g>
-                            </svg>
+            <!-- Map Browser Modal -->
+            <div class="modal-overlay" id="mapBrowserModalOverlay">
+                <div class="modal-container" id="mapBrowserModal">
+                    <!-- Browse Mode -->
+                    <div class="browse-mode" id="browseMode">
+                        <!-- Header with Search -->
+                        <div class="modal-header">
+                            <h2 class="modal-title">
+                                <i class="fas fa-map"></i> Map Browser
+                            </h2>
+                            
+                            <!-- Search Box -->
+                            <div class="search-container">
+                                <input
+                                    type="text"
+                                    id="searchInput"
+                                    placeholder="Search maps..."
+                                    class="search-input"
+                                />
+                                <button class="search-button" id="searchButton">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                         </div>
-                        <!-- Filter removed - only showing created maps now -->
+
+                        <!-- Scroll Container -->
+                        <div class="scroll-container">
+                            <!-- Left Scroll Button -->
+                            <button class="scroll-button scroll-left" id="scrollLeftBtn">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+
+                            <!-- Right Scroll Button -->
+                            <button class="scroll-button scroll-right" id="scrollRightBtn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+
+                            <!-- Horizontal Scrolling Maps -->
+                            <div class="maps-container" id="mapsContainer">
+                                <div class="maps-grid" id="mapsGrid">
+                                    <!-- Map cards will be populated here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button class="game-mode-close" onclick="closeGameModeModal()">×</button>
+
+                    <!-- Detail Mode -->
+                    <div class="detail-mode hidden" id="detailMode">
+                        <!-- Back Button -->
+                        <button class="back-button" id="backButton">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Back to Maps</span>
+                        </button>
+
+                        <div class="detail-content">
+                            <!-- Left Side - Image -->
+                            <div class="detail-image-container">
+                                <div class="image-wrapper">
+                                    <img id="detailMapImage" class="detail-map-image" alt="Map preview" />
+                                </div>
+                            </div>
+
+                            <!-- Right Side - Details -->
+                            <div class="detail-info">
+                                <!-- Map Title -->
+                                <h2 class="detail-title" id="detailMapName">
+                                    Map Name
+                                </h2>
+
+                                <!-- Stats -->
+                                <div class="detail-stats">
+                                    <div class="stat-item">
+                                        <i class="fas fa-users"></i>
+                                        <span id="detailOnlineCount">0</span>
+                                        <span>Online</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Made by:</span>
+                                        <span id="detailCreator">Creator</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Ranking:</span>
+                                        <span id="detailRanking">Top 1</span>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="detail-description">
+                                    <h3>Description</h3>
+                                    <p id="detailMapDescription">
+                                        Map description goes here...
+                                    </p>
+                                </div>
+
+                                <!-- Play Button -->
+                                <button class="play-button" id="playButton">
+                                    <i class="fas fa-play"></i>
+                                    Play Map
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Close Button -->
+                    <button class="close-button" id="closeButton">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button class="scroll-button scroll-left" onclick="scrollGameModeList('left')">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="game-mode-list" id="gameModeList">
-                    <!-- Maps will be populated here -->
-                </div>
-                <button class="scroll-button scroll-right" onclick="scrollGameModeList('right')">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
             </div>
 
             <!-- Game Join Controls -->
@@ -1729,6 +1802,7 @@
         console.log('✅ UI modules loaded and exposed globally');
     </script>
     <script type="module" src="/js/game.js?v=12"></script>
+    <script src="map-browser-modal.js"></script>
 </body>
 
 </html>

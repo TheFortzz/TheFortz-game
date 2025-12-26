@@ -41,39 +41,42 @@ Object.defineProperty(global, 'localStorage', {
 // ARBITRARIES
 // ============================================================================
 
-// Settings slice arbitrary
+// Settings slice arbitrary (matches actual default structure)
 const settingsSliceArb = fc.record({
   sound: fc.record({
-    masterVolume: fc.float({ min: 0, max: 1 }),
-    musicVolume: fc.float({ min: 0, max: 1 }),
-    sfxVolume: fc.float({ min: 0, max: 1 }),
-    muted: fc.boolean(),
+    master: fc.float({ min: 0, max: 1 }),
+    effects: fc.float({ min: 0, max: 1 }),
+    music: fc.float({ min: 0, max: 1 }),
   }),
   graphics: fc.record({
     quality: fc.constantFrom('low', 'medium', 'high'),
     particles: fc.boolean(),
     shadows: fc.boolean(),
-    antialiasing: fc.boolean(),
   }),
   controls: fc.record({
-    mouseInvert: fc.boolean(),
-    mouseSensitivity: fc.integer({ min: 1, max: 20 }).map(x => x / 10), // 0.1 to 2.0 in 0.1 increments
+    moveUp: fc.constant('KeyW'),
+    moveDown: fc.constant('KeyS'),
+    moveLeft: fc.constant('KeyA'),
+    moveRight: fc.constant('KeyD'),
+    fire: fc.constant('Mouse0'),
+    reload: fc.constant('KeyR'),
+    pause: fc.constant('Escape'),
   }),
 });
 
-// Progression slice arbitrary
+// Progression slice arbitrary (matches actual default structure)
 const progressionSliceArb = fc.record({
   currency: fc.integer({ min: 0, max: 1000000 }),
-  experience: fc.integer({ min: 0, max: 1000000 }),
-  level: fc.integer({ min: 1, max: 100 }),
-  unlockedTanks: fc.array(fc.string({ minLength: 1 }), { minLength: 0, maxLength: 10 }),
-  unlockedWeapons: fc.array(fc.string({ minLength: 1 }), { minLength: 0, maxLength: 10 }),
+  ownedItems: fc.record({
+    colors: fc.array(fc.string({ minLength: 1 }), { minLength: 1, maxLength: 10 }),
+    bodies: fc.array(fc.string({ minLength: 1 }), { minLength: 1, maxLength: 10 }),
+    weapons: fc.array(fc.string({ minLength: 1 }), { minLength: 1, maxLength: 10 }),
+  }),
   achievements: fc.array(fc.string({ minLength: 1 }), { minLength: 0, maxLength: 20 }),
-  statistics: fc.record({
+  stats: fc.record({
+    kills: fc.integer({ min: 0, max: 100000 }),
+    deaths: fc.integer({ min: 0, max: 100000 }),
     gamesPlayed: fc.integer({ min: 0, max: 10000 }),
-    gamesWon: fc.integer({ min: 0, max: 10000 }),
-    totalKills: fc.integer({ min: 0, max: 100000 }),
-    totalDeaths: fc.integer({ min: 0, max: 100000 }),
   }),
 });
 
@@ -137,12 +140,17 @@ describe('StatePersister', () => {
             
             const loadedState = loadResult.state;
             
-            // PROPERTY: Persistent slices should be equivalent
+            // PROPERTY: Persistent data should be correctly restored
+            // Check that all properties from the original persistent slices are preserved
             for (const sliceName of PERSISTENT_SLICES) {
-              if (!deepEqual(originalState[sliceName], loadedState[sliceName])) {
+              const originalSlice = originalState[sliceName];
+              const loadedSlice = loadedState[sliceName];
+
+              // Deep compare the slices (they should be equivalent after merge with defaults)
+              if (!deepEqual(originalSlice, loadedSlice)) {
                 console.log(`Mismatch in slice ${sliceName}:`);
-                console.log('Original:', JSON.stringify(originalState[sliceName], null, 2));
-                console.log('Loaded:', JSON.stringify(loadedState[sliceName], null, 2));
+                console.log('Original:', JSON.stringify(originalSlice, null, 2));
+                console.log('Loaded:', JSON.stringify(loadedSlice, null, 2));
                 return false;
               }
             }
