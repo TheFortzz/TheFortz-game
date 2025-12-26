@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/styles/index.css?v=10">
     <link rel="stylesheet" href="/styles/ui-buttons.css">
@@ -797,91 +798,89 @@
             <!-- Champions Screen -->
             <div id="championsScreen" class="feature-screen hidden">
                 <button class="feature-close-btn" onclick="closeAllPanels()">×</button>
-                <div class="feature-header">
-                    <h1>CHAMPIONS</h1>
-                    <p>Hall of Fame & Leaderboards</p>
+                
+                <!-- Champions Container -->
+                <div class="champions-container">
+                    <!-- Header -->
+                    <div class="champions-header">
+                        <hr class="champions-divider">
+                        <h1 class="champions-title">Champions</h1>
+                    </div>
+
+                    <!-- Tabs Navigation -->
+                    <div class="champions-tabs">
+                        <button class="champions-tab active" data-tab="creator" onclick="switchChampionsTab('creator')">
+                            <i class="fas fa-star"></i>
+                            <span>Top Creator</span>
+                        </button>
+                        <button class="champions-tab" data-tab="player" onclick="switchChampionsTab('player')">
+                            <i class="fas fa-trophy"></i>
+                            <span>Top Player</span>
+                        </button>
+                        <button class="champions-tab" data-tab="fortz" onclick="switchChampionsTab('fortz')">
+                            <i class="fas fa-bolt"></i>
+                            <span>TopFortz</span>
+                        </button>
+                        <button class="champions-tab" data-tab="prime" onclick="switchChampionsTab('prime')">
+                            <i class="fas fa-crown"></i>
+                            <span>PrimePlayer</span>
+                        </button>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div class="champions-content">
+                        <div class="champions-leaderboard" id="championsLeaderboard">
+                            <!-- Leaderboard entries will be populated here -->
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Horizontal Navigation Buttons -->
-                <div class="champions-nav" style="display: flex; justify-content: center; gap: 15px; margin: 20px auto; max-width: 800px;">
-                    <button class="champions-tab-btn active" onclick="switchChampionsTab('top-players')" id="tabTopPlayers"
-                        style="flex: 1; padding: 15px 25px; background: linear-gradient(180deg, rgba(255,215,0,0.3) 0%, rgba(255,165,0,0.2) 100%); border: 2px solid #FFD700; color: #FFD700; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;">
-                        🏅 Top Players
-                    </button>
-                    <button class="champions-tab-btn" onclick="switchChampionsTab('top-creators')" id="tabTopCreators"
-                        style="flex: 1; padding: 15px 25px; background: rgba(0,247,255,0.1); border: 2px solid rgba(0,247,255,0.5); color: #00f7ff; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;">
-                        🎨 Top Creators
-                    </button>
-                    <button class="champions-tab-btn" onclick="switchChampionsTab('champions')" id="tabChampions"
-                        style="flex: 1; padding: 15px 25px; background: rgba(147,112,219,0.1); border: 2px solid rgba(147,112,219,0.5); color: #9370DB; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;">
-                        🏆 Champions
-                    </button>
-                    <button class="champions-tab-btn" onclick="switchChampionsTab('award')" id="tabAward"
-                        style="flex: 1; padding: 15px 25px; background: rgba(255,105,180,0.1); border: 2px solid rgba(255,105,180,0.5); color: #FF69B4; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;">
-                        🎖️ Award
-                    </button>
-                </div>
+                <!-- Player Profile Modal -->
+                <div id="playerProfileModal" class="player-profile-modal hidden">
+                    <div class="profile-backdrop" onclick="closePlayerProfile()"></div>
+                    <div class="profile-container">
+                        <button class="profile-close-btn" onclick="closePlayerProfile()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        
+                        <div class="profile-content">
+                            <!-- Left: Player Profile -->
+                            <div class="profile-left">
+                                <div class="profile-avatar">
+                                    <div class="avatar-rank" id="profileRank">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                </div>
+                                <h2 class="profile-name" id="profileName">Player Name</h2>
+                                <div class="profile-score">
+                                    <div class="score-value" id="profileScore">0</div>
+                                    <div class="score-label">Total Points</div>
+                                </div>
+                                <button class="add-friend-btn">Add Friend</button>
+                            </div>
 
-                <!-- Tab Content Areas -->
-                <div class="champions-content" style="max-width: 900px; margin: 0 auto; padding: 20px;">
-                    <!-- Top Players Tab -->
-                    <div id="championsTabTopPlayers" class="champions-tab-content" style="display: block;">
-                        <div class="leaderboard-list" id="topPlayersList" style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px;">
-                            <div class="leaderboard-header" style="display: flex; padding: 10px 15px; border-bottom: 2px solid rgba(255,215,0,0.3); margin-bottom: 10px;">
-                                <span style="flex: 0.5; color: #FFD700; font-weight: bold;">#</span>
-                                <span style="flex: 2; color: #FFD700; font-weight: bold;">Player</span>
-                                <span style="flex: 1; color: #FFD700; font-weight: bold; text-align: center;">Wins</span>
-                                <span style="flex: 1; color: #FFD700; font-weight: bold; text-align: center;">K/D</span>
-                                <span style="flex: 1; color: #FFD700; font-weight: bold; text-align: right;">Rating</span>
-                            </div>
-                            <div id="topPlayersListContent" style="max-height: 400px; overflow-y: auto;">
-                                <!-- Players will be loaded dynamically -->
-                                <div style="text-align: center; color: #888; padding: 40px;">Loading top players...</div>
-                            </div>
-                        </div>
-                    </div>
+                            <!-- Right: Stats Categories -->
+                            <div class="profile-right">
+                                <!-- Category Buttons -->
+                                <div class="stats-categories">
+                                    <button class="stats-category active" data-category="eliminations" onclick="switchStatsCategory('eliminations')">
+                                        <i class="fas fa-sword"></i>
+                                        <span>Eliminations</span>
+                                    </button>
+                                    <button class="stats-category" data-category="battletime" onclick="switchStatsCategory('battletime')">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Battle Time</span>
+                                    </button>
+                                    <button class="stats-category" data-category="glory" onclick="switchStatsCategory('glory')">
+                                        <i class="fas fa-award"></i>
+                                        <span>Glory Record</span>
+                                    </button>
+                                </div>
 
-                    <!-- Top Creators Tab -->
-                    <div id="championsTabTopCreators" class="champions-tab-content" style="display: none;">
-                        <div class="leaderboard-list" id="topCreatorsList" style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px;">
-                            <div class="leaderboard-header" style="display: flex; padding: 10px 15px; border-bottom: 2px solid rgba(0,247,255,0.3); margin-bottom: 10px;">
-                                <span style="flex: 0.5; color: #00f7ff; font-weight: bold;">#</span>
-                                <span style="flex: 2; color: #00f7ff; font-weight: bold;">Creator</span>
-                                <span style="flex: 1; color: #00f7ff; font-weight: bold; text-align: center;">Maps</span>
-                                <span style="flex: 1; color: #00f7ff; font-weight: bold; text-align: center;">Plays</span>
-                                <span style="flex: 1; color: #00f7ff; font-weight: bold; text-align: right;">Likes</span>
-                            </div>
-                            <div id="topCreatorsListContent" style="max-height: 400px; overflow-y: auto;">
-                                <!-- Creators will be loaded dynamically -->
-                                <div style="text-align: center; color: #888; padding: 40px;">Loading top creators...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Champions Tab -->
-                    <div id="championsTabChampions" class="champions-tab-content" style="display: none;">
-                        <div class="champions-hall" style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px;">
-                            <div style="text-align: center; margin-bottom: 20px;">
-                                <h2 style="color: #9370DB; margin-bottom: 10px;">🏆 Hall of Champions 🏆</h2>
-                                <p style="color: #888;">Season winners and tournament champions</p>
-                            </div>
-                            <div id="championsHallContent" style="max-height: 400px; overflow-y: auto;">
-                                <!-- Champions will be loaded dynamically -->
-                                <div style="text-align: center; color: #888; padding: 40px;">Loading champions...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Award Tab -->
-                    <div id="championsTabAward" class="champions-tab-content" style="display: none;">
-                        <div class="awards-section" style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px;">
-                            <div style="text-align: center; margin-bottom: 20px;">
-                                <h2 style="color: #FF69B4; margin-bottom: 10px;">🎖️ Special Awards 🎖️</h2>
-                                <p style="color: #888;">Recognition for outstanding achievements</p>
-                            </div>
-                            <div id="awardsContent" style="max-height: 400px; overflow-y: auto;">
-                                <!-- Awards will be loaded dynamically -->
-                                <div style="text-align: center; color: #888; padding: 40px;">Loading awards...</div>
+                                <!-- Stats Display -->
+                                <div class="stats-display" id="statsDisplay">
+                                    <!-- Stats will be populated here -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1419,8 +1418,8 @@
                         <div class="detail-content">
                             <!-- Left Side - Image -->
                             <div class="detail-image-container">
-                                <div class="image-wrapper">
-                                    <img id="detailMapImage" class="detail-map-image" alt="Map preview" />
+                                <div class="detail-canvas-container">
+                                    <canvas id="detailMapCanvas" class="detail-canvas" width="600" height="400"></canvas>
                                 </div>
                             </div>
 
@@ -1803,6 +1802,8 @@
     </script>
     <script type="module" src="/js/game.js?v=12"></script>
     <script src="map-browser-modal.js"></script>
+    <script src="/js/demoMapGenerator.js"></script>
+    <script src="/js/champions.js"></script>
 </body>
 
 </html>

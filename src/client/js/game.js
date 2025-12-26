@@ -1258,15 +1258,19 @@ function declineFriendRequest(requestId) {
  * Game mode functions
  */
 function closeGameModeModal() {
-    console.log('❌ Closing game mode modal');
+    console.log('❌ Closing map browser modal');
     if (window.closeMapBrowserModal) {
         window.closeMapBrowserModal();
         return;
     }
     
-    const modal = document.querySelector('.game-mode-modal');
-    if (modal) {
-        modal.style.display = 'none';
+    const overlay = document.getElementById('mapBrowserModalOverlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.style.display = 'none';
+        console.log('✅ Map browser modal closed');
+    } else {
+        console.warn('⚠️ Map browser modal overlay not found');
     }
 }
 
@@ -1341,12 +1345,14 @@ function openBattleRoyal() {
         return;
     }
 
-    // Show the game mode modal for map selection
-    const modal = document.getElementById('gameModeModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex'; // Ensure it's visible
-        console.log('✅ Game mode modal shown');
+    // Show the map browser modal for map selection
+    const modal = document.getElementById('mapBrowserModal');
+    const overlay = document.getElementById('mapBrowserModalOverlay');
+    
+    if (modal && overlay) {
+        overlay.classList.remove('hidden');
+        overlay.style.display = 'flex'; // Ensure it's visible
+        console.log('✅ Map browser modal shown');
 
         // Populate the modal with available maps
         if (typeof window.populateGameModeList === 'function') {
@@ -1356,7 +1362,7 @@ function openBattleRoyal() {
             console.warn('⚠️ populateGameModeList function not available');
         }
     } else {
-        console.error('❌ Game mode modal not found');
+        console.error('❌ Map browser modal not found');
     }
 }
 

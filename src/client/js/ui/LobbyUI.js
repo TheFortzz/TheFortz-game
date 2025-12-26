@@ -1204,10 +1204,12 @@ if (typeof window !== 'undefined') {
       window.openMapBrowserModal();
       return;
     }
-    const modal = document.getElementById('gameModeModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.style.display = 'block';
+    const modal = document.getElementById('mapBrowserModal');
+    const overlay = document.getElementById('mapBrowserModalOverlay');
+    
+    if (modal && overlay) {
+      overlay.classList.remove('hidden');
+      overlay.style.display = 'flex';
 
       // Load available maps
       if (typeof window.loadAvailableMaps === 'function') {
@@ -1380,13 +1382,16 @@ if (typeof window !== 'undefined') {
   };
 
   window.closeGameModeModal = () => {
-    console.log('Close game mode modal');
+    console.log('Close map browser modal');
     if (window.closeMapBrowserModal) {
       window.closeMapBrowserModal();
       return;
     }
-    const modal = document.getElementById('gameModesScreen');
-    if (modal) modal.classList.add('hidden');
+    const overlay = document.getElementById('mapBrowserModalOverlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      overlay.style.display = 'none';
+    }
   };
 
   window.closeStatsBox = () => {
@@ -1623,10 +1628,12 @@ if (typeof window !== 'undefined') {
   const originalOpenBattleRoyal = window.openBattleRoyal;
   window.openBattleRoyal = () => {
     console.log('Opening map selection modal');
-    const modal = document.getElementById('gameModeModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.style.display = 'block';
+    const modal = document.getElementById('mapBrowserModal');
+    const overlay = document.getElementById('mapBrowserModalOverlay');
+    
+    if (modal && overlay) {
+      overlay.classList.remove('hidden');
+      overlay.style.display = 'flex';
 
       // Load maps
       const STORAGE_KEYS = {

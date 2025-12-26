@@ -39,6 +39,23 @@ app.get('/index.css', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.css'));
 });
 
+// Serve map-browser-modal files from client root
+app.get('/map-browser-modal.js', (req, res) => {
+    res.type('application/javascript');
+    res.sendFile(path.join(__dirname, '../client/map-browser-modal.js'));
+});
+
+app.get('/map-browser-modal.css', (req, res) => {
+    res.type('text/css');
+    res.sendFile(path.join(__dirname, '../client/map-browser-modal.css'));
+});
+
+// Serve champions.js from js directory
+app.get('/js/champions.js', (req, res) => {
+    res.type('application/javascript');
+    res.sendFile(path.join(__dirname, '../client/js/champions.js'));
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.html'));
 });
